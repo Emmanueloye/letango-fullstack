@@ -1,5 +1,5 @@
-import { body } from 'express-validator';
 import { checkForErrors, validateParams } from '../../utils';
+const { body } = require('express-validator');
 
 export const validateSignUp = checkForErrors([
   body('surname').notEmpty().withMessage('Surname field is required.'),

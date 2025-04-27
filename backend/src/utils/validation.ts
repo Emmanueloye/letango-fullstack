@@ -1,7 +1,9 @@
 import * as AppError from '../errors/appError';
 import { NextFunction, Request, Response } from 'express';
-import expressValidator = require('express-validator');
 import { Types } from 'mongoose';
+const { param } = require('express-validator');
+
+// const { body, param, validationResult } = expressValidator;
 
 export const checkForErrors = (validations: any, errType = 400) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -47,8 +49,8 @@ export const checkForErrors = (validations: any, errType = 400) => {
 //   ];
 // };
 
-// export const validateParams = checkForErrors([
-//   param('id')
-//     .custom((value) => Types.ObjectId.isValid(value))
-//     .withMessage('No page found for the requested id'),
-// ]);
+export const validateParams = checkForErrors([
+  param('id')
+    .custom((value: Types.ObjectId) => Types.ObjectId.isValid(value))
+    .withMessage('No page found for the requested id'),
+]);
