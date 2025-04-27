@@ -7,13 +7,17 @@ import VerifyEmail from './pages/auth/VerifyEmail';
 import OTPValidation, {
   action as OTPValidationAction,
 } from './pages/auth/OTPValidation';
+import ResetPasswordLink, {
+  action as forgetPasswordAction,
+} from './pages/auth/ResetPasswordLink';
+import PasswordReset, {
+  action as resetPasswordAction,
+} from './pages/auth/PasswordReset';
 import DashBoardLayout from './layouts/DashBoardLayout';
 import Profile from './pages/auth/Profile';
 import ProfileLayout from './layouts/ProfileLayout';
 import ProfileUpdate from './pages/auth/ProfileUpdate';
 import PasswordUpdate from './pages/auth/PasswordUpdate';
-import ResetPasswordLink from './pages/auth/ResetPasswordLink';
-import PasswordReset from './pages/auth/PasswordReset';
 import Dashboard from './pages/Dashboard';
 import ManageGroup from './pages/userGroupMgt/ManageGroup';
 import CreateGroup from './pages/userGroupMgt/CreateGroup';
@@ -60,8 +64,16 @@ const router = createBrowserRouter([
         action: OTPValidationAction,
       },
       { path: 'verify-email', element: <VerifyEmail /> },
-      { path: 'forget-password', element: <ResetPasswordLink /> },
-      { path: 'reset-password', element: <PasswordReset /> },
+      {
+        path: 'forget-password',
+        element: <ResetPasswordLink />,
+        action: forgetPasswordAction,
+      },
+      {
+        path: 'reset-password',
+        element: <PasswordReset />,
+        action: resetPasswordAction,
+      },
     ],
   },
   {

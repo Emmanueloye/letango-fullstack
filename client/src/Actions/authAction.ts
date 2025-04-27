@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   message: '',
   verifyMessage: '',
+  passwordMessage: '',
 };
 
 const authSlice = createSlice({
@@ -14,6 +15,9 @@ const authSlice = createSlice({
     },
     updateVerificationMsg: (state, action) => {
       state.verifyMessage = action.payload;
+    },
+    passwordResetMsg: (state, action) => {
+      state.passwordMessage = action.payload;
     },
   },
 });

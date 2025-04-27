@@ -6,12 +6,14 @@ import { useAppSelector } from '../../Actions/store';
 
 const LoginForm = ({ error }: { error?: string }) => {
   const { message } = useAppSelector((state) => state.auth);
+  const { passwordMessage } = useAppSelector((state) => state.auth);
   const { state } = useNavigation();
   return (
     <>
       <section className='mt-30'>
         <div className='text-center'>
           {message && <FormError error={message} />}
+          {passwordMessage && <FormError error={passwordMessage} />}
         </div>
         <Form
           method='post'

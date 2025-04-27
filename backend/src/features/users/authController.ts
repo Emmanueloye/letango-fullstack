@@ -273,7 +273,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   // If no user, it's either data is not correct or reset token has expires.
   if (!user) {
     throw new AppError.BadRequest(
-      'Password reset failed due to invalid reset credentials. Please follow the reset link sent to your email.'
+      'Password reset failed due to invalid reset credentials. Please follow the reset link sent to your email or start the process again.'
     );
   }
 
@@ -286,9 +286,10 @@ export const resetPassword = async (req: Request, res: Response) => {
   await user.save();
 
   // Respond to user
-  res
-    .status(statusCodes.OK)
-    .json({ status: 'success', message: 'Password reset successfully.' });
+  res.status(statusCodes.OK).json({
+    status: 'success',
+    message: 'Password reset successfully. Login with your new credentials.',
+  });
 };
 
 // To be updated later

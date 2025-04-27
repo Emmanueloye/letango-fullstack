@@ -29,6 +29,14 @@ const sendProdError = (err: any, res: Response) => {
   }
 };
 
+const handleValidationError = (err: any) => {
+  const msg = Object.values(err.errors)
+    .map((val: any) => val.message)
+    .join(',');
+
+  return new AppError.BadRequest(msg);
+};
+
 /**
  * The middleware handles all application errors. All errors throw within the app goes throught this middleware.
  * @param err the error object thrown by the request
@@ -42,15 +50,12 @@ const globalErrorMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const error = { ...err };
+  let error = { ...err };
 
-  // send error during production
-  if (process.env.NODE_ENV === 'production') {
-    sendProdError(err, res);
-  }
+  if (err.name === 'ValidationError') error = handleValidationError(error);
 
-  // send error during production
-  if (process.env.NODE_ENV === 'development') sendDevError(err, res);
+  sendProdError(error, res);
+  // sendDevError(err, res);
 };
 
 export default globalErrorMiddleware;
