@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import ejs from 'ejs';
 import { convert } from 'html-to-text';
+import path from 'path';
 
 /**
  * * Email class for sending emails using nodemailer with ejs templates.
@@ -32,27 +33,29 @@ class Email {
     });
   }
   private async send(template: string, subject: string, data: any) {
-    ejs.renderFile(
-      `${__dirname}/../view/emails/${template}.ejs`,
-      { ...data },
-      (err, result) => {
-        if (err) {
-          throw err;
-        } else {
-          const mailOptions = {
-            from:
-              process.env.NODE_ENV === 'production'
-                ? process.env.EMAIL_SENDER_PROD
-                : process.env.EMAIL_SENDER_DEV,
-            to: data.email,
-            subject,
-            html: result,
-            text: convert(result),
-          };
-          return this.emailTransporter().sendMail(mailOptions);
-        }
+    // Switch file path depending on production/development
+    const filepath =
+      process.env.NODE_ENV === 'production'
+        ? path.resolve(__dirname, `../../src/view/emails/${template}.ejs`)
+        : path.resolve(__dirname, `../view/emails/${template}.ejs`);
+
+    ejs.renderFile(filepath, { ...data }, (err, result) => {
+      if (err) {
+        throw err;
+      } else {
+        const mailOptions = {
+          from:
+            process.env.NODE_ENV === 'production'
+              ? process.env.EMAIL_SENDER_PROD
+              : process.env.EMAIL_SENDER_DEV,
+          to: data.email,
+          subject,
+          html: result,
+          text: convert(result),
+        };
+        return this.emailTransporter().sendMail(mailOptions);
       }
-    );
+    });
   }
   /**
    * * Sends a verification email to the user with a link to verify their email address.

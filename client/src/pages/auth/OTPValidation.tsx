@@ -19,8 +19,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await extractFormData(request);
   const params = extractParams(request);
 
-  console.log({ ...formData, ...params });
-
   return postData({
     url: '/auth/verify-OTP',
     data: { ...formData, ...params },

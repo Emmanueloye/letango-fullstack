@@ -1,5 +1,5 @@
 // Import packages
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
@@ -73,7 +73,7 @@ app.use(express.static(path.resolve(__dirname, './../../client/dist')));
 app.use('/api/v1/auth', authRouter);
 
 //==================== send the html file for all routes =================//
-app.get('*', (req, res) => {
+app.get('*', (req: Request, res: Response) => {
   res.sendFile(path.resolve(__dirname, './../../client/dist', 'index.html'));
 });
 
