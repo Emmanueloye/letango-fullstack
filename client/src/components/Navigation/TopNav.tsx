@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import SiteMode from './SiteMode';
 import { CiLogout } from 'react-icons/ci';
 import { useState } from 'react';
+import { User } from '../../dtos/UserDto';
 
-const TopNav = () => {
+const TopNav = ({ user, logout }: { user: User; logout: () => void }) => {
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { isSidebarOpen } = useAppSelector((state) => state.ui);
@@ -49,8 +50,8 @@ const TopNav = () => {
               onClick={() => setIsAuthMenuOpen(!isAuthMenuOpen)}
             >
               <span className='mt-1 dark:text-slate-50 authbox'>
-                {`Osunkoya`.charAt(0).toUpperCase()}
-                {`mayowa`.charAt(0).toUpperCase()}
+                {user?.surname.charAt(0).toUpperCase()}
+                {user?.otherNames.split(' ')?.[0]?.charAt(0).toUpperCase()}
               </span>
               <FaAngleDown className='mt-1 dark:text-slate-50 authbox' />
             </div>
@@ -79,7 +80,10 @@ const TopNav = () => {
                 </Link>
               </li>
               <li>
-                <button className='flex items-baseline'>
+                <button
+                  className='flex items-baseline cursor-pointer'
+                  onClick={logout}
+                >
                   <CiLogout />
                   <span className='ml-1'>Logout</span>
                 </button>

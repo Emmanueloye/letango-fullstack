@@ -3,8 +3,9 @@ import { useAppDispatch, useAppSelector } from '../../Actions/store';
 import { dashboardActions } from '../../Actions/DashboardAction';
 import { NavLink } from 'react-router-dom';
 import avater from '../../assets/user-2935527_1280.webp';
+import { User } from '../../dtos/UserDto';
 
-const SideBar = () => {
+const SideBar = ({ user }: { user: User }) => {
   const dispatch = useAppDispatch();
   // Get the sidebar state from store
   const { isSidebarOpen } = useAppSelector((state) => state.ui);
@@ -26,15 +27,17 @@ const SideBar = () => {
       <div className='flex justify-between items-center border-b-2 border-primary-500 dark:border-amber-500 dark:bg-slate-700 bg-green-200 px-2'>
         <div className='flex item-center py-2.5 px-4 text-primary-500 dark:text-slate-50 '>
           <img
-            src={avater}
+            src={user?.photo || avater}
             alt='User image'
             width={40}
             height={40}
             className='rounded-full mr-1'
           />
           <div>
-            <h3 className=' font-600'>Osunkoya Mayowa</h3>
-            <p className='text-sm'>User ref: 112234</p>
+            <h3 className=' font-600 capitalize text-sm mb-1'>
+              {user?.otherNames?.split(' ')[0]}
+            </h3>
+            <p className='text-sm font-poppins'>User ref: {user?.userRef}</p>
           </div>
         </div>
         {/* Close button on small screen */}
@@ -114,78 +117,82 @@ const SideBar = () => {
             report user
           </NavLink>
         </li>
-        {/* Admin links */}
-        <h3 className='border-b'>Admin</h3>
-        <li className='mb-2 p-1'>
-          <NavLink
-            to='/account/admin'
-            className={({ isActive }) =>
-              isActive ? 'block font-700 capitalize' : 'block capitalize'
-            }
-            onClick={() => dispatch(dashboardActions.closeSidebar())}
-            end
-          >
-            admin overview
-          </NavLink>
-        </li>
-        <li className='mb-2 p-1'>
-          <NavLink
-            to='/account/admin/user-manager'
-            className={({ isActive }) =>
-              isActive ? 'block font-700 capitalize' : 'block capitalize'
-            }
-            onClick={() => dispatch(dashboardActions.closeSidebar())}
-          >
-            user manager
-          </NavLink>
-        </li>
-        <li className='mb-2 p-1'>
-          <NavLink
-            to='/account/admin/group-manager'
-            className={({ isActive }) =>
-              isActive ? 'block font-700 capitalize' : 'block capitalize'
-            }
-            onClick={() => dispatch(dashboardActions.closeSidebar())}
-          >
-            group manager
-          </NavLink>
-        </li>
-        <li className='mb-2 p-1'>
-          <NavLink
-            to='/account/admin/withdrawals'
-            className={({ isActive }) =>
-              isActive ? 'block font-700 capitalize' : 'block capitalize'
-            }
-            onClick={() => dispatch(dashboardActions.closeSidebar())}
-          >
-            Withdrawals
-          </NavLink>
-        </li>
-
-        <li className='mb-2 p-1'>
-          <NavLink
-            to='/account/admin/kyc-review'
-            className={({ isActive }) =>
-              isActive ? 'block font-700 capitalize' : 'block capitalize'
-            }
-            onClick={() => dispatch(dashboardActions.closeSidebar())}
-          >
-            KYC review & approval
-          </NavLink>
-        </li>
-        <li className='mb-2 p-1'>
-          <NavLink
-            to='/account/admin/statement'
-            className={({ isActive }) =>
-              isActive ? 'block font-700 capitalize' : 'block capitalize'
-            }
-            onClick={() => dispatch(dashboardActions.closeSidebar())}
-          >
-            statement
-          </NavLink>
-        </li>
+        {['super-admin', 'admin'].includes(user?.role) && (
+          <>
+            {' '}
+            {/* Admin links */}
+            <h3 className='border-b'>Admin</h3>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+                end
+              >
+                admin overview
+              </NavLink>
+            </li>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin/user-manager'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+              >
+                user manager
+              </NavLink>
+            </li>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin/group-manager'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+              >
+                group manager
+              </NavLink>
+            </li>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin/withdrawals'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+              >
+                Withdrawals
+              </NavLink>
+            </li>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin/kyc-review'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+              >
+                KYC review & approval
+              </NavLink>
+            </li>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin/statement'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+              >
+                statement
+              </NavLink>
+            </li>
+          </>
+        )}
       </ul>
-      <div className='text-[10px]'>
+      <div className='text-[10px] text-slate-300 absolute bottom-0 mt-10 mx-4'>
         <small>Developed by Oyediran Emmanuel</small>
       </div>
     </aside>

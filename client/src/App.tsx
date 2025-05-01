@@ -13,11 +13,17 @@ import ResetPasswordLink, {
 import PasswordReset, {
   action as resetPasswordAction,
 } from './pages/auth/PasswordReset';
-import DashBoardLayout from './layouts/DashBoardLayout';
+import DashBoardLayout, {
+  loader as dashboardLoader,
+} from './layouts/DashBoardLayout';
 import Profile from './pages/auth/Profile';
 import ProfileLayout from './layouts/ProfileLayout';
-import ProfileUpdate from './pages/auth/ProfileUpdate';
-import PasswordUpdate from './pages/auth/PasswordUpdate';
+import ProfileUpdate, {
+  action as profileUpdateAction,
+} from './pages/auth/ProfileUpdate';
+import PasswordUpdate, {
+  action as updatePasswordAction,
+} from './pages/auth/PasswordUpdate';
 import Dashboard from './pages/Dashboard';
 import ManageGroup from './pages/userGroupMgt/ManageGroup';
 import CreateGroup from './pages/userGroupMgt/CreateGroup';
@@ -33,13 +39,21 @@ import BeneficiaryDetails from './pages/userGroupMgt/BeneficiaryDetails';
 import GroupReportLanding from './pages/report/GroupReportLanding';
 import GroupTransactions from './pages/report/GroupTransactions';
 import GroupStatement from './pages/report/GroupStatement';
-import UserManager from './pages/admin/usersManager/UserManager';
+import UserManager, {
+  loader as userManagerLoader,
+  action as userManagerAction,
+} from './pages/admin/usersManager/UserManager';
 import GroupManager from './pages/admin/groupManager/GroupManager';
 import OpenWithdrawals from './pages/admin/withdrawals/OpenWithdrawals';
 import ClosedWithdrawals from './pages/admin/withdrawals/ClosedWithdrawals';
 import Statements from './pages/report/Statements';
-import EditUser from './pages/admin/usersManager/EditUser';
-import ViewUser from './pages/admin/usersManager/ViewUser';
+import EditUser, {
+  loader as adminEditUserLoader,
+  action as adminEditUserAction,
+} from './pages/admin/usersManager/EditUser';
+import ViewUser, {
+  loader as viewUserLoader,
+} from './pages/admin/usersManager/ViewUser';
 import EditAdminGroup from './pages/admin/groupManager/EditAdminGroup';
 import ViewAdminGroup from './pages/admin/groupManager/ViewAdminGroup';
 import WithdrawalLanding from './pages/admin/withdrawals/WithdrawalLanding';
@@ -79,6 +93,8 @@ const router = createBrowserRouter([
   {
     path: '/account',
     element: <DashBoardLayout />,
+    loader: dashboardLoader,
+    id: 'user',
     errorElement: <DashboardError />, //come back to this as it's not working yet.
     children: [
       { index: true, element: <Dashboard /> },
@@ -87,8 +103,16 @@ const router = createBrowserRouter([
         element: <ProfileLayout />,
         children: [
           { index: true, element: <Profile /> },
-          { path: 'edit-profile', element: <ProfileUpdate /> },
-          { path: 'change-password', element: <PasswordUpdate /> },
+          {
+            path: 'edit-profile',
+            element: <ProfileUpdate />,
+            action: profileUpdateAction,
+          },
+          {
+            path: 'change-password',
+            element: <PasswordUpdate />,
+            action: updatePasswordAction,
+          },
         ],
       },
       {
@@ -139,11 +163,22 @@ const router = createBrowserRouter([
           {
             path: 'user-manager',
             children: [
-              { index: true, element: <UserManager /> },
-              { path: 'edit/:id', element: <EditUser /> },
+              {
+                index: true,
+                element: <UserManager />,
+                loader: userManagerLoader,
+                action: userManagerAction,
+              },
+              {
+                path: 'edit/:id',
+                element: <EditUser />,
+                loader: adminEditUserLoader,
+                action: adminEditUserAction,
+              },
               {
                 path: 'view/:id',
                 element: <ViewUser />,
+                loader: viewUserLoader,
               },
             ],
           },

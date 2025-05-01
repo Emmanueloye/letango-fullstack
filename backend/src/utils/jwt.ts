@@ -49,4 +49,18 @@ const sendCookies = ({ res, access, refresh }: CookiesParams) => {
   });
 };
 
+export const logoutCookies = (res: Response) => {
+  // Send empty cookies to logout user.
+  res.cookie('lto_acc', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1,
+  });
+  res.cookie('lto_ref', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1,
+  });
+};
+
 export default sendCookies;

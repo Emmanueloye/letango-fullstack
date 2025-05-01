@@ -6,12 +6,16 @@ const TableCard = ({
   showAction,
   editUrl,
   viewUrl,
+  userStatus,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
   showAction?: boolean;
   editUrl?: string;
   viewUrl?: string;
+  userStatus?: string;
+  id?: string;
 }) => {
   return (
     <div className='dark:bg-slate-800 shadow-md py-2 px-4 mb-4 rounded-2xl'>
@@ -26,6 +30,8 @@ const TableCard = ({
           viewUrl={viewUrl || ''}
           showUserAction
           className='border-0 border-t-2 justify-between pt-2 flex-wrap'
+          userStatus={userStatus}
+          id={id as string}
         />
       )}
     </div>

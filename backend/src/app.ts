@@ -17,6 +17,7 @@ import globalErrorMiddleware from './middlewares/globalErrorMiddleware';
 
 //============ Import routers modules ==========//
 import authRouter from './features/users/authRoutes';
+import userRouter from './features/users/userRoutes';
 import AppError from './errors';
 import statusCodes from './errors/statusCodes';
 
@@ -80,11 +81,12 @@ app.use(express.static(path.resolve(__dirname, './../../client/dist')));
 
 //==================== Mount routes =================//
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
 
 //==================== send the html file for all routes =================//
-app.get('*', (req: Request, res: Response) => {
-  res.sendFile(path.resolve(__dirname, './../../client/dist', 'index.html'));
-});
+// app.get('*', (req: Request, res: Response) => {
+//   res.sendFile(path.resolve(__dirname, './../../client/dist', 'index.html'));
+// });
 
 //========= Mount global error middlewares ========//
 app.use(notFoundMiddleware);

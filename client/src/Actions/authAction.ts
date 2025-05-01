@@ -4,6 +4,7 @@ const initialState = {
   message: '',
   verifyMessage: '',
   passwordMessage: '',
+  isAuth: false,
 };
 
 const authSlice = createSlice({
@@ -18,6 +19,9 @@ const authSlice = createSlice({
     },
     passwordResetMsg: (state, action) => {
       state.passwordMessage = action.payload;
+    },
+    updateAuth: (state, action) => {
+      state.isAuth = action.payload;
     },
   },
 });

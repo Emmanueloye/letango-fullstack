@@ -1,6 +1,7 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useRouteLoaderData } from 'react-router-dom';
 
 const ProfileLayout = () => {
+  const data = useRouteLoaderData('user');
   return (
     <>
       <div className='flex justify-center flex-wrap *:mr-1'>
@@ -36,7 +37,7 @@ const ProfileLayout = () => {
           Update Password
         </NavLink>
       </div>
-      <Outlet />
+      <Outlet context={data.user} />
     </>
   );
 };

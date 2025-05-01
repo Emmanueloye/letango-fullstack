@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as authController from './authController';
-import * as validation from './validateUser';
+import * as validation from './userValidation';
 import * as authMiddleware from '../../middlewares/authMiddleware';
 import { loginRateLimiter } from '../../middlewares/routeLimiter';
 
@@ -34,5 +34,5 @@ router
   .route('/reset-password')
   .post(validation.validateResetPassword, authController.resetPassword);
 
-router.route('/logout').get(authMiddleware.protect, authController.logout);
+router.route('/logout').delete(authMiddleware.protect, authController.logout);
 export default router;

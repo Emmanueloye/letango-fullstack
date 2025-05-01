@@ -1,6 +1,7 @@
 // Global imports
 import 'express-async-errors';
 import dotenv from 'dotenv';
+import { v2 as cloudinary } from 'cloudinary';
 dotenv.config();
 
 // This to handle uncaught exceptions but typescript should handle this but in case it doesn't
@@ -8,6 +9,13 @@ process.on('uncaughtException', (err) => {
   // Log the errors
   console.error(`Uncaught Exception ⚠⚠⚠`);
   console.error(`${err.name}: ${err.message}`);
+});
+
+// Cloudinary setup
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API,
+  api_secret: process.env.CLOUDINARY_SECRET,
 });
 
 // Packages and modules imports

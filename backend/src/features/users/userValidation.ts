@@ -47,3 +47,19 @@ export const validateResetPassword = checkForErrors([
     .notEmpty()
     .withMessage('Confirm password field is required.'),
 ]);
+
+export const validateProfileUpdate = checkForErrors([
+  body('surname').notEmpty().withMessage('Surname field is required.'),
+  body('otherNames').notEmpty().withMessage('Other names field is required.'),
+  body('phone').notEmpty().withMessage('Phone field is required.'),
+]);
+
+export const validatePasswordUpdate = checkForErrors([
+  body('currentPassword')
+    .notEmpty()
+    .withMessage('Current password field is required.'),
+  body('password').notEmpty().withMessage('Password field is required.'),
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('Confirm password field is required.'),
+]);

@@ -1,49 +1,47 @@
-import { Form } from 'react-router-dom';
-import LinkBtn from '../../../components/UI/LinkBtn';
-import Title from '../../../components/UI/Title';
-import Button from '../../../components/UI/Button';
+/* eslint-disable react-refresh/only-export-components */
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  useLoaderData,
+} from 'react-router-dom';
+import AdminEditUser from '../../../components/DashboardComponents/AdminEditUser';
+import {
+  extractFormData,
+  getData,
+  patchData,
+  queryClient,
+} from '../../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
 
 const EditUser = () => {
-  return (
-    <section>
-      <div className='flex justify-end mb-2'>
-        <LinkBtn btnText='back' url='/account/admin/user-manager' />
-      </div>
-      <Title title='update users' />
+  const params = useLoaderData();
 
-      <Form id='updateUserForm'>
-        <div className='lg:grid lg:grid-cols-2 gap-4'>
-          <div className='w-full mb-4 lg:mb-0'>
-            <label htmlFor='surname'>surname</label>
-            <input id='surname' name='surname' autoComplete='off' />
-          </div>
-          <div className='w-full mb-4 lg:mb-0'>
-            <label htmlFor='otherNames'>other names</label>
-            <input id='otherNames' name='otherNames' autoComplete='off' />
-          </div>
-          <div className='w-full mb-4 lg:mb-0'>
-            <label htmlFor='email'>email</label>
-            <input id='email' name='email' autoComplete='off' />
-          </div>
-          <div className='w-full mb-4 lg:mb-0'>
-            <label htmlFor='phone'>phone</label>
-            <input id='phone' name='phone' autoComplete='off' />
-          </div>
-          <div className='w-full mb-4 lg:mb-0'>
-            <label htmlFor='userStatus'>user status</label>
-            <select id='userStatus' className=' capitalize'>
-              <option value=''>suspend</option>
-              <option value=''>banned</option>
-              <option value=''>active</option>
-            </select>
-          </div>
-        </div>
-        <div className='mt-3'>
-          <Button btnText='save' btnType='submit' />
-        </div>
-      </Form>
-    </section>
-  );
+  const { data } = useQuery({
+    queryKey: ['fetchUser', 'user'],
+    queryFn: () => getData({ url: `/users/${params.id}` }),
+  });
+
+  return <AdminEditUser user={data.user} />;
 };
 
 export default EditUser;
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchUser', 'user'],
+    queryFn: () => getData({ url: `/users/${params.id}` }),
+  });
+  return params;
+};
+
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+  const data = await extractFormData(request);
+  queryClient.invalidateQueries({ queryKey: ['fetchUser'] });
+  return patchData({
+    url: `/users/${params.id}`,
+    data,
+    setToast: true,
+    invalidate: ['fetchUser'],
+    redirectTo: '/account/admin/user-manager',
+  });
+};

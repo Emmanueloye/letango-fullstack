@@ -298,16 +298,8 @@ export const logout = async (req: Request, res: Response) => {
   await Token.findOneAndDelete({ userId: req.user.id });
 
   // Send empty cookies to logout user.
-  res.cookie('lto_acc', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1,
-  });
-  res.cookie('lto_ref', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1,
-  });
+  utils.logoutCookies(res);
+
   res.status(statusCodes.NO_CONTENT).json({ status: 'success' });
 };
 

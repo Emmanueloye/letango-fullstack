@@ -1,7 +1,18 @@
+/* eslint-disable react-refresh/only-export-components */
+import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 import LinkBtn from '../../../components/UI/LinkBtn';
 import Title from '../../../components/UI/Title';
+import { getData, queryClient } from '../../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
 
 const ViewUser = () => {
+  const params = useLoaderData();
+
+  const { data } = useQuery({
+    queryKey: ['fetchUser', 'user'],
+    queryFn: () => getData({ url: `/users/${params.id}` }),
+  });
+
   return (
     <section>
       <div className='flex justify-end mb-2'>
@@ -17,7 +28,8 @@ const ViewUser = () => {
             name='surname'
             autoComplete='off'
             disabled
-            defaultValue={''}
+            defaultValue={data?.user?.surname}
+            className='capitalize'
           />
         </div>
         <div className='w-full mb-4 lg:mb-0'>
@@ -27,7 +39,8 @@ const ViewUser = () => {
             name='otherNames'
             autoComplete='off'
             disabled
-            defaultValue={''}
+            defaultValue={data?.user?.otherNames}
+            className='capitalize'
           />
         </div>
         <div className='w-full mb-4 lg:mb-0'>
@@ -37,7 +50,7 @@ const ViewUser = () => {
             name='email'
             autoComplete='off'
             disabled
-            defaultValue={''}
+            defaultValue={data?.user?.email}
           />
         </div>
         <div className='w-full mb-4 lg:mb-0'>
@@ -47,7 +60,8 @@ const ViewUser = () => {
             name='phone'
             autoComplete='off'
             disabled
-            defaultValue={''}
+            defaultValue={data?.user?.phone}
+            className='capitalize'
           />
         </div>
         <div className='w-full mb-4 lg:mb-0'>
@@ -57,7 +71,8 @@ const ViewUser = () => {
             name='userStatus'
             autoComplete='off'
             disabled
-            defaultValue={''}
+            defaultValue={data?.user?.status}
+            className='capitalize'
           />
         </div>
       </div>
@@ -66,3 +81,11 @@ const ViewUser = () => {
 };
 
 export default ViewUser;
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchUser', 'user'],
+    queryFn: () => getData({ url: `/users/${params.id}` }),
+  });
+  return params;
+};

@@ -1,14 +1,19 @@
+import { FormActionType } from '../../dtos/formAction';
 import Button from '../UI/Button';
-import { Form } from 'react-router-dom';
+import { Form, useActionData } from 'react-router-dom';
+import FormError from '../UI/FormError';
 
 const PasswordUpdateForm = () => {
+  const data = useActionData() as FormActionType;
+
   return (
     <article className='w-11/12 bg-gray-100 dark:bg-slate-800 container mx-auto lg:py-2 px-3 shadow-lg'>
       {/* Header */}
       <h3 className='border-b-2 py-4 mb-8 font-600 uppercase text-center border-b-green-500'>
         Update Password
       </h3>
-      <Form id='form'>
+      <Form id='form' method='patch'>
+        {data?.status === 'fail' && <FormError error={data.message} />}
         {/* current password group */}
         <div className='mb-2'>
           <label
@@ -42,15 +47,15 @@ const PasswordUpdateForm = () => {
         {/* Email group */}
         <div className='mb-2'>
           <label
-            htmlFor='confirmPassowrd'
+            htmlFor='confirmPassword'
             className={`after:text-red-500 after:content-['*'] after:font-700 text-sm `}
           >
             confirm Passowrd
           </label>
           <input
             type='password'
-            id='confirmPassowrd'
-            name='confirmPassowrd'
+            id='confirmPassword'
+            name='confirmPassword'
             autoComplete='off'
           />
         </div>

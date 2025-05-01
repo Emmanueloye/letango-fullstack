@@ -39,7 +39,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, 'Password field is required.'],
-      minlenght: [6, 'Password must be at least 6 characters long.'],
+      minlength: [6, 'Password must be at least 6 characters long.'],
       select: false,
     },
     confirmPassword: {
@@ -61,6 +61,7 @@ const userSchema = new Schema(
     passwordChangedAt: Date,
     photo: String,
     photoPublicId: String,
+    phone: String,
     role: {
       type: String,
       enum: {

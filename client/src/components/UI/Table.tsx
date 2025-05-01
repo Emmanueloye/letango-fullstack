@@ -23,7 +23,7 @@ const Table = ({
       {/* Table rows */}
       <div className='*:even:bg-[#f1f5f9] *:dark:even:bg-[#314158]'>
         <div
-          className='grid grid-cols-4 items-stretch capitalize text-sm font-400 font-poppins *:py-1 *:px-2 even:bg-[#f1f5f9] *:dark:even:bg-[#314158]'
+          className='grid grid-cols-4 items-stretch capitalize text-sm font-400 *:py-1 *:px-2 even:bg-[#f1f5f9] *:dark:even:bg-[#314158]'
           style={{ gridTemplateColumns: columns }}
         >
           {children}

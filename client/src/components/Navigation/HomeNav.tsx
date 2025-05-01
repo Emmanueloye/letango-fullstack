@@ -1,19 +1,32 @@
 import { FaBars } from 'react-icons/fa';
 // import logo from '../../assets/logo-no-bg.png';
 // import whiteLogo from '../../assets/whiteLogo-nobg.png';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import SiteMode from './SiteMode';
+import { User } from '../../dtos/UserDto';
+import { useAppDispatch, useAppSelector } from '../../Actions/store';
+import { deleteData, queryClient } from '../../helperFunc.ts/apiRequest';
+import { authActions } from '../../Actions/authAction';
+import { toast } from 'react-toastify';
 const HomeNav = ({
   scrollToSection,
   activeSection,
+  user,
 }: {
   scrollToSection: (data: string) => void;
   activeSection: string;
+  user?: User;
 }) => {
   // State to manage mobile menue toggle.
   const [isOpen, setIsOpen] = useState(false);
   const [logo, setLogo] = useState<string | undefined>(undefined);
+  const [userData] = useState(user);
+
+  const { isAuth } = useAppSelector((state) => state.auth);
+
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   // Refs to manage the height of mobile menu drop down.
   const boxRef = useRef<HTMLDivElement>(null);
@@ -29,6 +42,21 @@ const HomeNav = ({
       containerRef.current!.style.height = '0px';
     }
   }, [isOpen]);
+
+  const logout = async () => {
+    const result = await deleteData({
+      url: '/auth/logout',
+    });
+
+    dispatch(authActions.updateAuth(false));
+    if (result.status === 'success') {
+      queryClient.invalidateQueries();
+
+      toast.success('You are logged out. See you soon.');
+
+      navigate('/');
+    }
+  };
 
   return (
     <header className='lg:border-b-3 lg:border-primary-500 dark:lg:border-amber-600 bg-white dark:bg-slate-800 sticky top-0 left-0 z-50'>
@@ -102,22 +130,37 @@ const HomeNav = ({
             {/*=================================================================================
         ======================== Auth and call to action links================================= */}
             <div className='inline-block lg:flex flex-col lg:flex-row lg:items-center *:mb-2 *:lg:mb-0 *:mt-2 *:lg:mt-0 *:lg:mr-2'>
-              <div>
-                <Link
-                  to='/signup'
-                  className='bg-green-600 hover:bg-green-400 px-3 py-1 rounded-md text-white font-600'
+              {!isAuth && !userData ? (
+                <>
+                  {/* Signup link */}
+                  <div>
+                    <Link
+                      to='/signup'
+                      className='bg-green-600 hover:bg-green-400 px-3 py-1 rounded-md text-white font-600'
+                    >
+                      Sign up
+                    </Link>
+                  </div>
+                  {/* Login link */}
+                  <div>
+                    <Link
+                      to='/login'
+                      className='border border-primary-500 font-500 text-primary-500 dark:text-slate-50 dark:border-slate-50 px-3 py-1 rounded-md hover:bg-primary-500 hover:text-white lg:mr-3'
+                    >
+                      Login in
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <button
+                  onClick={logout}
+                  className='border border-primary-500 font-500 text-primary-500 dark:text-slate-50 dark:border-slate-50 px-3 py-1 rounded-md hover:bg-primary-500 hover:text-white lg:mr-3 cursor-pointer'
                 >
-                  Sign up
-                </Link>
-              </div>
-              <div>
-                <Link
-                  to='/login'
-                  className='border border-primary-500 font-500 text-primary-500 dark:text-slate-50 dark:border-slate-50 px-3 py-1 rounded-md hover:bg-primary-500 hover:text-white lg:mr-3'
-                >
-                  Login in
-                </Link>
-              </div>
+                  Logout
+                </button>
+              )}
+
+              {/* Site mode button */}
               <SiteMode setLogo={setLogo} />
             </div>
           </div>
