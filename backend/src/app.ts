@@ -17,6 +17,8 @@ import globalErrorMiddleware from './middlewares/globalErrorMiddleware';
 
 //============ Import routers modules ==========//
 import authRouter from './features/users/authRoutes';
+import AppError from './errors';
+import statusCodes from './errors/statusCodes';
 
 // setup the application
 /**
@@ -47,7 +49,14 @@ app.use(
     windowMs: Number(process.env.APP_RATE_LIMIT) * 60 * 1000, //30 minutes request
     limit: 200,
     legacyHeaders: false,
-    message: 'Too many requests. Please try again in the next 30 minutes.',
+    // This help use the global error handler for the error thrown here.
+    handler: (req, res, next) => {
+      const error = new AppError.TooManyRequests(
+        'You attempt to login multiple times more than required. Please try again after 30 minutes.'
+      );
+      error.statusCode = statusCodes.TO_MANY_REQUEST;
+      next(error);
+    },
   })
 );
 
