@@ -84,9 +84,9 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 
 //==================== send the html file for all routes =================//
-// app.get('*', (req: Request, res: Response) => {
-//   res.sendFile(path.resolve(__dirname, './../../client/dist', 'index.html'));
-// });
+app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
+  res.sendFile(path.resolve(__dirname, './../../client/dist', 'index.html'));
+});
 
 //========= Mount global error middlewares ========//
 app.use(notFoundMiddleware);

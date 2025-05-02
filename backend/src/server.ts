@@ -31,7 +31,7 @@ mongoose
 /**
  * Set up the port from the environment variable
  */
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 /**
  * Setup environment variables and initialize the server
