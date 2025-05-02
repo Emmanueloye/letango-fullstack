@@ -92,7 +92,7 @@ export const protect = async (
   utils.sendCookies({
     res,
     access: new Types.ObjectId(userId),
-    refresh: refresh,
+    refresh,
   });
 
   req.user = currentUser;

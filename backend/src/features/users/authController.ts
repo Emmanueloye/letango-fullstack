@@ -300,7 +300,7 @@ export const logout = async (req: Request, res: Response) => {
   // Send empty cookies to logout user.
   utils.logoutCookies(res);
 
-  res.status(statusCodes.NO_CONTENT).json({ status: 'success' });
+  res.status(statusCodes.OK).json({ status: 'success' });
 };
 
 //In case the details is set on query paramter, this middleware switch the email and token from the query parameters to the request body

@@ -71,6 +71,7 @@ export default DashBoardLayout;
 
 export const loader = async () => {
   const response = await fetchOnlyData({ url: '/users/me' });
+
   if (response.status === 'fail') {
     return redirect('/login');
   }
