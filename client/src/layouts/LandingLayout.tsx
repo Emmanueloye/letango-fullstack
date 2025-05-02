@@ -4,7 +4,7 @@ import HomeNav from '../components/Navigation/HomeNav';
 import {
   Outlet,
   ScrollRestoration,
-  useNavigate,
+  // useNavigate,
   useNavigation,
 } from 'react-router-dom';
 import { useAppDispatch } from '../Actions/store';
@@ -17,7 +17,7 @@ const LandingLayout = () => {
   const [user, setUser] = useState<User>();
   const dispatch = useAppDispatch();
   const { state } = useNavigation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -27,7 +27,6 @@ const LandingLayout = () => {
         setUser(response.user);
         dispatch(authActions.updateAuth(true));
       } else {
-        navigate('/');
         dispatch(authActions.updateAuth(false));
       }
     };
