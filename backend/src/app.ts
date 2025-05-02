@@ -43,7 +43,7 @@ app.use(
 );
 
 app.use(cors());
-
+app.set('trust proxy', 1);
 // To limit the rate of request
 app.use(
   rateLimit({
