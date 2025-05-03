@@ -18,7 +18,8 @@ type RefreshType = { access: string; refresh: string; iat: number };
 const checkAuth = (
   currentUser: any,
   existingRefreshToken: any,
-  iat: number
+  iat: number,
+  res: Response
 ) => {
   if (!currentUser) {
     throw new AppError.NotFound(
@@ -27,6 +28,7 @@ const checkAuth = (
   }
 
   if (currentUser.status !== 'active') {
+    utils.logoutCookies(res);
     throw new AppError.UnAuthorized(
       'Your account has been suspended or banned. Please contact the page admin.'
     );
@@ -66,7 +68,7 @@ export const protect = async (
     const existingRefreshToken = await Token.findOne({ userId });
 
     // Run checks
-    checkAuth(currentUser, existingRefreshToken, iat);
+    checkAuth(currentUser, existingRefreshToken, iat, res);
 
     // send both refresh and access token to user again.
     utils.sendCookies({
@@ -87,7 +89,7 @@ export const protect = async (
   const currentUser = await User.findById(userId);
   const existingRefreshToken = await Token.findOne({ userId });
 
-  checkAuth(currentUser, existingRefreshToken, iat);
+  checkAuth(currentUser, existingRefreshToken, iat, res);
 
   utils.sendCookies({
     res,

@@ -14,12 +14,13 @@ import './utils/cache';
 //============ Import error handlers modules ==========//
 import notFoundMiddleware from './middlewares/notFoundMiddleware';
 import globalErrorMiddleware from './middlewares/globalErrorMiddleware';
+import AppError from './errors';
+import statusCodes from './errors/statusCodes';
 
 //============ Import routers modules ==========//
 import authRouter from './features/users/authRoutes';
 import userRouter from './features/users/userRoutes';
-import AppError from './errors';
-import statusCodes from './errors/statusCodes';
+import personalTranRouter from './features/transactions/PersonalRoutes';
 
 // setup the application
 /**
@@ -82,6 +83,7 @@ app.use(express.static(path.resolve(__dirname, './../../client/dist')));
 //==================== Mount routes =================//
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/personal', personalTranRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {

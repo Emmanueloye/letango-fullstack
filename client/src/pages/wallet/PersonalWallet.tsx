@@ -1,10 +1,12 @@
 import { MdOutlineAccountBalance } from 'react-icons/md';
 import Card from '../../components/UI/Card';
 import { GiPouringChalice, GiReceiveMoney } from 'react-icons/gi';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import Chart from '../../components/DashboardComponents/Chart';
 import { walletData } from '../../assets/tempData/chartData';
 import Button from '../../components/UI/Button';
+import { User } from '../../dtos/UserDto';
+import LinkBtn from '../../components/UI/LinkBtn';
 
 // data type
 interface DataType {
@@ -12,6 +14,8 @@ interface DataType {
 }
 
 const PersonalWallet = () => {
+  const user = useOutletContext() as User;
+
   return (
     <>
       <section>
@@ -20,28 +24,32 @@ const PersonalWallet = () => {
           <Link to='/account/personal-wallet/transactions'>
             <Card
               cardDesc='Balance'
-              balance={20_000}
+              balance={user.personalWallet}
               icon={<MdOutlineAccountBalance />}
             />
           </Link>
           <Link to='/account/personal-wallet/inflows'>
             <Card
               cardDesc='inflow'
-              balance={50_000}
+              balance={user.inflow}
               icon={<GiReceiveMoney />}
             />
           </Link>
           <Link to='/account/personal-wallet/outflows'>
             <Card
               cardDesc='outflow'
-              balance={30_000}
+              balance={user.outflow}
               icon={<GiPouringChalice />}
             />
           </Link>
         </div>
         {/* personal wallet btns */}
         <div className='flex gap-3 mt-4 mb-3'>
-          <Button btnText='contribute' btnType='button' />
+          <LinkBtn
+            btnText='contribute'
+            url={`/account/personal-wallet/contribute/${user.userRef}`}
+            className='w-full flex justify-center'
+          />
           <Button btnText='transfer' btnType='button' />
           <Button btnText='place withdrawal' btnType='button' />
         </div>

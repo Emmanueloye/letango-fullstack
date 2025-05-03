@@ -74,6 +74,14 @@ const userSchema = new Schema(
       type: Number,
       default: 0,
     },
+    inflow: {
+      type: Number,
+      default: 0,
+    },
+    outflow: {
+      type: Number,
+      default: 0,
+    },
     status: {
       type: String,
       required: [true, 'User status field is required.'],

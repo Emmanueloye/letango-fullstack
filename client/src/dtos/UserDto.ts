@@ -15,6 +15,8 @@ export type User = {
   photoPublicId?: string;
   role: string;
   personalWallet: number;
+  inflow: number;
+  outflow: number;
   status: string;
   createdAt: Date;
 };

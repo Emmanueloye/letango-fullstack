@@ -62,6 +62,12 @@ import KYCReview from './pages/admin/usersManager/KYCReview';
 import ReportUser from './pages/userGroupMgt/ReportUser';
 import HomeError from './pages/HomeError';
 import DashboardError from './pages/DashboardError';
+import Contribute, {
+  action as contributeAction,
+} from './pages/wallet/Contribute';
+import PaymentConfirmation, {
+  loader as paymentConfirmationLoader,
+} from './pages/wallet/PaymentConfirmation';
 
 const router = createBrowserRouter([
   {
@@ -120,6 +126,16 @@ const router = createBrowserRouter([
         path: 'personal-wallet',
         children: [
           { index: true, element: <PersonalWallet /> },
+          {
+            path: 'contribute/:userRef',
+            element: <Contribute />,
+            action: contributeAction,
+          },
+          {
+            path: 'contribute/confirm',
+            element: <PaymentConfirmation />,
+            loader: paymentConfirmationLoader,
+          },
           {
             path: 'transactions',
             element: <WalletTransaction />,

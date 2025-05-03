@@ -14,10 +14,12 @@ const Card = ({
   return (
     <div className='bg-gray-100 dark:bg-slate-800 px-2 py-4 rounded-2xl shadow-lg shadow-black/25 cursor-pointer'>
       <p className='text-center font-500 capitalize'>{cardDesc}</p>
-      {balance && (
+      {balance ? (
         <p className='text-center text-sm font-poppins mt-3'>
           &#8358;{`${formatNumber(balance)}`}
         </p>
+      ) : (
+        <p className='text-center text-sm font-poppins mt-3'>&#8358;{`0.00`}</p>
       )}
       {optionalText && (
         <p className='text-center text-sm font-poppins mt-3'>{optionalText}</p>
