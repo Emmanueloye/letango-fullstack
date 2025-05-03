@@ -5,7 +5,6 @@ import Button from '../UI/Button';
 import { FormActionType } from '../../dtos/formAction';
 import FormError from '../UI/FormError';
 import { User } from '../../dtos/UserDto';
-import DataURIParser from 'datauri/parser';
 
 const UpdateProfileForm = () => {
   const data = useActionData() as FormActionType;
@@ -14,13 +13,9 @@ const UpdateProfileForm = () => {
   const [image, setImage] = useState(user?.photo || defaultUser);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const parser = new DataURIParser();
-
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setImage(
-        parser.format('jpeg', URL.createObjectURL(file)).content as string
-      );
+      setImage(URL.createObjectURL(file));
     }
   };
   return (
