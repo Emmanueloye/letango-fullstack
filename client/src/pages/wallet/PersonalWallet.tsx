@@ -20,7 +20,7 @@ const PersonalWallet = () => {
     <>
       <section>
         {/* Wallet cards */}
-        <div className='grid grid-cols-3 gap-4'>
+        <div className='grid md:grid-cols-3 gap-4'>
           <Link to='/account/personal-wallet/transactions'>
             <Card
               cardDesc='Balance'
@@ -30,21 +30,21 @@ const PersonalWallet = () => {
           </Link>
           <Link to='/account/personal-wallet/inflows'>
             <Card
-              cardDesc='inflow'
+              cardDesc='monthly inflow'
               balance={user.inflow}
               icon={<GiReceiveMoney />}
             />
           </Link>
           <Link to='/account/personal-wallet/outflows'>
             <Card
-              cardDesc='outflow'
+              cardDesc='monthly outflow'
               balance={user.outflow}
               icon={<GiPouringChalice />}
             />
           </Link>
         </div>
         {/* personal wallet btns */}
-        <div className='flex gap-3 mt-4 mb-3'>
+        <div className='grid md:grid-cols-3 gap-3 mt-4 mb-3'>
           <LinkBtn
             btnText='contribute'
             url={`/account/personal-wallet/contribute/${user.userRef}`}

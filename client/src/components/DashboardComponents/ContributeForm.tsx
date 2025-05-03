@@ -1,15 +1,19 @@
-import { Form, useOutletContext } from 'react-router-dom';
+import { Form, useActionData, useOutletContext } from 'react-router-dom';
 import Button from '../UI/Button';
 import Title from '../UI/Title';
 import { User } from '../../dtos/UserDto';
+import { FormActionType } from '../../dtos/formAction';
+import FormError from '../UI/FormError';
 
 const ContributeForm = () => {
   const user = useOutletContext() as User;
+  const data = useActionData() as FormActionType;
 
   return (
     <section>
       <Title title='Contribution Details' />
       <Form method='post' id='contributionForm' className='lg:w-3/5 lg:mx-auto'>
+        {data?.status === 'fail' && <FormError error={data?.message} />}
         {/* General info section */}
         {/* Fullname */}
         <div className=''>

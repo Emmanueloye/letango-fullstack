@@ -29,7 +29,9 @@ import ManageGroup from './pages/userGroupMgt/ManageGroup';
 import CreateGroup from './pages/userGroupMgt/CreateGroup';
 import KYC from './pages/userGroupMgt/KYC';
 import PersonalWallet from './pages/wallet/PersonalWallet';
-import WalletTransaction from './pages/wallet/WalletTransaction';
+import WalletTransaction, {
+  action as walletTransactionAction,
+} from './pages/wallet/WalletTransaction';
 import TransactionFlow from './pages/wallet/TransactionFlow';
 import EditGroup from './pages/userGroupMgt/EditGroup';
 import GroupView from './pages/userGroupMgt/GroupView';
@@ -68,6 +70,7 @@ import Contribute, {
 import PaymentConfirmation, {
   loader as paymentConfirmationLoader,
 } from './pages/wallet/PaymentConfirmation';
+import TransactionDetails from './pages/wallet/TransactionDetails';
 
 const router = createBrowserRouter([
   {
@@ -138,7 +141,17 @@ const router = createBrowserRouter([
           },
           {
             path: 'transactions',
-            element: <WalletTransaction />,
+            children: [
+              {
+                index: true,
+                element: <WalletTransaction />,
+                action: walletTransactionAction,
+              },
+              {
+                path: ':id',
+                element: <TransactionDetails />,
+              },
+            ],
           },
           { path: 'inflows', element: <TransactionFlow /> },
           { path: 'outflows', element: <TransactionFlow /> },

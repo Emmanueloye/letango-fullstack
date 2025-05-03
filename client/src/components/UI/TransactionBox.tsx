@@ -13,8 +13,10 @@ const TransactionBox = ({
   amount: number;
   show?: boolean;
 }) => {
+  const amtColor = amount > 0 ? 'text-green-600' : 'text-amber-600';
+
   return (
-    <article className=' bg-gray-100 dark:bg-slate-800 py-2 px-4 mt-2 font-poppins rounded-2xl shadow'>
+    <article className=' bg-gray-100 dark:bg-slate-800 py-2 px-4 mt-1 font-poppins rounded-2xl shadow'>
       <div className='flex justify-between items-center flex-wrap '>
         <div>
           <h4 className='font-600 capitalize text-sm mb-2 font-ral'>
@@ -23,7 +25,7 @@ const TransactionBox = ({
           <p className='text-xs  text-gray-500 dark:text-gray-400'>{date}</p>
           <p className='text-xs  text-gray-500 dark:text-gray-400'>{time}</p>
         </div>
-        <p className='text-sm font-500 break-words'>
+        <p className={`text-sm font-500 break-words ${amtColor}`}>
           &#8358;{formatNumber(amount)}
         </p>
       </div>

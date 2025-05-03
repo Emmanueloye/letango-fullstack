@@ -1,11 +1,16 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import PersonalTransaction from './personalTransModel';
 import axios from 'axios';
 import statusCodes from '../../errors/statusCodes';
 import crypto from 'crypto';
 import AppError from '../../errors';
+import * as utils from '../../utils';
+import * as factory from '../../utils/handlerFactory';
 
 export const initializeTransaction = async (req: Request, res: Response) => {
+  if (req.body.contribution <= 0) {
+    throw new AppError.BadRequest('Contribution cannot be less than NGN1.');
+  }
   const data = {
     email: req.user.email,
     amount: req.body.contribution * 100,
@@ -91,3 +96,42 @@ export const confirmPayment = async (req: Request, res: Response) => {
   }
   res.status(statusCodes.OK).json({ status: 'success', payment });
 };
+
+export const customerStatement = async (req: Request, res: Response) => {
+  const { startDate, endDate } = req.body;
+  if (startDate > endDate) {
+    throw new AppError.BadRequest(
+      'End date cannot be earlier than the start date.'
+    );
+  }
+
+  const lastDate: Date = utils.lastDate(endDate);
+
+  const priorDateData = await PersonalTransaction.find({
+    userRef: req.user.userRef,
+    createdAt: { $gte: new Date('2025-01-01'), $lte: startDate },
+  });
+
+  const openingBal = priorDateData.reduce((acc, curr) => {
+    return acc + curr.contribution;
+  }, 0);
+
+  const statement = await PersonalTransaction.find({
+    userRef: req.user.userRef,
+    createdAt: { $gte: new Date(startDate), $lte: lastDate },
+  });
+
+  res.status(statusCodes.OK).json({
+    status: 'success',
+    openingBal,
+    noHits: statement.length,
+    statement,
+    date: { startDate, endDate },
+  });
+};
+
+export const getTransaction = factory.getOne({
+  Model: PersonalTransaction,
+  label: 'transaction',
+  queryKey: 'transactionId',
+});

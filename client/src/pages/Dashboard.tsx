@@ -3,6 +3,8 @@ import Card from '../components/UI/Card';
 import { TbCurrencyNaira } from 'react-icons/tb';
 import Chart from '../components/DashboardComponents/Chart';
 import { data } from '../assets/tempData/chartData';
+import { useOutletContext } from 'react-router-dom';
+import { User } from '../dtos/UserDto';
 
 // data type
 interface DataType {
@@ -10,12 +12,14 @@ interface DataType {
 }
 
 const Dashboard = () => {
+  const user = useOutletContext() as User;
+
   return (
     <section>
       <div className='grid sm:grid-cols-2  gap-2'>
         <Card
           cardDesc='personal wallet'
-          balance={20_000}
+          balance={user?.personalWallet}
           icon={<TbCurrencyNaira />}
         />
         <Card

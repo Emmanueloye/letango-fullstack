@@ -19,4 +19,12 @@ router
   .route('/confirm')
   .get(authMiddleware.protect, personalTranController.confirmPayment);
 
+router
+  .route('/statement')
+  .post(authMiddleware.protect, personalTranController.customerStatement);
+
+router
+  .route('/:id')
+  .get(authMiddleware.protect, personalTranController.getTransaction);
+
 export default router;

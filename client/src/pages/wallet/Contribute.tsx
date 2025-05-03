@@ -15,7 +15,7 @@ export default Contribute;
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const data = await extractFormData(request);
-  queryClient.invalidateQueries({ queryKey: ['user'] });
+  queryClient.invalidateQueries();
   const result = await postData({ url: `/personal`, data });
   if (result.status === 'success') {
     return redirect(result.redirectURL);

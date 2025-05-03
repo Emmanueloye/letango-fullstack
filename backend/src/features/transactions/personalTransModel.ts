@@ -59,8 +59,10 @@ type ITransaction = InferSchemaType<typeof personalTransactionSchema>;
 
 interface TransactionModel extends Model<ITransaction> {
   calcBalance: (userRef: string) => void;
+  calcInflow: (userRef: string) => void;
+  calcOutflow: (userRef: string) => void;
 }
-// Calculate number of review and average rating and save it in product collection.
+// Calculate personal wallet balance
 personalTransactionSchema.statics.calcBalance = async function (userRef) {
   const metrics = await this.aggregate([
     { $match: { userRef: userRef } },
@@ -72,8 +74,7 @@ personalTransactionSchema.statics.calcBalance = async function (userRef) {
     },
   ]);
 
-  // [{ _id: 'FRK59RPF', balance: 10000 }];
-
+  // Save the balance in user database.
   await User.findOneAndUpdate(
     { userRef },
     {
@@ -83,32 +84,90 @@ personalTransactionSchema.statics.calcBalance = async function (userRef) {
   );
 };
 
-// Update the calculation on create/save
+// Update the personal wallet balance on save
 personalTransactionSchema.post('save', function () {
   const model = this.constructor as TransactionModel;
   model.calcBalance(this.userRef as string);
 });
 
-// // Update the calculation on update.
-// personalTransactionSchema.pre('findOneAndUpdate', async function () {
-//   // Get the currently updated document and pass it to the post middleware.
-//   (this as any).review = await this.model.findOne(this.getQuery());
-// });
+// Calculate monthly inflow on save
+personalTransactionSchema.statics.calcInflow = async function (userRef) {
+  const metrics = await this.aggregate([
+    {
+      $addFields: {
+        documentMonth: { $month: '$createdAt' },
+        monthDate: { $month: new Date() },
+      },
+    },
+    {
+      // Match the document the added fields
+      $match: { $expr: { $eq: ['$documentMonth', '$monthDate'] } },
+    },
+    { $match: { contribution: { $gt: 0 } } },
+    { $match: { userRef: userRef } },
 
-// personalTransactionSchema.post('findOneAndUpdate', async function () {
-//   await (this as any).review.constructor.calcReviewMetrics(
-//     (this as any).review.product
-//   );
-// });
+    {
+      $group: {
+        _id: '$userRef',
+        inflow: { $sum: '$contribution' },
+      },
+    },
+  ]);
 
-// // Update the calculation on delete
-// personalTransactionSchema.post(
-//   'deleteOne',
-//   { document: true, query: false },
-//   function () {
-//     const model = this.constructor as ReviewModel;
-//     model.calcReviewMetrics(this.product as Types.ObjectId);
-//   }
-// );
+  // Save the balance in user database.
+  await User.findOneAndUpdate(
+    { userRef },
+    {
+      inflow: metrics?.at(0)?.inflow || 0,
+    },
+    { new: true }
+  );
+};
+
+// Update monthly inflow on save
+personalTransactionSchema.post('save', function () {
+  const model = this.constructor as TransactionModel;
+  model.calcInflow(this.userRef as string);
+});
+
+// Calculate monthly inflow on save
+personalTransactionSchema.statics.calcOutflow = async function (userRef) {
+  const metrics = await this.aggregate([
+    {
+      $addFields: {
+        documentMonth: { $month: '$createdAt' },
+        monthDate: { $month: new Date() },
+      },
+    },
+    {
+      // Match the document the added fields
+      $match: { $expr: { $eq: ['$documentMonth', '$monthDate'] } },
+    },
+    { $match: { contribution: { $lt: 0 } } },
+    { $match: { userRef: userRef } },
+
+    {
+      $group: {
+        _id: '$userRef',
+        outflow: { $sum: '$contribution' },
+      },
+    },
+  ]);
+
+  // Save the balance in user database.
+  await User.findOneAndUpdate(
+    { userRef },
+    {
+      outflow: metrics?.at(0)?.outflow || 0,
+    },
+    { new: true }
+  );
+};
+
+// Update monthly inflow on save
+personalTransactionSchema.post('save', function () {
+  const model = this.constructor as TransactionModel;
+  model.calcOutflow(this.userRef as string);
+});
 
 export default model('PersonalTransaction', personalTransactionSchema);
