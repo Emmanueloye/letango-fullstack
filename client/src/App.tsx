@@ -95,6 +95,7 @@ const router = createBrowserRouter([
     element: <DashBoardLayout />,
     loader: dashboardLoader,
     id: 'user',
+    HydrateFallback: () => null, // to stop the hydration warning in react router dom
     errorElement: <DashboardError />, //come back to this as it's not working yet.
     children: [
       { index: true, element: <Dashboard /> },

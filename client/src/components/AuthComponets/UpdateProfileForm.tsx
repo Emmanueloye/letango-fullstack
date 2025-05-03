@@ -12,12 +12,12 @@ const UpdateProfileForm = () => {
   const user = useOutletContext() as User;
   const [image, setImage] = useState(user?.photo || defaultUser);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImage(URL.createObjectURL(file));
-    }
-  };
+  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     const file = e.target.files[0];
+  //     setImage(URL.createObjectURL(file));
+  //   }
+  // };
   return (
     <article className='w-11/12 bg-gray-100 dark:bg-slate-800 container mx-auto lg:py-2 px-3 shadow-lg'>
       {/* Header */}
@@ -108,7 +108,9 @@ const UpdateProfileForm = () => {
               id='photo'
               name='photo'
               autoComplete='off'
-              onChange={handleImageChange}
+              onChange={(e) =>
+                setImage(URL.createObjectURL(e.target.files![0]))
+              }
               className='p-0.5'
             />
           </div>
