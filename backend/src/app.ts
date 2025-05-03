@@ -33,14 +33,14 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 // Security packages
 // Set HTTP request headers
 app.use(helmet());
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     useDefaults: true,
-//     // directives: {
-//     //   'img-src': ["'self'", 'https: data:'],
-//     // },
-//   })
-// );
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      'img-src': ["'self'", 'https: data:'],
+    },
+  })
+);
 
 app.use(cors());
 app.set('trust proxy', 1);
