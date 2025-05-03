@@ -13,14 +13,29 @@ type JWTPayload = AccessToken | RefreshToken;
 
 type CookiesParams = { res: Response; access: Types.ObjectId; refresh: string };
 
+export const logoutCookies = (res: Response) => {
+  // Send empty cookies to logout user.
+  res.cookie('lto_acc', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1,
+  });
+  res.cookie('lto_ref', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1,
+  });
+};
+
 export const createJWT = (payload: JWTPayload) => {
   return jwt.sign(payload, process.env.JWT_SECRET as string);
 };
 
-export const verifyJWT = (token: string) => {
+export const verifyJWT = (token: string, res: Response) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET as string);
   } catch (error) {
+    logoutCookies(res);
     throw new AppError.Unauthenticated(
       'Authentication failed due to invalid credentials.'
     );
@@ -46,20 +61,6 @@ const sendCookies = ({ res, access, refresh }: CookiesParams) => {
     signed: true,
     maxAge: Number(process.env.REFRESH_COOKIE_EXPIRES) * 24 * 60 * 60 * 1000,
     secure: process.env.NODE_ENV === 'production', // Ensure the cookie is only sent over HTTPS
-  });
-};
-
-export const logoutCookies = (res: Response) => {
-  // Send empty cookies to logout user.
-  res.cookie('lto_acc', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1,
-  });
-  res.cookie('lto_ref', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1,
   });
 };
 

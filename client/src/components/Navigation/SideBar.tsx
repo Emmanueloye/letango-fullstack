@@ -192,7 +192,7 @@ const SideBar = ({ user }: { user: User }) => {
           </>
         )}
       </ul>
-      <div className='text-[10px] text-slate-300 absolute bottom-0 mt-10 mx-4'>
+      <div className='text-[10px] text-slate-300 absolute bottom-0 left-0 mt-10 mx-4'>
         <small>Developed by Oyediran Emmanuel</small>
       </div>
     </aside>

@@ -56,7 +56,7 @@ export const protect = async (
   // If there is access token
   if (accessToken) {
     // decode the access token.
-    const decode = utils.verifyJWT(accessToken);
+    const decode = utils.verifyJWT(accessToken, res);
     const { access: userId, iat } = decode as AccessType;
 
     // Get current logged in user from the user collection
@@ -81,7 +81,7 @@ export const protect = async (
     return next();
   }
 
-  const decode = utils.verifyJWT(refreshToken);
+  const decode = utils.verifyJWT(refreshToken, res);
   const { access: userId, refresh, iat } = decode as RefreshType;
 
   const currentUser = await User.findById(userId);
