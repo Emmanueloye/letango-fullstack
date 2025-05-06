@@ -21,7 +21,11 @@ router
 
 router
   .route('/statement')
-  .post(authMiddleware.protect, personalTranController.customerStatement);
+  .get(
+    authMiddleware.protect,
+    personalTranController.switchDate,
+    personalTranController.customerStatement
+  );
 
 router
   .route('/:id')

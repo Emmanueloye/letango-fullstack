@@ -37,6 +37,12 @@ type PostInput<T> = {
   invalidate?: string[];
 };
 
+type FormDataValue = unknown;
+
+interface FormData {
+  [key: string]: FormDataValue;
+}
+
 /**
  * This function fetch data from the server and does not throw error to trigger page errorboundary.
  * @param object url, params -  fetchOnlyData accepts url and query paramaters (optional)
@@ -47,7 +53,7 @@ export const fetchOnlyData = async ({
   params,
 }: {
   url: string;
-  params?: Record<string, string | number | boolean>;
+  params?: FormData;
 }) => {
   try {
     const result = await customFetch.get(url, { params });

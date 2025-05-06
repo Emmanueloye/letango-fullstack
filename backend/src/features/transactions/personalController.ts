@@ -97,6 +97,13 @@ export const confirmPayment = async (req: Request, res: Response) => {
   res.status(statusCodes.OK).json({ status: 'success', payment });
 };
 
+export const switchDate = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.startDate) req.body.startDate = req.query.startDate;
+  if (!req.body.endDate) req.body.endDate = req.query.endDate;
+
+  next();
+};
+
 export const customerStatement = async (req: Request, res: Response) => {
   const { startDate, endDate } = req.body;
   if (startDate > endDate) {
