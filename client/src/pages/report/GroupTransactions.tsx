@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import Button from '../../components/UI/Button';
-import DateRangeSelector from '../../components/UI/DateRangeSelector';
+// import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import LinkBtn from '../../components/UI/LinkBtn';
 import Table from '../../components/UI/Table';
 import TransactionBox from '../../components/UI/TransactionBox';
@@ -21,7 +21,7 @@ const GroupTransactions = () => {
       <div className='flex justify-end mb-4'>
         <LinkBtn btnText='back' url='/account/manage-group/view/1/reports' />
       </div>
-      <DateRangeSelector />
+      {/* <DateRangeSelector /> */}
       <div className='flex justify-center'>
         <div className='md:w-2/5 w-full mt-5'>
           <Button

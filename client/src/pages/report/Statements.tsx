@@ -1,4 +1,4 @@
-import DateRangeSelector from '../../components/UI/DateRangeSelector';
+// import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import LinkBtn from '../../components/UI/LinkBtn';
 import TransactionBox from '../../components/UI/TransactionBox';
 
@@ -9,7 +9,7 @@ const Statements = () => {
         <LinkBtn btnText='back' url='/account/personal-wallet' />
       </div>
       {/* Date selector */}
-      <DateRangeSelector showCustomer title='date range & customers' />
+      {/* <DateRangeSelector showCustomer title='date range & customers' /> */}
       <article>
         <h4 className='text-center mt-8 font-600'>Transaction history</h4>
         <TransactionBox

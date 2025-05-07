@@ -1,4 +1,4 @@
-import DateRangeSelector from '../../components/UI/DateRangeSelector';
+// import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import LinkBtn from '../../components/UI/LinkBtn';
 
 const GroupStatement = () => {
@@ -7,7 +7,7 @@ const GroupStatement = () => {
       <div className='flex justify-end mb-4'>
         <LinkBtn btnText='back' url='/account/manage-group/view/1/reports' />
       </div>
-      <DateRangeSelector />
+      {/* <DateRangeSelector /> */}
       <div className='grid md:grid-cols-2 mt-4'>
         {/* Income section */}
         <div>

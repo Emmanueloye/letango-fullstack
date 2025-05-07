@@ -15,7 +15,7 @@ import { User } from '../../dtos/UserDto';
 import ReportPagination from '../../components/UI/ReportPagination';
 import { useState } from 'react';
 import { PAGE_SIZE } from '../../Actions/constant';
-import DownloadStatment from '../../components/Downloads/downloadStatment';
+import DownloadStatment from '../../components/Downloads/DownloadStatment';
 
 const WalletTransaction = () => {
   const [report, setReport] = useState<PersonalStatment>();
