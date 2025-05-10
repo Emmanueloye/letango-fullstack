@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx';
-import { StatementType } from '../../dtos/statementDto';
-import { User } from '../../dtos/UserDto';
-import { formatDate } from '../../helperFunc.ts/utilsFunc';
+import { StatementType } from '../../../dtos/statementDto';
+import { User } from '../../../dtos/UserDto';
+import { formatDate } from '../../../helperFunc.ts/utilsFunc';
 import { FaFileExcel } from 'react-icons/fa';
 
 const DownloadStatment = ({

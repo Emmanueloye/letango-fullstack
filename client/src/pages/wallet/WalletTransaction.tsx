@@ -15,7 +15,8 @@ import { User } from '../../dtos/UserDto';
 import ReportPagination from '../../components/UI/ReportPagination';
 import { useState } from 'react';
 import { PAGE_SIZE } from '../../Actions/constant';
-import DownloadStatment from '../../components/Downloads/DownloadStatment';
+import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
+import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
 
 const WalletTransaction = () => {
   const [report, setReport] = useState<PersonalStatment>();
@@ -76,8 +77,15 @@ const WalletTransaction = () => {
       <div className='block'>
         {report?.status === 'success' && report?.noHits > 0 ? (
           <>
-            <div>
+            <div className='flex gap-2 flex-wrap'>
               <DownloadStatment
+                openingBal={report?.openingBal}
+                closingBal={user?.personalWallet}
+                customerDetails={user}
+                dateRange={report?.date}
+                statementContent={report?.statement}
+              />
+              <DownloadStatementPDF
                 openingBal={report?.openingBal}
                 closingBal={user?.personalWallet}
                 customerDetails={user}
