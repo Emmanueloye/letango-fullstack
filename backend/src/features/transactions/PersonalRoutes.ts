@@ -27,6 +27,14 @@ router
     personalTranController.customerStatement
   );
 
+// router
+//   .route('/inflow')
+//   .get(authMiddleware.protect, personalTranController.monthlyInflow);
+
+// router
+//   .route('/outflow')
+//   .get(authMiddleware.protect, personalTranController.monthlyOutflow);
+
 router
   .route('/:id')
   .get(authMiddleware.protect, personalTranController.getTransaction);

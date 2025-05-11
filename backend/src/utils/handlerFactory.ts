@@ -160,6 +160,6 @@ export const deleteOne = ({ Model, label }: { Model: any; label: string }) => {
       );
     }
     await doc.deleteOne();
-    res.status(statusCodes.NO_CONTENT).json({ status: 'success' });
+    res.status(statusCodes.OK).json({ status: 'success' });
   };
 };

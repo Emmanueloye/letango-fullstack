@@ -21,6 +21,8 @@ import statusCodes from './errors/statusCodes';
 import authRouter from './features/users/authRoutes';
 import userRouter from './features/users/userRoutes';
 import personalTranRouter from './features/transactions/PersonalRoutes';
+import transferRouter from './features/transactions/transferRoute';
+import beneficiaryRouter from './features/beneficiaries/beneficiaryRoutes';
 
 // setup the application
 /**
@@ -84,6 +86,8 @@ app.use(express.static(path.resolve(__dirname, './../../client/dist')));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/personal', personalTranRouter);
+app.use('/api/v1/beneficiaries', beneficiaryRouter);
+app.use('/api/v1/transfer', transferRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {

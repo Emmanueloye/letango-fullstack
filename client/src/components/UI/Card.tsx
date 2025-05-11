@@ -5,21 +5,23 @@ const Card = ({
   balance,
   optionalText,
   icon,
+  className,
 }: {
   cardDesc: string;
   balance?: number;
   optionalText?: string;
-  icon: React.ReactElement;
+  icon?: React.ReactElement;
+  className?: string;
 }) => {
   return (
-    <div className='bg-gray-100 dark:bg-slate-800 px-2 py-4 rounded-2xl shadow-lg shadow-black/25 cursor-pointer'>
+    <div
+      className={`flex justify-center flex-col items-center bg-gray-100 dark:bg-slate-800 px-2 py-4 rounded-2xl shadow-lg shadow-black/25 ${className}`}
+    >
       <p className='text-center font-500 capitalize'>{cardDesc}</p>
-      {balance ? (
+      {balance && (
         <p className='text-center text-sm font-poppins mt-3'>
           &#8358;{`${formatNumber(balance)}`}
         </p>
-      ) : (
-        <p className='text-center text-sm font-poppins mt-3'>&#8358;{`0.00`}</p>
       )}
       {optionalText && (
         <p className='text-center text-sm font-poppins mt-3'>{optionalText}</p>

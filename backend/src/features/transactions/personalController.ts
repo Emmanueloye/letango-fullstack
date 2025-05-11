@@ -1,11 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import PersonalTransaction from './personalTransModel';
+import User from '../users/userModel';
 import axios from 'axios';
 import statusCodes from '../../errors/statusCodes';
 import crypto from 'crypto';
 import AppError from '../../errors';
 import * as utils from '../../utils';
 import * as factory from '../../utils/handlerFactory';
+import { startSession } from 'mongoose';
 
 export const initializeTransaction = async (req: Request, res: Response) => {
   if (req.body.contribution <= 0) {
@@ -64,26 +66,47 @@ export const verifyPayment = async (req: Request, res: Response) => {
 
   const data = eventData.data;
 
-  if (eventData.event === 'charge.success' && data.status === 'success') {
-    await PersonalTransaction.create({
-      userRef: data.metadata.userRef,
-      from: data.metadata.userRef,
-      to: data.metadata.userRef,
-      fromId: data.metadata.userId,
-      toId: data.metadata.userId,
-      transactionRef: data.reference,
-      contribution: data.amount / 100,
-      bank: data.authorization.bank,
-      channel: data.channel,
-      transactionId: data.id,
-      description: data.metadata.description,
-      transactionType: data.metadata.transactionType,
-      fee: data.fees / 100,
-      createdAt: Date.now(),
-    });
-  }
+  const session = await startSession();
 
-  res.status(statusCodes.OK).json({ status: 'success' });
+  if (eventData.event === 'charge.success' && data.status === 'success') {
+    try {
+      const user = await User.findOne({ userRef: data.metadata.userRef });
+      if (!user) {
+        throw new AppError.NotFound('User not found');
+      }
+
+      await session.withTransaction(async () => {
+        await PersonalTransaction.create(
+          [
+            {
+              userRef: data.metadata.userRef,
+              from: data.metadata.userRef,
+              to: data.metadata.userRef,
+              fromId: data.metadata.userId,
+              toId: data.metadata.userId,
+              transactionRef: data.reference,
+              contribution: data.amount / 100,
+              bank: data.authorization.bank,
+              channel: data.channel,
+              transactionId: data.id,
+              description: data.metadata.description,
+              transactionType: data.metadata.transactionType,
+              fee: data.fees / 100,
+              createdAt: Date.now(),
+            },
+          ],
+          { session }
+        );
+
+        user.personalWallet += data.amount / 100;
+        user.inflow += data.amount / 100;
+        await user.save({ session });
+      });
+      res.status(statusCodes.OK).json({ status: 'success' });
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
 };
 
 export const confirmPayment = async (req: Request, res: Response) => {

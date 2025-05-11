@@ -34,7 +34,7 @@ const DownloadStatementPDF = ({
       formatDate(new Date(item.createdAt)),
       item.transactionRef,
       item.description,
-      formatNumber(debit),
+      formatNumber(debit === 0 ? 0 : debit * -1),
       formatNumber(credit),
       formatNumber(balance),
     ];

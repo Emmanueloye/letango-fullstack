@@ -26,31 +26,40 @@ const PersonalWallet = () => {
               cardDesc='Balance'
               balance={user.personalWallet}
               icon={<MdOutlineAccountBalance />}
+              className='curson-pointer'
             />
           </Link>
-          <Link to='/account/personal-wallet/inflows'>
-            <Card
-              cardDesc='monthly inflow'
-              balance={user.inflow}
-              icon={<GiReceiveMoney />}
-            />
-          </Link>
-          <Link to='/account/personal-wallet/outflows'>
-            <Card
-              cardDesc='monthly outflow'
-              balance={user.outflow}
-              icon={<GiPouringChalice />}
-            />
-          </Link>
+
+          <Card
+            cardDesc='monthly inflow'
+            balance={user.inflow}
+            icon={<GiReceiveMoney />}
+          />
+
+          <Card
+            cardDesc='monthly outflow'
+            balance={user.outflow}
+            icon={<GiPouringChalice />}
+          />
         </div>
         {/* personal wallet btns */}
-        <div className='grid md:grid-cols-3 gap-3 mt-4 mb-3'>
+        <div className='grid md:grid-cols-4 gap-3 mt-4 mb-3'>
           <LinkBtn
             btnText='contribute'
             url={`/account/personal-wallet/contribute/${user.userRef}`}
             className='w-full flex justify-center'
           />
-          <Button btnText='transfer' btnType='button' />
+          <LinkBtn
+            btnText='transfer'
+            url={`/account/personal-wallet/transfer`}
+            className='w-full flex justify-center'
+          />
+          <LinkBtn
+            btnText='beneficiaries'
+            url={`/account/personal-wallet/beneficiary/${user.userRef}`}
+            className='w-full flex justify-center'
+          />
+
           <Button btnText='place withdrawal' btnType='button' />
         </div>
         {/* Chart section */}

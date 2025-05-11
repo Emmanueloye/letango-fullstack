@@ -30,7 +30,9 @@ import CreateGroup from './pages/userGroupMgt/CreateGroup';
 import KYC from './pages/userGroupMgt/KYC';
 import PersonalWallet from './pages/wallet/PersonalWallet';
 import WalletTransaction from './pages/wallet/WalletTransaction';
-import TransactionFlow from './pages/wallet/TransactionFlow';
+// import TransactionFlow, {
+//   loader as inflowLoader,
+// } from './pages/wallet/TransactionFlow';
 import EditGroup from './pages/userGroupMgt/EditGroup';
 import GroupView from './pages/userGroupMgt/GroupView';
 import CreateGroupRules from './pages/userGroupMgt/CreateGroupRules';
@@ -69,6 +71,14 @@ import PaymentConfirmation, {
   loader as paymentConfirmationLoader,
 } from './pages/wallet/PaymentConfirmation';
 import TransactionDetails from './pages/wallet/TransactionDetails';
+import PersonalTransfer, {
+  loader as personalTransferLoader,
+  action as personalTransferAction,
+} from './pages/wallet/PersonalTransfer';
+import TransferLanding from './pages/wallet/TransferLanding';
+import AddBeneficiary, {
+  action as addBeneficiaryAction,
+} from './pages/wallet/AddBeneficiary';
 
 const router = createBrowserRouter([
   {
@@ -133,6 +143,24 @@ const router = createBrowserRouter([
             action: contributeAction,
           },
           {
+            path: 'transfer',
+            children: [
+              { index: true, element: <TransferLanding /> },
+              {
+                path: 'personal',
+                element: <PersonalTransfer />,
+                loader: personalTransferLoader,
+                action: personalTransferAction,
+              },
+            ],
+          },
+
+          {
+            path: 'beneficiary/:userRef',
+            element: <AddBeneficiary />,
+            action: addBeneficiaryAction,
+          },
+          {
             path: 'contribute/confirm',
             element: <PaymentConfirmation />,
             loader: paymentConfirmationLoader,
@@ -150,8 +178,12 @@ const router = createBrowserRouter([
               },
             ],
           },
-          { path: 'inflows', element: <TransactionFlow /> },
-          { path: 'outflows', element: <TransactionFlow /> },
+          // {
+          //   path: 'inflow',
+          //   element: <TransactionFlow />,
+          //   loader: inflowLoader,
+          // },
+          // { path: 'outflows', element: <TransactionFlow /> },
         ],
       },
       {

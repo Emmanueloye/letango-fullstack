@@ -88,6 +88,10 @@ class Email {
       data
     );
   }
+
+  async sendTransactionAlert(data: any) {
+    await this.send('transactionAlert', 'Transaction Alert', data);
+  }
 }
 
 export default new Email();

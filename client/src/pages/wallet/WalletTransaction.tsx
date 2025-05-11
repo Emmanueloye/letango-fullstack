@@ -10,11 +10,11 @@ import {
   formatDateWD,
   formatNumber,
   formatTime,
+  paginate,
 } from '../../helperFunc.ts/utilsFunc';
 import { User } from '../../dtos/UserDto';
 import ReportPagination from '../../components/UI/ReportPagination';
 import { useState } from 'react';
-import { PAGE_SIZE } from '../../Actions/constant';
 import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
 import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
 
@@ -49,13 +49,8 @@ const WalletTransaction = () => {
 
   // Pagination setup
   const [searchParams] = useSearchParams();
-  // Get current page from search params.
-  const currentPage = !searchParams.get('page')
-    ? 1
-    : Number(searchParams.get('page'));
-  // Set start and end index for slice
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const endIndex = currentPage * PAGE_SIZE;
+  // Get start and end index
+  const { startIndex, endIndex } = paginate(searchParams);
 
   const statements = report?.statement || [];
   const paginateStatements = statements?.slice(startIndex, endIndex);
@@ -75,7 +70,7 @@ const WalletTransaction = () => {
 
       {/* transaction cards */}
       <div className='block'>
-        {report?.status === 'success' && report?.noHits > 0 ? (
+        {report?.status === 'success' && statements?.length > 0 ? (
           <>
             <div className='flex gap-2 flex-wrap'>
               <DownloadStatment

@@ -36,7 +36,7 @@ router
   .route('/:id')
   .get(
     authMiddleware.protect,
-    authMiddleware.restrictTo('super-admin', 'admin'),
+    authMiddleware.restrictTo('super-admin', 'admin', 'user'),
     userController.getUser
   )
   .patch(

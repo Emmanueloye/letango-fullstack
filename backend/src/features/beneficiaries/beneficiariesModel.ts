@@ -5,6 +5,9 @@ const beneficiarySchema = new Schema({
     type: Types.ObjectId,
     ref: 'User',
   },
+  userRef: {
+    type: String,
+  },
   accountRef: {
     type: String,
     required: [true, 'Account reference field is required.'],
