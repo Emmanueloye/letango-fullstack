@@ -3,6 +3,7 @@ import statusCodes from '../errors/statusCodes';
 import * as utils from '../utils';
 import GetRequestAPI, { paginateDetails } from './getRequestAPI';
 import AppError from '../errors';
+import { auditLog } from '../features/log/logController';
 
 type CreateOneParams = {
   Model: any;
@@ -10,6 +11,7 @@ type CreateOneParams = {
   queryKey?: string;
   includedFields?: string[];
   excludedFields?: string[];
+  log?: boolean;
 };
 
 type GetOneParams = {
@@ -113,6 +115,7 @@ export const updateOne = ({
   queryKey,
   includedFields,
   excludedFields,
+  log = false,
 }: CreateOneParams) => {
   return async (req: Request, res: Response) => {
     const filteredObj = utils.bodyFilter({
@@ -140,6 +143,19 @@ export const updateOne = ({
       throw new AppError.NotFound(
         `We could not find ${label} resource you are looking for.`
       );
+    }
+
+    if (log) {
+      const fields = Object.keys(filteredObj).filter(
+        (key) => filteredObj[key] != null
+      );
+      await auditLog({
+        requester: req.user.id,
+        action: 'update',
+        change: `${req.user.surname} ${req.user.otherNames} updates ${[
+          ...fields,
+        ]}`,
+      });
     }
     res.status(statusCodes.OK).json({
       status: 'success',

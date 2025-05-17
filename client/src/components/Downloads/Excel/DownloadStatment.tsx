@@ -66,7 +66,7 @@ const DownloadStatment = ({
         credit = item.contribution;
       }
       if (item.contribution < 0) {
-        runningBalance -= item.contribution;
+        runningBalance += item.contribution;
         debit = item.contribution * -1;
       }
 

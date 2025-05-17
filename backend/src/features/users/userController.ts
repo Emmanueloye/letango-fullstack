@@ -71,7 +71,7 @@ export const setUserId = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-export const processUserImage = async (
+export const processImage = async (
   req: Request,
   res: Response,
   next: NextFunction

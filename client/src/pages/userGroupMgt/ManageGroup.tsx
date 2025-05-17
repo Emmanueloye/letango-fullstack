@@ -1,8 +1,18 @@
-import { FaPeopleGroup, FaUserGroup } from 'react-icons/fa6';
+/* eslint-disable react-refresh/only-export-components */
+import { FaPeopleGroup } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import GroupCard from '../../components/DashboardComponents/GroupCard';
+import { getData, queryClient } from '../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
+import Empty from '../../components/UI/Empty';
+import { Member } from '../../dtos/groupDto';
 
 const ManageGroup = () => {
+  const { data } = useQuery({
+    queryKey: ['fetchGroupMember', 'groupMember'],
+    queryFn: () => getData({ url: `/members` }),
+  });
+
   return (
     <section>
       <Link
@@ -12,26 +22,34 @@ const ManageGroup = () => {
         create group
       </Link>
 
-      <div className='grid lg:grid-cols-4 gap-3 mt-8'>
-        <GroupCard
-          cardDesc='Alapomeji Association'
-          balance={1_200_000}
-          icon={<FaUserGroup />}
-          detailURLText={'view group'}
-          detailURL='/account/manage-group/view/1'
-          editURL='/account/manage-group/update-group/1'
-        />
-        <GroupCard
-          cardDesc='Majue Contribution'
-          balance={200_000}
-          icon={<FaPeopleGroup />}
-          detailURLText={'view group'}
-          detailURL='/account/manage-group/view/2'
-          editURL='/account/manage-group/update-group/2'
-        />
-      </div>
+      {data?.userGroups?.length > 0 ? (
+        <div className='grid lg:grid-cols-4 gap-3 mt-8'>
+          {data?.userGroups?.map((item: Member) => {
+            return (
+              <GroupCard
+                key={item?._id}
+                cardDesc={item?.groupId?.groupName}
+                balance={item?.groupId?.groupBalance}
+                icon={<FaPeopleGroup />}
+                detailURLText={'view group'}
+                detailURL={`/account/manage-group/view/${item?.groupRef}`}
+                editURL={`/account/manage-group/update-group/${item?.groupRef}`}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <Empty message='You are not a member of any group yet.' />
+      )}
     </section>
   );
 };
 
 export default ManageGroup;
+
+export const loader = () => {
+  return queryClient.ensureQueryData({
+    queryKey: ['fetchGroupMember', 'groupMember'],
+    queryFn: () => getData({ url: `/members` }),
+  });
+};

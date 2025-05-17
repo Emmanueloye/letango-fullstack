@@ -5,7 +5,11 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import LoginForm from '../../components/AuthComponets/LoginForm';
-import { extractFormData, postData } from '../../helperFunc.ts/apiRequest';
+import {
+  extractFormData,
+  postData,
+  queryClient,
+} from '../../helperFunc.ts/apiRequest';
 import { FormActionType } from '../../dtos/formAction';
 import { useEffect } from 'react';
 import { useAppDispatch } from '../../Actions/store';
@@ -30,8 +34,15 @@ export default Login;
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const data = await extractFormData(request);
-  return postData({
+  const resp = await postData({
     url: '/auth/login',
     data,
   });
+
+  if (resp.status === 'success') {
+    queryClient.invalidateQueries();
+    return resp;
+  }
+  queryClient.invalidateQueries();
+  return resp;
 };

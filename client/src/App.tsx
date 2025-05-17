@@ -25,16 +25,25 @@ import PasswordUpdate, {
   action as updatePasswordAction,
 } from './pages/auth/PasswordUpdate';
 import Dashboard from './pages/Dashboard';
-import ManageGroup from './pages/userGroupMgt/ManageGroup';
-import CreateGroup from './pages/userGroupMgt/CreateGroup';
+import ManageGroup, {
+  loader as manageGroupLoader,
+} from './pages/userGroupMgt/ManageGroup';
+import CreateGroup, {
+  action as createGroupAction,
+} from './pages/userGroupMgt/CreateGroup';
 import KYC from './pages/userGroupMgt/KYC';
 import PersonalWallet from './pages/wallet/PersonalWallet';
 import WalletTransaction from './pages/wallet/WalletTransaction';
 // import TransactionFlow, {
 //   loader as inflowLoader,
 // } from './pages/wallet/TransactionFlow';
-import EditGroup from './pages/userGroupMgt/EditGroup';
-import GroupView from './pages/userGroupMgt/GroupView';
+import EditGroup, {
+  loader as editGroupLoader,
+  action as editGroupAction,
+} from './pages/userGroupMgt/EditGroup';
+import GroupView, {
+  loader as groupViewLoader,
+} from './pages/userGroupMgt/GroupView';
 import CreateGroupRules from './pages/userGroupMgt/CreateGroupRules';
 import ViewGroupRules from './pages/userGroupMgt/ViewGroupRules';
 import BeneficiaryDetails from './pages/userGroupMgt/BeneficiaryDetails';
@@ -79,6 +88,9 @@ import TransferLanding from './pages/wallet/TransferLanding';
 import AddBeneficiary, {
   action as addBeneficiaryAction,
 } from './pages/wallet/AddBeneficiary';
+import GroupContribute, {
+  loader as groupContributeLoader,
+} from './pages/userGroupMgt/GroupContribute';
 
 const router = createBrowserRouter([
   {
@@ -190,14 +202,28 @@ const router = createBrowserRouter([
         path: 'manage-group',
 
         children: [
-          { index: true, element: <ManageGroup /> },
-          { path: 'create-group', element: <CreateGroup /> },
-          { path: 'update-group/:groupId', element: <EditGroup /> },
+          { index: true, element: <ManageGroup />, loader: manageGroupLoader },
+          {
+            path: 'create-group',
+            element: <CreateGroup />,
+            action: createGroupAction,
+          },
+          {
+            path: 'update-group/:groupId',
+            element: <EditGroup />,
+            loader: editGroupLoader,
+            action: editGroupAction,
+          },
           {
             path: 'view/:groupId',
 
             children: [
-              { index: true, element: <GroupView /> },
+              { index: true, element: <GroupView />, loader: groupViewLoader },
+              {
+                path: 'contribute',
+                element: <GroupContribute />,
+                loader: groupContributeLoader,
+              },
               { path: 'manage-rules', element: <CreateGroupRules /> },
               { path: 'view-rules', element: <ViewGroupRules /> },
               { path: 'beneficiaries', element: <BeneficiaryDetails /> },

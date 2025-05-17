@@ -23,6 +23,9 @@ import userRouter from './features/users/userRoutes';
 import personalTranRouter from './features/transactions/PersonalRoutes';
 import transferRouter from './features/transactions/transferRoute';
 import beneficiaryRouter from './features/beneficiaries/beneficiaryRoutes';
+import groupRouter from './features/group/groupRoutes';
+import memberRouter from './features/members/memberRoutes';
+import fundClassRouter from './features/groupExpenseHead/fundClassRoutes';
 
 // setup the application
 /**
@@ -88,6 +91,9 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/personal', personalTranRouter);
 app.use('/api/v1/beneficiaries', beneficiaryRouter);
 app.use('/api/v1/transfer', transferRouter);
+app.use('/api/v1/groups', groupRouter);
+app.use('/api/v1/members', memberRouter);
+app.use('/api/v1/fundClasses', fundClassRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {

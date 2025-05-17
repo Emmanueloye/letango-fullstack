@@ -139,7 +139,9 @@ export const patchData = async <T>({
     const result = await customFetch.patch(url, data);
 
     if (invalidate) {
-      queryClient.invalidateQueries({ queryKey: invalidate });
+      invalidate.forEach((item) =>
+        queryClient.invalidateQueries({ queryKey: [item] })
+      );
     }
     if (setToast) {
       toast.success(result?.data?.message, {

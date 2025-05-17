@@ -1,18 +1,29 @@
+/* eslint-disable react-refresh/only-export-components */
 import { MdChat } from 'react-icons/md';
 import GroupBanner from '../../components/DashboardComponents/GroupBanner';
 import LinkBtn from '../../components/UI/LinkBtn';
 import { useState } from 'react';
-import { Form } from 'react-router-dom';
+import { Form, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import ChatBox from '../../components/DashboardComponents/ChatBox';
 import TransactionBox from '../../components/UI/TransactionBox';
 import { chatMessages } from '../../assets/tempData/chatData';
 import { FaTimesCircle } from 'react-icons/fa';
+import { getData, queryClient } from '../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
+import { Group } from '../../dtos/groupDto';
+import { formatNumber } from '../../helperFunc.ts/utilsFunc';
 
 const GroupView = () => {
+  const params = useLoaderData();
   const [showChat, setShowChat] = useState(false);
-  // Pending
-  // const [currentMsg, setCurrentMsg] = useState('');
+
+  const { data } = useQuery({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+  });
+
+  const group: Group = data?.group;
 
   return (
     <section>
@@ -20,12 +31,14 @@ const GroupView = () => {
         <LinkBtn btnText='Back' url='/account/manage-group' />
       </div>
       {/* Group banner */}
-      <GroupBanner />
+      <GroupBanner group={group} />
       {/* Balance & report line */}
       <div className='bg-gray-100 dark:bg-slate-800 flex justify-between items-center flex-wrap mt-0.5 p-1.5 border-b-2 border-t-2 border-green-600'>
         <div className='font-poppins text-sm'>
           <span className='font-500'>Account Balance: </span>
-          <span className='font-600 text-green-600'>&#8358;20,000</span>
+          <span className='font-600 text-green-600'>
+            &#8358;{formatNumber(group?.groupBalance || 0)}
+          </span>
         </div>
 
         <LinkBtn btnText='report' url='/account/manage-group/view/1/reports' />
@@ -33,21 +46,33 @@ const GroupView = () => {
       {/* Group action buttons/links */}
 
       <div className='flex flex-wrap gap-3 mt-4 text-sm'>
+        <LinkBtn
+          btnText='contribute'
+          url={`/account/manage-group/view/${group?.groupRef}/contribute`}
+        />
         <div>
-          <Button btnText='contribute' btnType='button' />
+          <Button btnText='withdrawal' btnType='button' />
         </div>
         <div>
-          <Button btnText='payout' btnType='button' />
+          <Button btnText='invite' btnType='button' />
         </div>
         <div>
-          <Button btnText='invite members' btnType='button' />
+          <Button btnText='members' btnType='button' />
         </div>
         <LinkBtn
-          btnText='manage beneficiaries'
+          btnText='beneficiaries'
           url='/account/manage-group/view/1/beneficiaries'
         />
         <LinkBtn
-          btnText='approval authorities'
+          btnText='approvals'
+          url='/account/manage-group/view/1/beneficiaries'
+        />
+        <LinkBtn
+          btnText='fund class'
+          url='/account/manage-group/view/1/beneficiaries'
+        />
+        <LinkBtn
+          btnText='pledge'
           url='/account/manage-group/view/1/beneficiaries'
         />
       </div>
@@ -128,3 +153,11 @@ const GroupView = () => {
 };
 
 export default GroupView;
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+  });
+  return params;
+};

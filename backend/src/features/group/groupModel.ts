@@ -1,9 +1,14 @@
-import { model, Schema, Types } from 'mongoose';
+import { InferSchemaType, model, Schema, Types } from 'mongoose';
 
 const groupSchema = new Schema({
+  groupRef: {
+    type: String,
+    required: true,
+  },
   groupName: {
     type: String,
     required: [true, 'Group name field is required.'],
+    unique: true,
   },
   groupType: {
     type: String,
@@ -13,10 +18,10 @@ const groupSchema = new Schema({
     type: String,
     required: [true, 'Group purpose field is required.'],
   },
-  groupLogo: {
+  photo: {
     type: String,
   },
-  groupLogoPublicId: String,
+  photoPublicId: String,
   groupDescription: {
     type: String,
     required: [true, 'Group description field is required.'],
@@ -34,10 +39,16 @@ const groupSchema = new Schema({
     type: [Types.ObjectId],
     ref: 'User',
   },
+  groupCode: {
+    type: String,
+    unique: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
   },
 });
 
-export default model('Group', groupSchema);
+export type IGroup = InferSchemaType<typeof groupSchema>;
+
+export default model<IGroup>('Group', groupSchema);

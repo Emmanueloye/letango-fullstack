@@ -18,7 +18,7 @@ const GroupCard = ({
   icon: React.ReactElement;
 }) => {
   return (
-    <div className='bg-gray-100 dark:bg-slate-800 px-2 py-4 rounded-2xl shadow-lg shadow-black/25 cursor-pointer'>
+    <div className='bg-gray-100 dark:bg-slate-800 px-2 py-4 rounded-2xl shadow-lg shadow-black/25'>
       {/* card header */}
       <div className='flex justify-center gap-3'>
         <p className='text-center font-500 capitalize'>{cardDesc}</p>
@@ -27,11 +27,11 @@ const GroupCard = ({
         </Link>
       </div>
       {/* Card balance */}
-      {balance && (
-        <p className='text-center text-sm font-poppins mt-3'>{`N${formatNumber(
-          balance
-        )}`}</p>
-      )}
+      <div className='flex justify-center '>
+        <p className='text-center text-sm font-poppins mt-3'>
+          &#8358;{`${formatNumber(balance || 0)}`}
+        </p>
+      </div>
       {/* View details link */}
       <div className='flex justify-center mt-3 text-sm underline'>
         <Link to={detailURL} className='capitalize text-center'>

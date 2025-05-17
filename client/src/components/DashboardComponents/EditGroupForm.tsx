@@ -1,13 +1,34 @@
-import { Form } from 'react-router-dom';
+import { Form, useLoaderData } from 'react-router-dom';
 import Title from '../UI/Title';
 import Button from '../UI/Button';
+import { useQuery } from '@tanstack/react-query';
+import { getData } from '../../helperFunc.ts/apiRequest';
 
 const EditGroupForm = () => {
+  const params = useLoaderData();
+  const { data } = useQuery({
+    queryKey: ['fetchGroup', 'group'],
+    queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+  });
+
+  const typeOptions = [
+    'Peer contribution',
+    'Association',
+    'Club',
+    'Crowd funding',
+  ];
+  const purposeOptions = [
+    'Group contribution',
+    'Community portfolio',
+    'Special project',
+    'Fund raising',
+  ];
+
   return (
     <div className='w-full lg:w-4/5 lg:mx-auto bg-gray-100 dark:bg-slate-800 p-2.5 lg:p-4 rounded-lg'>
       {/* Form title */}
       <Title title='update group' />
-      <Form id='updateGroup'>
+      <Form id='updateGroup' method='patch' encType='multipart/form-data'>
         {/* Group name input */}
         <div className='mb-6'>
           <label
@@ -20,8 +41,9 @@ const EditGroupForm = () => {
             type='text'
             id='groupName'
             name='groupName'
-            defaultValue={''}
+            defaultValue={data?.group?.groupName}
             autoComplete='off'
+            className='capitalize'
           />
         </div>
         {/* Group type input */}
@@ -32,46 +54,53 @@ const EditGroupForm = () => {
           >
             group type
           </label>
+
           <select name='groupType' id='groupType'>
-            <option value='' hidden>
-              Select group type
+            <option value={data?.group?.groupType}>
+              {data?.group?.groupType}
             </option>
-            <option value=''>Peer contribution</option>
-            <option value=''>Association</option>
-            <option value=''>Club</option>
-            <option value=''>Crowd funding</option>
+            {typeOptions
+              .filter(
+                (item) =>
+                  item.toUpperCase() !== data?.group?.groupType.toUpperCase()
+              )
+              .map((item) => (
+                <option value={item} key={item}>
+                  {item}
+                </option>
+              ))}
           </select>
         </div>
         {/* Group purpose input */}
         <div className='mb-6'>
           <label
-            htmlFor='groupObjective'
+            htmlFor='groupPurpose'
             className={`after:text-red-500 after:content-['*'] after:font-700`}
           >
             Purpose of Group
           </label>
 
-          <select name='groupType' id='groupType'>
-            <option value='' hidden>
-              Select group purpose
+          <select name='groupPurpose' id='groupPurpose'>
+            <option value={data?.group?.groupPurpose}>
+              {data?.group?.groupPurpose}
             </option>
-            <option value=''>Personal contribution</option>
-            <option value=''>Group contribution</option>
-            <option value=''>Community portfolio</option>
-            <option value=''>Special project</option>
-            <option value=''>Fund raising</option>
+            {purposeOptions
+              .filter(
+                (item) =>
+                  item.toUpperCase() !== data?.group?.groupPurpose.toUpperCase()
+              )
+              .map((item) => (
+                <option value={item} key={item}>
+                  {item}
+                </option>
+              ))}
           </select>
         </div>
         {/* Group logo */}
         <div className='mb-6'>
-          <label
-            htmlFor='logo'
-            className={`after:text-red-500 after:content-['*'] after:font-700`}
-          >
-            Group logo
-          </label>
+          <label htmlFor='logo'>Group logo</label>
 
-          <input type='file' />
+          <input type='file' id='logo' name='photo' />
         </div>
         {/* Group description input */}
         <div className='mb-6'>
@@ -85,7 +114,7 @@ const EditGroupForm = () => {
           <textarea
             name='description'
             id='description'
-            defaultValue={''}
+            defaultValue={data?.group?.groupDescription}
           ></textarea>
         </div>
         <Button btnText='update group' btnType='submit' />

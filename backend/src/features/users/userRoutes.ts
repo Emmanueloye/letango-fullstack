@@ -20,7 +20,7 @@ router
     authMiddleware.protect,
     userController.setUserId,
     userController.uploadUserPhoto,
-    userController.processUserImage,
+    userController.processImage,
     userController.updateMe
   );
 

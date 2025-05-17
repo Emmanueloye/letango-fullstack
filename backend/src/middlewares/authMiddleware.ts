@@ -74,7 +74,7 @@ export const protect = async (
     utils.sendCookies({
       res,
       access: new Types.ObjectId(userId),
-      refresh: existingRefreshToken!.refreshToken,
+      refresh: existingRefreshToken?.refreshToken as string,
     });
 
     // Assign current user to req.user.
