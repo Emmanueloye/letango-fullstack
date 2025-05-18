@@ -31,7 +31,11 @@ const JoinGroup = () => {
       <article className='bg-gray-100 dark:bg-slate-700  dark:text-slate-50 p-3 shadow mt-6 mb-4 flex flex-col justify-center items-center font-500 h-auto text-center'>
         {data?.status === 'fail' && (
           <div className='bg-amber-600 p-2 rounded-lg mb-4'>
-            <p>{data?.message}. Please login or sign up to join the group.</p>
+            {data?.message.startsWith('Auth') ? (
+              <p>{data?.message}. Please login or sign up to join the group.</p>
+            ) : (
+              <p>{data?.message}</p>
+            )}
           </div>
         )}
         <h3 className='text-center mb-5'>
