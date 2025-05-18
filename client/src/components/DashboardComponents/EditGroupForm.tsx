@@ -1,10 +1,12 @@
-import { Form, useLoaderData } from 'react-router-dom';
+import { Form, useActionData, useLoaderData } from 'react-router-dom';
 import Title from '../UI/Title';
 import Button from '../UI/Button';
 import { useQuery } from '@tanstack/react-query';
 import { getData } from '../../helperFunc.ts/apiRequest';
+import FormError from '../UI/FormError';
 
 const EditGroupForm = () => {
+  const action = useActionData();
   const params = useLoaderData();
   const { data } = useQuery({
     queryKey: ['fetchGroup', params.groupId],
@@ -29,6 +31,7 @@ const EditGroupForm = () => {
       {/* Form title */}
       <Title title='update group' />
       <Form id='updateGroup' method='patch' encType='multipart/form-data'>
+        {action?.status === 'fail' && <FormError error={action?.message} />}
         {/* Group name input */}
         <div className='mb-6'>
           <label

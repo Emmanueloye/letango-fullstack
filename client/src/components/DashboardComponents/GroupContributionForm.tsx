@@ -10,8 +10,6 @@ const GroupContributionForm = () => {
 
   const excludedFields = ['peer contribution', 'crowd funding'];
 
-  //   const isIncluded = excludedFields.includes(group?.groupType.toLowerCase());
-
   return (
     <section>
       <div className='flex justify-end mb-3'>
@@ -77,8 +75,10 @@ const GroupContributionForm = () => {
                 <option value='' hidden>
                   Purpose of payment
                 </option>
-                {fundClasses?.map((item: { head: string }) => (
-                  <option value={item.head}>{item.head}</option>
+                {fundClasses?.map((item: { _id: string; head: string }) => (
+                  <option value={item._id} key={item._id}>
+                    {item.head}
+                  </option>
                 ))}
               </select>
             </div>

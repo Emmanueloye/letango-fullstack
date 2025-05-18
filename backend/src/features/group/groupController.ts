@@ -123,6 +123,12 @@ export const getGroup = async (req: Request, res: Response) => {
   // Get the current group
   const group = await Group.findOne({ groupRef: req.params.id });
 
+  if (!group) {
+    throw new AppError.NotFound(
+      'The group you are looking for is not available on the server.'
+    );
+  }
+
   // Get the group with the incoming group reference and logged in user
   const member = await Member.findOne({
     groupRef: req.params.id,
@@ -135,7 +141,52 @@ export const getGroup = async (req: Request, res: Response) => {
       'The group you are looking for is not available on the server.'
     );
   }
-  res.status(statusCodes.OK).json({ status: 'success', group });
+
+  const inviteLink = `${process.env.BASE_URL}/join/${group?.groupName
+    ?.toLowerCase()
+    .split(' ')
+    .join('-')}?group=${group?.groupRef}&join=${group?.groupCode}`;
+
+  res.status(statusCodes.OK).json({ status: 'success', group, inviteLink });
+};
+
+export const joinGroup = async (req: Request, res: Response) => {
+  // Get group and join code from the incoming query parameter
+  const { group, join } = req.body;
+  // Get the group requested to join
+  const reqGroup = await Group.findOne({ groupRef: group, groupCode: join });
+
+  // Check if the group exist
+  if (!reqGroup) {
+    throw new AppError.NotFound(
+      'Resource you are requesting for does is not available on our server.'
+    );
+  }
+
+  const existingMember = await Member.findOne({
+    memberId: req.user.id,
+    groupRef: reqGroup.groupRef,
+  });
+
+  //Check if the user is already a member the group
+  if (existingMember) {
+    throw new AppError.BadRequest(
+      `You are already a member of ${reqGroup.groupName}`
+    );
+  }
+
+  // Add member to the group
+  await Member.create({
+    memberId: req.user.id,
+    groupId: reqGroup._id,
+    groupRef: reqGroup.groupRef,
+    role: 'member',
+  });
+
+  res.status(statusCodes.CREATED).json({
+    status: 'success',
+    message: `Congratulations! You are now a member of ${reqGroup.groupName}`,
+  });
 };
 
 export const processImage = async (

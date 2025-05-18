@@ -5,39 +5,20 @@ import {
   getData,
   queryClient,
 } from '../../helperFunc.ts/apiRequest';
-import LinkBtn from '../../components/UI/LinkBtn';
-import { formatNumber } from '../../helperFunc.ts/utilsFunc';
+// import LinkBtn from '../../components/UI/LinkBtn';
+// import { formatNumber } from '../../helperFunc.ts/utilsFunc';
+import PaymentConfirmView from '../../components/DashboardComponents/PaymentConfirmView';
+import { IPayment } from '../../dtos/paymentDto';
 
 const PaymentConfirmation = () => {
   const data = useLoaderData();
 
   return (
-    <section>
-      <article className='w-full lg:w-2/5 dark:bg-slate-800 bg-gray-100 p-2 mx-auto shadow'>
-        <div className='text-center mb-4'>
-          <p className='capitalize'>Transaction Successful</p>
-          {/* <p>reference</p> */}
-        </div>
-        <div className='flex justify-between mb-3 flex-wrap'>
-          <p className='capitalize'>refrence :</p>
-          <p>{data?.payment?.transactionRef}</p>
-        </div>
-        <div className='flex justify-between mb-3 flex-wrap'>
-          <p className='capitalize'>contribution :</p>
-          <p className='font-poppins'>
-            &#8358;
-            {data?.payment?.contribution
-              ? formatNumber(data?.payment?.contribution)
-              : '0.00'}
-          </p>
-        </div>
-        <LinkBtn
-          btnText='Personal Wallet'
-          url='/account/personal-wallet'
-          className='flex justify-center'
-        />
-      </article>
-    </section>
+    <PaymentConfirmView
+      payment={data?.payment as IPayment}
+      btnText='Personal Wallet'
+      url='/account/personal-wallet'
+    />
   );
 };
 

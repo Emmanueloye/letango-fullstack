@@ -15,6 +15,7 @@ export default Contribute;
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const data = await extractFormData(request);
+  data.type = 'personal';
   queryClient.invalidateQueries();
   const result = await postData({ url: `/personal`, data });
   if (result.status === 'success') {

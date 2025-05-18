@@ -34,6 +34,7 @@ const ManageGroup = () => {
                 detailURLText={'view group'}
                 detailURL={`/account/manage-group/view/${item?.groupRef}`}
                 editURL={`/account/manage-group/update-group/${item?.groupRef}`}
+                role={item.role}
               />
             );
           })}

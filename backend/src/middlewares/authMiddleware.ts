@@ -2,6 +2,7 @@
 import { NextFunction, Request, Response } from 'express';
 import User from '../features/users/userModel';
 import Token from '../features/users/tokenModel';
+import Group from '../features/group/groupModel';
 import AppError from '../errors';
 import * as utils from '../utils';
 import { Types } from 'mongoose';
@@ -112,3 +113,51 @@ export const restrictTo = (...roles: string[]) => {
     next();
   };
 };
+
+export const checkGroupResource = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const groupId = !req.body.groupRef
+    ? (req.body.groupRef = req.params.id)
+    : req.params.id;
+
+  const group = await Group.findOne({ groupRef: groupId });
+
+  const isOwner = Array.isArray(group?.owner)
+    ? !group?.owner.includes(req.user.id)
+    : group?.owner !== req.user.id;
+
+  if (isOwner) {
+    throw new AppError.UnAuthorized(
+      'You are not permitted to perform this action.'
+    );
+  }
+
+  next();
+};
+
+// export const checkGroupResource = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const groupId = !req.body.groupRef
+//     ? (req.body.groupRef = req.params.id)
+//     : req.params.id;
+
+//   const group = await Group.findOne({ groupRef: groupId });
+
+//   const isOwner = Array.isArray(group?.owner)
+//     ? !group?.owner.includes(req.user.id)
+//     : group?.owner !== req.user.id;
+
+//   if (isOwner) {
+//     throw new AppError.UnAuthorized(
+//       'You are not permitted to perform this action.'
+//     );
+//   }
+
+//   next();
+// };

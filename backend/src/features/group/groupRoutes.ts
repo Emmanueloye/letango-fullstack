@@ -14,10 +14,13 @@ router
     groupController.createGroup
   );
 
+router.route('/join').post(authMiddleware.protect, groupController.joinGroup);
+
 router
   .route('/:id')
   .patch(
     authMiddleware.protect,
+    authMiddleware.checkGroupResource,
     groupController.uploadImage,
     groupController.processImage,
     groupController.updateGroup

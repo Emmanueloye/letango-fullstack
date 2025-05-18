@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { MdChat } from 'react-icons/md';
+import { MdChat, MdOutlineContentCopy } from 'react-icons/md';
 import GroupBanner from '../../components/DashboardComponents/GroupBanner';
 import LinkBtn from '../../components/UI/LinkBtn';
 import { useState } from 'react';
@@ -12,17 +12,44 @@ import { FaTimesCircle } from 'react-icons/fa';
 import { getData, queryClient } from '../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
 import { Group } from '../../dtos/groupDto';
-import { formatNumber } from '../../helperFunc.ts/utilsFunc';
+import {
+  formatDateWD,
+  formatNumber,
+  formatTime,
+} from '../../helperFunc.ts/utilsFunc';
+import { GroupTransaction } from '../../dtos/paymentDto';
+import Empty from '../../components/UI/Empty';
+import { toast } from 'react-toastify';
 
 const GroupView = () => {
   const params = useLoaderData();
   const [showChat, setShowChat] = useState(false);
+  const [showLink, setShowLink] = useState(false);
 
   const { data } = useQuery({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),
   });
 
+  const { data: transactData } = useQuery({
+    queryKey: ['fetchTransactions', params.groupId],
+    queryFn: () =>
+      getData({
+        url: `/group-transacts?groupRef=${params.groupId}&sort=-createdAt&limit=10`,
+      }),
+  });
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(data?.inviteLink);
+      setShowLink(false);
+      toast.success('Invite link copied to clipboard');
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
+  const transactions: GroupTransaction[] = transactData.transactions;
   const group: Group = data?.group;
 
   return (
@@ -43,6 +70,21 @@ const GroupView = () => {
 
         <LinkBtn btnText='report' url='/account/manage-group/view/1/reports' />
       </div>
+      {/* Group link copy interface */}
+      {showLink && (
+        <div className='flex items-center relative mt-3'>
+          <input
+            type='text'
+            className='pr-8 font-poppins text-sm'
+            defaultValue={data?.inviteLink}
+          />
+          <MdOutlineContentCopy
+            title='Copy'
+            className='text-2xl absolute right-0 cursor-pointer'
+            onClick={handleCopy}
+          />
+        </div>
+      )}
       {/* Group action buttons/links */}
 
       <div className='flex flex-wrap gap-3 mt-4 text-sm'>
@@ -53,7 +95,7 @@ const GroupView = () => {
         <div>
           <Button btnText='withdrawal' btnType='button' />
         </div>
-        <div>
+        <div onClick={() => setShowLink(!showLink)}>
           <Button btnText='invite' btnType='button' />
         </div>
         <div>
@@ -89,26 +131,24 @@ const GroupView = () => {
             />
           </div>
           {/* Recent transactions */}
-          <div>
-            <TransactionBox
-              description='Osunkoya Mayowa: contribution for Jan 2025'
-              date='Thursday, April 4, 2025'
-              time='11:45pm'
-              amount={20_000}
-            />
-            <TransactionBox
-              description='Anomymous: contribution for Jan 2025'
-              date='Monday, April 14, 2025'
-              time='10:15am'
-              amount={20_000}
-            />
-            <TransactionBox
-              description='Admin: payment for community gate'
-              date='Monday, April 14, 2025'
-              time='1:15pm'
-              amount={25_000}
-            />
-          </div>
+          {/* 'Osunkoya Mayowa: contribution for Jan 2025' */}
+          {transactions?.length > 0 ? (
+            <div>
+              {transactions?.map((item) => (
+                <TransactionBox
+                  key={item?._id}
+                  description={`${item?.fromId?.surname} ${
+                    item?.fromId?.otherNames?.split(' ')[0]
+                  }: ${item?.head ? item?.head : item?.description}`}
+                  date={formatDateWD(new Date(item?.createdAt))}
+                  time={formatTime(new Date(item?.createdAt))}
+                  amount={item?.contribution}
+                />
+              ))}
+            </div>
+          ) : (
+            <Empty message='No recent transaction' />
+          )}
         </main>
         {/* Group chat */}
         <aside
@@ -158,6 +198,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   await queryClient.ensureQueryData({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+  });
+
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchTransactions', params.groupId],
+    queryFn: () =>
+      getData({
+        url: `/group-transacts?groupRef=${params.groupId}&sort=-createdAt&limit=10`,
+      }),
   });
   return params;
 };

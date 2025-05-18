@@ -27,7 +27,7 @@ const groupSchema = new Schema({
     required: [true, 'Group description field is required.'],
   },
   owner: {
-    type: Types.ObjectId,
+    type: [Types.ObjectId],
     ref: 'User',
     required: true,
   },
@@ -38,6 +38,7 @@ const groupSchema = new Schema({
   approvalAuthorities: {
     type: [Types.ObjectId],
     ref: 'User',
+    select: false,
   },
   groupCode: {
     type: String,

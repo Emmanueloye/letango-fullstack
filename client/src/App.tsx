@@ -90,7 +90,14 @@ import AddBeneficiary, {
 } from './pages/wallet/AddBeneficiary';
 import GroupContribute, {
   loader as groupContributeLoader,
+  action as groupContributeAction,
 } from './pages/userGroupMgt/GroupContribute';
+import GroupPaymentConfirm, {
+  loader as groupPaymentConfirmLoader,
+} from './pages/userGroupMgt/GroupPaymentConfirm';
+import JoinGroup, {
+  action as joinGroupAction,
+} from './pages/userGroupMgt/JoinGroup';
 
 const router = createBrowserRouter([
   {
@@ -116,6 +123,11 @@ const router = createBrowserRouter([
         path: 'reset-password',
         element: <PasswordReset />,
         action: resetPasswordAction,
+      },
+      {
+        path: 'join/:groupName',
+        element: <JoinGroup />,
+        action: joinGroupAction,
       },
     ],
   },
@@ -198,6 +210,7 @@ const router = createBrowserRouter([
           // { path: 'outflows', element: <TransactionFlow /> },
         ],
       },
+
       {
         path: 'manage-group',
 
@@ -223,6 +236,12 @@ const router = createBrowserRouter([
                 path: 'contribute',
                 element: <GroupContribute />,
                 loader: groupContributeLoader,
+                action: groupContributeAction,
+              },
+              {
+                path: 'contribute/confirm',
+                element: <GroupPaymentConfirm />,
+                loader: groupPaymentConfirmLoader,
               },
               { path: 'manage-rules', element: <CreateGroupRules /> },
               { path: 'view-rules', element: <ViewGroupRules /> },

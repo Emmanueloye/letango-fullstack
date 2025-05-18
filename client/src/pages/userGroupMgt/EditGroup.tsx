@@ -14,7 +14,7 @@ const EditGroup = () => {
       <div className='flex justify-end'>
         <LinkBtn btnText='Back' url='/account/manage-group' />
       </div>
-      <EditGroupForm />;
+      <EditGroupForm />
     </>
   );
 };

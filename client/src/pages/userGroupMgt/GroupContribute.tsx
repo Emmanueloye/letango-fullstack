@@ -1,7 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
-import { LoaderFunctionArgs } from 'react-router-dom';
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  redirect,
+} from 'react-router-dom';
 import GroupContributionForm from '../../components/DashboardComponents/GroupContributionForm';
-import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
+import {
+  extractFormData,
+  fetchOnlyData,
+  postData,
+  queryClient,
+} from '../../helperFunc.ts/apiRequest';
 
 const GroupContribute = () => {
   //   const data = useLoaderData();
@@ -17,7 +26,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     queryKey: ['fetchFundClass', params.groupId],
     queryFn: () =>
       fetchOnlyData({
-        url: `/fundClasses?groupRef=${params.groupId}&headType=income`,
+        url: `/fundClasses?groupRef=${params.groupId}&headType=income&isActive=true`,
       }),
   });
 
@@ -26,4 +35,19 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
   });
   return { fundClasses: classes.fundClasses, group: respGroup.group };
+};
+
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+  const data = await extractFormData(request);
+  // console.log(params);
+
+  data.type = 'group';
+  data.groupRef = params.groupId || '';
+
+  const result = await postData({ url: `/personal`, data });
+  if (result.status === 'success') {
+    queryClient.invalidateQueries();
+    return redirect(result.redirectURL);
+  }
+  return result;
 };

@@ -9,6 +9,7 @@ const GroupCard = ({
   detailURL,
   editURL,
   icon,
+  role,
 }: {
   cardDesc: string;
   balance?: number;
@@ -16,15 +17,18 @@ const GroupCard = ({
   detailURL: string;
   editURL: string;
   icon: React.ReactElement;
+  role?: string;
 }) => {
   return (
     <div className='bg-gray-100 dark:bg-slate-800 px-2 py-4 rounded-2xl shadow-lg shadow-black/25'>
       {/* card header */}
       <div className='flex justify-center gap-3'>
         <p className='text-center font-500 capitalize'>{cardDesc}</p>
-        <Link to={editURL} className='text-amber-600'>
-          <FaPencilAlt title='Edit' />
-        </Link>
+        {role === 'owner' && (
+          <Link to={editURL} className='text-amber-600'>
+            <FaPencilAlt title='Edit' />
+          </Link>
+        )}
       </div>
       {/* Card balance */}
       <div className='flex justify-center '>

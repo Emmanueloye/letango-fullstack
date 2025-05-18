@@ -20,12 +20,13 @@ import statusCodes from './errors/statusCodes';
 //============ Import routers modules ==========//
 import authRouter from './features/users/authRoutes';
 import userRouter from './features/users/userRoutes';
-import personalTranRouter from './features/transactions/PersonalRoutes';
+import transactionRouter from './features/transactions/transactionRoutes';
 import transferRouter from './features/transactions/transferRoute';
 import beneficiaryRouter from './features/beneficiaries/beneficiaryRoutes';
 import groupRouter from './features/group/groupRoutes';
 import memberRouter from './features/members/memberRoutes';
 import fundClassRouter from './features/groupExpenseHead/fundClassRoutes';
+import groupTransactRouter from './features/transactions/groupTransactionRoutes';
 
 // setup the application
 /**
@@ -88,12 +89,13 @@ app.use(express.static(path.resolve(__dirname, './../../client/dist')));
 //==================== Mount routes =================//
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/personal', personalTranRouter);
+app.use('/api/v1/personal', transactionRouter);
 app.use('/api/v1/beneficiaries', beneficiaryRouter);
 app.use('/api/v1/transfer', transferRouter);
 app.use('/api/v1/groups', groupRouter);
 app.use('/api/v1/members', memberRouter);
 app.use('/api/v1/fundClasses', fundClassRouter);
+app.use('/api/v1/group-transacts', groupTransactRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {
