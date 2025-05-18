@@ -7,7 +7,7 @@ import { getData } from '../../helperFunc.ts/apiRequest';
 const EditGroupForm = () => {
   const params = useLoaderData();
   const { data } = useQuery({
-    queryKey: ['fetchGroup', 'group'],
+    queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),
   });
 
