@@ -14,7 +14,6 @@ import {
 
 const GroupContribute = () => {
   //   const data = useLoaderData();
-  //   console.log(data);
 
   return <GroupContributionForm />;
 };
@@ -39,7 +38,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
   const data = await extractFormData(request);
-  // console.log(params);
 
   data.type = 'group';
   data.groupRef = params.groupId || '';

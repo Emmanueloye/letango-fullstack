@@ -32,6 +32,10 @@ const GroupBanner = ({ group }: { group: Group }) => {
         }`}
       >
         <div className='mb-2'>
+          <span className='font-600 capitalize'>group Ref: </span>
+          <span className='font-poppins'>{group?.groupRef}</span>
+        </div>
+        <div className='mb-2'>
           <span className='font-600 capitalize'>group type: </span>
           <span className='capitalize'>{group?.groupType}</span>
         </div>

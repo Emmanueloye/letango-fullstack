@@ -6,6 +6,11 @@ const memberSchema = new Schema({
     ref: 'User',
     required: true,
   },
+  memberName: {
+    type: String,
+    required: true,
+    lowercase: true,
+  },
   groupId: {
     type: Types.ObjectId,
     ref: 'Group',
@@ -18,8 +23,12 @@ const memberSchema = new Schema({
   role: {
     type: String,
     enum: {
-      values: ['member', 'owner'],
+      values: ['member', 'admin', 'owner'],
     },
+  },
+  status: {
+    type: Boolean,
+    default: true,
   },
   joinedAt: {
     type: Date,
@@ -30,7 +39,10 @@ const memberSchema = new Schema({
 type IMember = InferSchemaType<typeof memberSchema>;
 
 memberSchema.pre(/^find/, function (this: Query<{}, IMember>) {
-  this.populate({ path: 'groupId' });
+  this.populate({ path: 'groupId' }).populate({
+    path: 'memberId',
+    select: 'surname otherNames',
+  });
 });
 
 export default model('Member', memberSchema);

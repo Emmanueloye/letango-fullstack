@@ -18,12 +18,11 @@ type GetOneParams = {
   Model: any;
   label: string;
   queryKey?: string;
+  paramKey?: string;
   populateOption?: { path: string; select?: string };
 };
 
-// baseUrl: '/api/v1/users',
-//   originalUrl: '/api/v1/users/me'
-
+// To create document
 export const createOne = ({
   Model,
   label,
@@ -31,12 +30,14 @@ export const createOne = ({
   excludedFields,
 }: CreateOneParams) => {
   return async (req: Request, res: Response) => {
+    // Restrict the body. This allows developers to specify either fields allowed or field to be excluded. One of these fields is required. If includedFields is specifed, no need to specified excluded fields.
     const filteredObj = utils.bodyFilter({
       req,
       includedFields,
       excludedFields,
     });
 
+    // Create new document
     const newDoc = await Model.create(filteredObj);
     res.status(statusCodes.CREATED).json({
       status: 'success',
@@ -48,12 +49,36 @@ export const createOne = ({
   };
 };
 
-export const getAll = ({ Model, label }: { Model: any; label: string }) => {
+// This Get all data relating to the query sent. You can also pass additional queries to the function by setting queryKeys and values. QueryKeys are the fields that will be queried and the values are the values that will be used to filter or query the fields.
+export const getAll = ({
+  Model,
+  label,
+  queryKeys,
+  values,
+}: {
+  Model: any;
+  label: string;
+  queryKeys?: string[];
+  values?: string[];
+}) => {
   return async (req: Request, res: Response) => {
-    // Hack to get reviews on product - for nested get request on review
     let filterObj: any = {};
-    if (req.params.productid) filterObj = { product: req.params.productId };
 
+    if (queryKeys) {
+      if (!values) {
+        throw new AppError.BadRequest(
+          'QueryKey and query properties must be specified.'
+        );
+      }
+    }
+
+    // This enable us to pass additional queries to the getAll function. Only specify the properties on database as the queryKeys and the name of the value(s) coming from the user as values.
+    if (queryKeys && values) {
+      queryKeys.map((el, i) => (filterObj[el] = req.query[values[i]]));
+      // console.log(filterObj);
+    }
+
+    // Get requested data. Where querykeys and values are set and not available on the request, this query return an empty array.
     const getFeatures = new GetRequestAPI(Model.find(filterObj), req.query)
       .filter()
       .sort()
@@ -79,17 +104,21 @@ export const getAll = ({ Model, label }: { Model: any; label: string }) => {
   };
 };
 
+// GetOne function allows user to query for a single document. queryKey allows developers to modify the standard query by being specify with their query. paramKey allows you to switch between req.params and req.query
 export const getOne = ({
   Model,
   label,
   queryKey,
   populateOption,
+  paramKey,
 }: GetOneParams) => {
   return async (req: Request, res: Response) => {
     let query;
     // To make the factory flexible to find by other criteria other than id.
     if (queryKey) {
-      query = Model.findOne({ [queryKey]: req.params.id });
+      // Sometimes, value may be coming from req.query and not req.params. This make it ease to use the function for both. Specify paramKey to match the property of the incoming req.query. If not specified, then req.params.id will be used.
+      const value = paramKey ? req.query[paramKey] : req.params.id;
+      query = Model.findOne({ [queryKey]: value });
     } else {
       query = Model.findById(req.params.id);
     }
@@ -109,6 +138,7 @@ export const getOne = ({
   };
 };
 
+// Ditto to createOne
 export const updateOne = ({
   Model,
   label,
@@ -145,6 +175,7 @@ export const updateOne = ({
       );
     }
 
+    // If log is present, create an audit trail for such update.
     if (log) {
       const fields = Object.keys(filteredObj).filter(
         (key) => filteredObj[key] != null
@@ -167,6 +198,7 @@ export const updateOne = ({
   };
 };
 
+// The function delete document.
 export const deleteOne = ({ Model, label }: { Model: any; label: string }) => {
   return async (req: Request, res: Response) => {
     const doc = await Model.findById(req.params.id);

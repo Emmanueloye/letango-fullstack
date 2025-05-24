@@ -9,6 +9,7 @@ const groupSchema = new Schema({
     type: String,
     required: [true, 'Group name field is required.'],
     unique: true,
+    lowercase: true,
   },
   groupType: {
     type: String,

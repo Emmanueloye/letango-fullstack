@@ -8,4 +8,6 @@ import statusCodes from '../../errors/statusCodes';
 export const getFundClass = factory.getAll({
   Model: FundClass,
   label: 'fundClasses',
+  queryKeys: ['groupRef', 'headType', 'isActive'],
+  values: ['groupRef', 'headType', 'isActive'],
 });

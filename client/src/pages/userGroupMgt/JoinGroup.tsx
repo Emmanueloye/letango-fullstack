@@ -9,7 +9,11 @@ import {
   useSubmit,
 } from 'react-router-dom';
 import Button from '../../components/UI/Button';
-import { extractFormData, postData } from '../../helperFunc.ts/apiRequest';
+import {
+  extractFormData,
+  postData,
+  queryClient,
+} from '../../helperFunc.ts/apiRequest';
 
 const JoinGroup = () => {
   const data = useActionData();
@@ -77,6 +81,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   });
 
   if (resp.status === 'success') {
+    queryClient.invalidateQueries({ queryKey: ['fetchMemberList'] });
     return redirect('/account/manage-group');
   }
 

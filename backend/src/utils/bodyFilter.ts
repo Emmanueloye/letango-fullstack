@@ -13,7 +13,7 @@ const fieldCheck = ({
   // Create a copy of the request body
   const incomingReqBody: Record<string, any> = { ...req.body };
 
-  // Create a new object variable to store the manupulated the incoming request body.
+  // Create a new object variable to store the manupulated incoming request body.
   let acceptedBodyObj: Record<string, any> = {};
 
   if (includedFields && excludedFields) {
@@ -31,7 +31,7 @@ const fieldCheck = ({
     });
   }
 
-  // If exludedFields is set, manupulate the incoming request body to delete fields specified in the includedFields array.
+  // If exludedFields is set, manupulate the incoming request body to delete fields specified in the excludedFields array.
   if (excludedFields) {
     excludedFields.forEach((el) => {
       if (incomingReqBody.hasOwnProperty(el)) {

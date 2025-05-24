@@ -44,8 +44,6 @@ const TransactionFlow = () => {
   const inflowList = flowData || [];
   const paginateInflow = inflowList?.slice(startIndex, endIndex);
 
-  console.log(paginateInflow);
-
   return (
     <div>
       <div className='flex justify-end mb-4'>

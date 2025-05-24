@@ -137,27 +137,3 @@ export const checkGroupResource = async (
 
   next();
 };
-
-// export const checkGroupResource = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const groupId = !req.body.groupRef
-//     ? (req.body.groupRef = req.params.id)
-//     : req.params.id;
-
-//   const group = await Group.findOne({ groupRef: groupId });
-
-//   const isOwner = Array.isArray(group?.owner)
-//     ? !group?.owner.includes(req.user.id)
-//     : group?.owner !== req.user.id;
-
-//   if (isOwner) {
-//     throw new AppError.UnAuthorized(
-//       'You are not permitted to perform this action.'
-//     );
-//   }
-
-//   next();
-// };

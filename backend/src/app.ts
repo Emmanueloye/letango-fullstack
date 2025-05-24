@@ -22,7 +22,7 @@ import authRouter from './features/users/authRoutes';
 import userRouter from './features/users/userRoutes';
 import transactionRouter from './features/transactions/transactionRoutes';
 import transferRouter from './features/transactions/transferRoute';
-import beneficiaryRouter from './features/beneficiaries/beneficiaryRoutes';
+import beneficiaryRouter from './features/beneficiaries/beneficiaryRoutes'; //start here
 import groupRouter from './features/group/groupRoutes';
 import memberRouter from './features/members/memberRoutes';
 import fundClassRouter from './features/groupExpenseHead/fundClassRoutes';

@@ -13,13 +13,17 @@ import * as factory from '../../utils/handlerFactory';
 import { startSession } from 'mongoose';
 
 export const initializeTransaction = async (req: Request, res: Response) => {
+  // reject request if contribution is not up to NGN1000
   if (req.body.contribution <= 999) {
     throw new AppError.BadRequest('Contribution cannot be less than NGN1.');
   }
 
+  // To switch call back link depending on the type of contribution.
   let callBackLink;
+  // To switch data depending on the type of contribution
   let data;
 
+  // For personal wallet contribution
   if (req.body.type === 'personal') {
     callBackLink = process.env.PAYSTACK_CALLBACK_URL;
 
@@ -37,6 +41,7 @@ export const initializeTransaction = async (req: Request, res: Response) => {
     };
   }
 
+  // For group contribution
   if (req.body.type === 'group') {
     callBackLink = `${process.env.BASE_URL}/account/manage-group/view/${req.body.groupRef}/contribute/confirm`;
 
@@ -59,6 +64,7 @@ export const initializeTransaction = async (req: Request, res: Response) => {
     };
   }
 
+  // Send request to paystack
   try {
     const url = `${process.env.PAYSTACK_BASE_URL}/transaction/initialize`;
     const result = await axios.post(url, data, {
@@ -76,8 +82,6 @@ export const initializeTransaction = async (req: Request, res: Response) => {
       redirectURL: authorization_url,
     });
   } catch (error: any) {
-    // console.log(error);
-
     res.status(error.status).json({
       status: 'fail',
       message: error.message,
@@ -89,6 +93,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
   // Based on the initialization request, an event is emitted back to the server which is handled in verify checkout handler.
   let eventData;
 
+  // Verify that the incoming request is from paystack
   const hash = crypto
     .createHmac('sha512', `${process.env.PAYSTACK_API_SECRET}`)
     .update(JSON.stringify(req.body))
@@ -100,8 +105,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
 
   const data = eventData.data;
 
-  // console.log(data);
-
+  // Initiate a session for atomicity
   const session = await startSession();
 
   if (eventData.event === 'charge.success' && data.status === 'success') {
@@ -145,13 +149,11 @@ export const verifyPayment = async (req: Request, res: Response) => {
         throw new Error(error.message);
       }
     }
-    console.log(data.metadata.type);
 
     // This handles group contribution
     if (data.metadata.type === 'group') {
       try {
         const group = await Group.findOne({ groupRef: data.metadata.groupRef });
-        console.log(group);
 
         if (!group) {
           throw new AppError.NotFound('Group not found');
@@ -195,28 +197,20 @@ export const verifyPayment = async (req: Request, res: Response) => {
 };
 
 // To confirm payment made to personal wallet
-export const confirmPayment = async (req: Request, res: Response) => {
-  const payment = await PersonalTransaction.findOne({
-    transactionRef: req.query.reference,
-  });
-
-  if (!payment) {
-    throw new AppError.NotFound('No resource for this payment.');
-  }
-  res.status(statusCodes.OK).json({ status: 'success', payment });
-};
+export const confirmPersonalPayment = factory.getOne({
+  Model: PersonalTransaction,
+  label: 'payment',
+  queryKey: 'transactionRef',
+  paramKey: 'reference',
+});
 
 // To confirm group payment to user
-export const confirmGroupPayment = async (req: Request, res: Response) => {
-  const payment = await GroupTransaction.findOne({
-    transactionRef: req.query.reference,
-  });
-
-  if (!payment) {
-    throw new AppError.NotFound('No resource for this payment.');
-  }
-  res.status(statusCodes.OK).json({ status: 'success', payment });
-};
+export const confirmGroupPayment = factory.getOne({
+  Model: GroupTransaction,
+  label: 'payment',
+  queryKey: 'transactionRef',
+  paramKey: 'reference',
+});
 
 export const switchDate = (req: Request, res: Response, next: NextFunction) => {
   if (!req.body.startDate) req.body.startDate = req.query.startDate;
@@ -227,24 +221,30 @@ export const switchDate = (req: Request, res: Response, next: NextFunction) => {
 
 // Generates customers statement
 export const customerStatement = async (req: Request, res: Response) => {
+  // get incoming dates
   const { startDate, endDate } = req.body;
+  // Ensures that endate is not lower than start date
   if (startDate > endDate) {
     throw new AppError.BadRequest(
       'End date cannot be earlier than the start date.'
     );
   }
 
+  // Reformat end date
   const lastDate: Date = utils.lastDate(endDate);
 
+  // Transactions from beginning till start date to calculate opening balance
   const priorDateData = await PersonalTransaction.find({
     userRef: req.user.userRef,
     createdAt: { $gte: new Date('2025-01-01'), $lte: startDate },
   });
 
+  // Calculation of opening balance
   const openingBal = priorDateData.reduce((acc, curr) => {
     return acc + curr.contribution;
   }, 0);
 
+  // Get transactions within the start and end date
   const statement = await PersonalTransaction.find({
     userRef: req.user.userRef,
     createdAt: { $gte: new Date(startDate), $lte: lastDate },

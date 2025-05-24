@@ -31,7 +31,6 @@ const AddBeneficiaryForm = () => {
       }
     }, 2000);
   };
-  //   console.log(account);
 
   return (
     <Form method='post' className='bg-gray-100 dark:bg-slate-800 p-2 w-full '>

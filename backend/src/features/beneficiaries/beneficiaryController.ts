@@ -40,12 +40,14 @@ export const saveBeneficiary = async (req: Request, res: Response) => {
   res.status(statusCodes.CREATED).json({ status: 'success', beneficiary });
 };
 
+// Get the currently logged in beneficiaries
 export const getMyBeneficiaries = async (req: Request, res: Response) => {
   const beneficiaries = await Beneficiary.find({ userRef: req.user.userRef });
 
   res.status(statusCodes.OK).json({ status: 'success', beneficiaries });
 };
 
+// Delete beneficiaries
 export const deleteBeneficiaries = factory.deleteOne({
   Model: Beneficiary,
   label: 'beneficiary',

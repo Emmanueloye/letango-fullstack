@@ -3,7 +3,12 @@ import { MdChat, MdOutlineContentCopy } from 'react-icons/md';
 import GroupBanner from '../../components/DashboardComponents/GroupBanner';
 import LinkBtn from '../../components/UI/LinkBtn';
 import { useState } from 'react';
-import { Form, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import {
+  Form,
+  LoaderFunctionArgs,
+  redirect,
+  useLoaderData,
+} from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import ChatBox from '../../components/DashboardComponents/ChatBox';
 import TransactionBox from '../../components/UI/TransactionBox';
@@ -80,7 +85,7 @@ const GroupView = () => {
           />
           <MdOutlineContentCopy
             title='Copy'
-            className='text-2xl absolute right-0 cursor-pointer'
+            className='text-2xl absolute right-0 cursor-copy'
             onClick={handleCopy}
           />
         </div>
@@ -98,9 +103,10 @@ const GroupView = () => {
         <div onClick={() => setShowLink(!showLink)}>
           <Button btnText='invite' btnType='button' />
         </div>
-        <div>
-          <Button btnText='members' btnType='button' />
-        </div>
+        <LinkBtn
+          btnText='members'
+          url={`/account/manage-group/view/${group?.groupRef}/members`}
+        />
         <LinkBtn
           btnText='beneficiaries'
           url='/account/manage-group/view/1/beneficiaries'
@@ -207,5 +213,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
         url: `/group-transacts?groupRef=${params.groupId}&sort=-createdAt&limit=10`,
       }),
   });
+
+  const resp = await queryClient.ensureQueryData({
+    queryKey: ['fetchMember', params.groupId],
+    queryFn: () => getData({ url: `/members/${params.groupId}` }),
+  });
+
+  if (resp.status === 'fail') {
+    return redirect('/account/manage-group');
+  }
   return params;
 };

@@ -6,6 +6,6 @@ const router = Router();
 
 router
   .route('/')
-  .get(authMiddleware.protect, groupTransactController.getTransactions);
+  .get(authMiddleware.protect, groupTransactController.getGroupTransactions);
 
 export default router;

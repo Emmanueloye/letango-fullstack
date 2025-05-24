@@ -98,6 +98,9 @@ import GroupPaymentConfirm, {
 import JoinGroup, {
   action as joinGroupAction,
 } from './pages/userGroupMgt/JoinGroup';
+import MembersList, {
+  loader as memberListLoader,
+} from './pages/userGroupMgt/MembersList';
 
 const router = createBrowserRouter([
   {
@@ -242,6 +245,12 @@ const router = createBrowserRouter([
                 path: 'contribute/confirm',
                 element: <GroupPaymentConfirm />,
                 loader: groupPaymentConfirmLoader,
+              },
+
+              {
+                path: 'members',
+                element: <MembersList />,
+                loader: memberListLoader,
               },
               { path: 'manage-rules', element: <CreateGroupRules /> },
               { path: 'view-rules', element: <ViewGroupRules /> },

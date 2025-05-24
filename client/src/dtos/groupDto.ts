@@ -22,3 +22,25 @@ export type Member = {
   role: string;
   joinedAt: Date;
 };
+
+export type IPages = {
+  totalPages: number;
+  currentPage: number;
+  nextPage: number;
+  previousPage: number;
+  baseLink: string;
+};
+
+export type IMember = {
+  _id: string;
+  memberId: {
+    _id: string;
+    surname: string;
+    otherNames: string;
+  };
+  groupId: string;
+  groupRef: string;
+  role: 'member' | 'admin';
+  status: boolean;
+  joinedAt: Date;
+};

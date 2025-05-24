@@ -102,7 +102,6 @@ export const personalTransfer = async (req: Request, res: Response) => {
       newTo.personalWallet += Number(amount);
       newTo.inflow += Number(amount);
       await newTo.save({ session });
-      console.log(typeof amount);
 
       const senderEmailData = {
         senderName: `Transfer to ${newTo.surname} ${newTo.otherNames}`,
@@ -130,8 +129,6 @@ export const personalTransfer = async (req: Request, res: Response) => {
         .json({ status: 'success', message: 'Transaction successful.' });
     });
   } catch (error) {
-    console.log(error);
-
     throw new AppError.BadRequest(
       'Transaction failed. Please try again later.'
     );

@@ -10,7 +10,6 @@ router
     authMiddleware.protect,
     transferController.validateTransfer,
     transferController.personalTransfer
-  )
-  .get();
+  );
 
 export default router;

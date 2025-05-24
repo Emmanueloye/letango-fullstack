@@ -92,6 +92,7 @@ export const createGroup = async (req: Request, res: Response) => {
           memberId: req.user.id,
           groupId: group[0]._id,
           groupRef: group[0].groupRef,
+          memberName: `${req.user.surname} ${req.user.otherNames}`,
           role: 'owner',
         },
       ],
@@ -180,6 +181,7 @@ export const joinGroup = async (req: Request, res: Response) => {
     memberId: req.user.id,
     groupId: reqGroup._id,
     groupRef: reqGroup.groupRef,
+    memberName: `${req.user.surname} ${req.user.otherNames}`,
     role: 'member',
   });
 

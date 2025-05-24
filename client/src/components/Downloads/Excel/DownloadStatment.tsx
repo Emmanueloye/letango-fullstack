@@ -85,8 +85,6 @@ const DownloadStatment = ({
     // Closing Balance
     data.push(['', '', 'Closing Balance', '', '', closingBal || 0]);
 
-    // console.log(data);
-
     // Convert the data array to a worksheet
     const ws = XLSX.utils.aoa_to_sheet(data);
 

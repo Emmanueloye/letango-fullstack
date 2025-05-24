@@ -6,3 +6,10 @@ export const getTransactions = factory.getAll({
   Model: GroupTransaction,
   label: 'transactions',
 });
+
+export const getGroupTransactions = factory.getAll({
+  Model: GroupTransaction,
+  label: 'transactions',
+  queryKeys: ['groupRef'],
+  values: ['groupRef'],
+});

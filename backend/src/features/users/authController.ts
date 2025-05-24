@@ -35,6 +35,7 @@ export const createUser = async (req: Request, res: Response) => {
     res.status(statusCodes.CREATED).json({
       status: 'success',
       message: 'Please check your email for your verification email.',
+      url: data.url,
     });
   } catch (error) {
     await User.deleteOne({ _id: newUser._id });

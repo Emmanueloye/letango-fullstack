@@ -17,7 +17,7 @@ router.route('/webhook').post(transactionController.verifyPayment);
 
 router
   .route('/confirm')
-  .get(authMiddleware.protect, transactionController.confirmPayment);
+  .get(authMiddleware.protect, transactionController.confirmPersonalPayment);
 
 router
   .route('/group-confirm')
