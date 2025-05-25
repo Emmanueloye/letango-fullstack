@@ -21,19 +21,22 @@ export const validateCreateHead = utils.checkForErrors([
 export const getFundClass = factory.getAll({
   Model: FundClass,
   label: 'fundClasses',
-  // queryKeys: ['groupRef', 'headType', 'isActive'],
-  // values: ['groupRef', 'headType', 'isActive'],
+});
+
+export const getFundHead = factory.getOne({
+  Model: FundClass,
+  label: 'fundHead',
 });
 
 // To update fund heads for club and association.
 export const updateFundHead = factory.updateOne({
   Model: FundClass,
   label: 'fundHead',
-  // queryKey: 'groupRef',
+  includedFields: ['head', 'headType', 'isActive'],
 });
 
 // To delete fund heads for club and association.
-export const deleteFundHead = factory.deleteOne({
-  Model: FundClass,
-  label: 'fundHead',
-});
+// export const deleteFundHead = factory.deleteOne({
+//   Model: FundClass,
+//   label: 'fundHead',
+// });

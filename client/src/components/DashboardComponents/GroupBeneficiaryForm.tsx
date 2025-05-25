@@ -2,13 +2,15 @@ import { ChangeEvent, useState } from 'react';
 import Button from '../../components/UI/Button';
 import { FaTrash } from 'react-icons/fa';
 import LinkBtn from '../../components/UI/LinkBtn';
+import { useParams } from 'react-router-dom';
 
 type BeneficiaryType = {
   accountName: string;
   accountNumber: string;
 };
 
-const BeneficiaryDetails = () => {
+const GroupBeneficiaryForm = () => {
+  const params = useParams();
   const [beneficiary, setBeneficiary] = useState([
     {
       accountName: '',
@@ -46,7 +48,10 @@ const BeneficiaryDetails = () => {
           />
         </div>
 
-        <LinkBtn btnText='back' url='/account/manage-group/view/1' />
+        <LinkBtn
+          btnText='back'
+          url={`/account/manage-group/view/${params.groupId}`}
+        />
       </div>
       {beneficiary.map((item, i) => (
         <div
@@ -88,4 +93,4 @@ const BeneficiaryDetails = () => {
   );
 };
 
-export default BeneficiaryDetails;
+export default GroupBeneficiaryForm;

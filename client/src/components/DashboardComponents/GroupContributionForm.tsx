@@ -1,12 +1,30 @@
+import { useQuery } from '@tanstack/react-query';
 import { User } from '../../dtos/UserDto';
 import Button from '../UI/Button';
 import LinkBtn from '../UI/LinkBtn';
 import Title from '../UI/Title';
-import { Form, useLoaderData, useOutletContext } from 'react-router-dom';
+import { Form, useOutletContext, useParams } from 'react-router-dom';
+import { fetchOnlyData } from '../../helperFunc.ts/apiRequest';
 
 const GroupContributionForm = () => {
+  const params = useParams();
   const user = useOutletContext() as User;
-  const { group, fundClasses } = useLoaderData();
+
+  const { data: fundClass } = useQuery({
+    queryKey: ['fetchFundHead', params.groupId],
+    queryFn: () =>
+      fetchOnlyData({
+        url: `/fundClasses?groupRef=${params.groupId}&headType=income&isActive=true`,
+      }),
+  });
+
+  const { data: groupData } = useQuery({
+    queryKey: ['user', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
+
+  const fundClasses = fundClass?.fundClasses;
+  const group = groupData?.group;
 
   const excludedFields = ['peer contribution', 'crowd funding'];
 

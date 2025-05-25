@@ -34,9 +34,6 @@ import CreateGroup, {
 import KYC from './pages/userGroupMgt/KYC';
 import PersonalWallet from './pages/wallet/PersonalWallet';
 import WalletTransaction from './pages/wallet/WalletTransaction';
-// import TransactionFlow, {
-//   loader as inflowLoader,
-// } from './pages/wallet/TransactionFlow';
 import EditGroup, {
   loader as editGroupLoader,
   action as editGroupAction,
@@ -46,7 +43,6 @@ import GroupView, {
 } from './pages/userGroupMgt/GroupView';
 import CreateGroupRules from './pages/userGroupMgt/CreateGroupRules';
 import ViewGroupRules from './pages/userGroupMgt/ViewGroupRules';
-import BeneficiaryDetails from './pages/userGroupMgt/BeneficiaryDetails';
 import GroupReportLanding from './pages/report/GroupReportLanding';
 import GroupTransactions from './pages/report/GroupTransactions';
 import GroupStatement from './pages/report/GroupStatement';
@@ -108,6 +104,11 @@ import CreateFundHead, {
   loader as createFundHeadLoader,
   action as createFundHeaderLoader,
 } from './pages/userGroupMgt/CreateFundHead';
+import EditFundHead, {
+  loader as editFundHeadLoader,
+  action as editFundHeadAction,
+} from './pages/userGroupMgt/EditFundHead';
+import AddGroupBeneficiary from './pages/userGroupMgt/AddGroupBeneficiary';
 
 const router = createBrowserRouter([
   {
@@ -212,12 +213,6 @@ const router = createBrowserRouter([
               },
             ],
           },
-          // {
-          //   path: 'inflow',
-          //   element: <TransactionFlow />,
-          //   loader: inflowLoader,
-          // },
-          // { path: 'outflows', element: <TransactionFlow /> },
         ],
       },
 
@@ -275,13 +270,22 @@ const router = createBrowserRouter([
                   },
                   {
                     path: 'edit/:headId',
-                    element: <p></p>,
+                    element: <EditFundHead />,
+                    loader: editFundHeadLoader,
+                    action: editFundHeadAction,
                   },
                 ],
               },
               { path: 'manage-rules', element: <CreateGroupRules /> },
               { path: 'view-rules', element: <ViewGroupRules /> },
-              { path: 'beneficiaries', element: <BeneficiaryDetails /> },
+              { path: 'beneficiaries', element: <AddGroupBeneficiary /> },
+              {
+                path: 'my-pledge',
+                children: [
+                  { index: true, element: <p>pledge</p> },
+                  { path: 'create', element: <p>create pledge</p> },
+                ],
+              },
               {
                 path: 'reports',
                 children: [

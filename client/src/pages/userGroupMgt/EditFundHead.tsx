@@ -4,21 +4,30 @@ import {
   LoaderFunctionArgs,
   redirect,
 } from 'react-router-dom';
-import CreateFundHeadForm from '../../components/DashboardComponents/CreateFundHeadForm';
 import {
   extractFormData,
   fetchOnlyData,
-  postData,
+  getData,
+  patchData,
   queryClient,
 } from '../../helperFunc.ts/apiRequest';
+import EditFundHeadForm from '../../components/DashboardComponents/EditFundHeadForm';
 
-const CreateFundHead = () => {
-  return <CreateFundHeadForm />;
+const EditFundHead = () => {
+  return <EditFundHeadForm />;
 };
 
-export default CreateFundHead;
+export default EditFundHead;
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fundHead', { ...params }],
+    queryFn: () =>
+      getData({
+        url: `/fundClasses/${params.headId}?groupRef=${params.groupId}`,
+      }),
+  });
+
   const resp = await queryClient.ensureQueryData({
     queryKey: ['fetchMember', params.groupId],
     queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
@@ -32,12 +41,12 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
-  const data = await extractFormData(request);
+  const formData = await extractFormData(request);
 
-  return postData({
-    url: `/fundClasses`,
-    data,
-    invalidate: ['fetchFundHead', 'fundHead'],
+  return patchData({
+    url: `/fundClasses/${params.headId}?groupRef=${params.groupId}`,
+    data: { head: formData.head, headType: formData.headType },
+    invalidate: ['fundHead', 'fetchFundHead'],
     redirectTo: `/account/manage-group/view/${params.groupId}/fund-heads`,
     setToast: true,
   });

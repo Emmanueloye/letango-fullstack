@@ -22,7 +22,7 @@ export default GroupContribute;
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const classes = await queryClient.ensureQueryData({
-    queryKey: ['fetchFundClass', params.groupId],
+    queryKey: ['fetchFundHead', params.groupId],
     queryFn: () =>
       fetchOnlyData({
         url: `/fundClasses?groupRef=${params.groupId}&headType=income&isActive=true`,

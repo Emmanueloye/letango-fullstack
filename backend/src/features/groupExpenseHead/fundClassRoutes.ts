@@ -15,4 +15,13 @@ router
     fundClassController.createFunHead
   );
 
+router
+  .route('/:id')
+  .get(authMiddleware.protect, checkAdmin, fundClassController.getFundHead)
+  .patch(
+    authMiddleware.protect,
+    checkAdmin,
+    fundClassController.updateFundHead
+  );
+
 export default router;

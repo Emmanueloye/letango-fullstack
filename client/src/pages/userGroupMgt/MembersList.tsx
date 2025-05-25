@@ -65,7 +65,7 @@ const MembersList = () => {
       });
 
       //   Set members state depending on the result status. If there is error, we want to revert back to the main data.
-      if (result.status === 'success') {
+      if (result?.status === 'success' && searchVal) {
         setMembers(result?.members);
         setIsSearching(false);
       } else {

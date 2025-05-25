@@ -111,10 +111,10 @@ const GroupView = () => {
           btnText='members'
           url={`/account/manage-group/view/${group?.groupRef}/members`}
         />
-        <LinkBtn
+        {/* <LinkBtn
           btnText='beneficiaries'
-          url='/account/manage-group/view/1/beneficiaries'
-        />
+          url={`/account/manage-group/view/${group?.groupRef}/beneficiaries`}
+        /> */}
         <LinkBtn
           btnText='approvals'
           url='/account/manage-group/view/1/beneficiaries'
@@ -125,7 +125,7 @@ const GroupView = () => {
         />
         <LinkBtn
           btnText='pledge'
-          url='/account/manage-group/view/1/beneficiaries'
+          url={`/account/manage-group/view/${group?.groupRef}/my-pledge`}
         />
       </div>
 
