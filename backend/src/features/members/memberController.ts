@@ -65,14 +65,14 @@ export const checkMembership = async (
   next();
 };
 
-// Middleware function checking that only member can view member list.
+// Middleware function checking that only member with owner and admin right can modify key group information.
 export const checkAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const member = await Member.findOne({
-    groupRef: req.query.groupRef,
+    groupRef: req.body.groupRef ? req.body.groupRef : req.query.groupRef,
     memberId: req.user._id,
     status: true,
   });
@@ -82,8 +82,6 @@ export const checkAdmin = async (
       'Your request cannot be handled by our server.'
     );
   }
-
-  console.log(member.role);
 
   if (!['admin', 'owner'].includes(member?.role as string)) {
     throw new AppError.UnAuthorized(

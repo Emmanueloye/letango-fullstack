@@ -14,7 +14,11 @@ import ChatBox from '../../components/DashboardComponents/ChatBox';
 import TransactionBox from '../../components/UI/TransactionBox';
 import { chatMessages } from '../../assets/tempData/chatData';
 import { FaTimesCircle } from 'react-icons/fa';
-import { getData, queryClient } from '../../helperFunc.ts/apiRequest';
+import {
+  fetchOnlyData,
+  getData,
+  queryClient,
+} from '../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
 import { Group } from '../../dtos/groupDto';
 import {
@@ -117,7 +121,7 @@ const GroupView = () => {
         />
         <LinkBtn
           btnText='fund class'
-          url='/account/manage-group/view/1/beneficiaries'
+          url={`/account/manage-group/view/${group?.groupRef}/fund-heads`}
         />
         <LinkBtn
           btnText='pledge'
@@ -216,7 +220,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
   const resp = await queryClient.ensureQueryData({
     queryKey: ['fetchMember', params.groupId],
-    queryFn: () => getData({ url: `/members/${params.groupId}` }),
+    queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
   });
 
   if (resp.status === 'fail') {

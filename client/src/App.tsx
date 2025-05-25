@@ -101,6 +101,13 @@ import JoinGroup, {
 import MembersList, {
   loader as memberListLoader,
 } from './pages/userGroupMgt/MembersList';
+import FundHeadLanding, {
+  loader as fundHeadLandingLoader,
+} from './pages/userGroupMgt/FundHeadLanding';
+import CreateFundHead, {
+  loader as createFundHeadLoader,
+  action as createFundHeaderLoader,
+} from './pages/userGroupMgt/CreateFundHead';
 
 const router = createBrowserRouter([
   {
@@ -251,6 +258,26 @@ const router = createBrowserRouter([
                 path: 'members',
                 element: <MembersList />,
                 loader: memberListLoader,
+              },
+              {
+                path: 'fund-heads',
+                children: [
+                  {
+                    index: true,
+                    element: <FundHeadLanding />,
+                    loader: fundHeadLandingLoader,
+                  },
+                  {
+                    path: 'create',
+                    element: <CreateFundHead />,
+                    loader: createFundHeadLoader,
+                    action: createFundHeaderLoader,
+                  },
+                  {
+                    path: 'edit/:headId',
+                    element: <p></p>,
+                  },
+                ],
               },
               { path: 'manage-rules', element: <CreateGroupRules /> },
               { path: 'view-rules', element: <ViewGroupRules /> },

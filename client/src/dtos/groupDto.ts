@@ -44,3 +44,13 @@ export type IMember = {
   status: boolean;
   joinedAt: Date;
 };
+
+export type IFundHead = {
+  _id: string;
+  groupRef: string;
+  groupId: string;
+  head: string;
+  headType: string;
+  isActive: boolean;
+  createdAt: Date;
+};

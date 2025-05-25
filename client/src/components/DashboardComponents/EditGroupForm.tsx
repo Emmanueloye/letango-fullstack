@@ -8,6 +8,7 @@ import FormError from '../UI/FormError';
 const EditGroupForm = () => {
   const action = useActionData();
   const params = useLoaderData();
+
   const { data } = useQuery({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),

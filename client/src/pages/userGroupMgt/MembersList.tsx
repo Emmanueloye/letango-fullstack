@@ -266,7 +266,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   await queryClient.ensureQueryData({
     queryKey: ['fetchMember', params.groupId],
-    queryFn: () => getData({ url: `/members/${params.groupId}` }),
+    queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
   });
 
   return { groupId: params.groupId, page };

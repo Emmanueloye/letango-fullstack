@@ -34,10 +34,12 @@ const SideBar = ({ user }: { user: User }) => {
             className='rounded-full mr-1'
           />
           <div>
-            <h3 className=' font-600 capitalize text-sm mb-1'>
-              {user?.otherNames?.split(' ')[0]}
+            <h3 className=' font-500 capitalize text-[13px] mb-1'>
+              {user?.surname} {user?.otherNames?.split(' ')[0]}
             </h3>
-            <p className='text-sm font-poppins'>User ref: {user?.userRef}</p>
+            <p className='text-sm font-poppins text-[13px]'>
+              User ref: {user?.userRef}
+            </p>
           </div>
         </div>
         {/* Close button on small screen */}

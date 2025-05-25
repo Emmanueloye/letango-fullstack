@@ -11,11 +11,13 @@ const fundClassSchema = new Schema({
   },
   head: {
     type: String,
-    required: [true, 'head field is required.'],
+    required: [true, 'Head field is required.'],
+    lowercase: true,
   },
   headType: {
     type: String,
     required: [true, 'Head type field is required.'],
+    lowercase: true,
     enum: {
       values: ['income', 'expense'],
       message: 'Input for head type not valid',
@@ -30,5 +32,7 @@ const fundClassSchema = new Schema({
     default: Date.now(),
   },
 });
+
+fundClassSchema.index({ head: 1, headtype: 1, groupRef: 1 }, { unique: true });
 
 export default model('FundClass', fundClassSchema);
