@@ -51,7 +51,7 @@ export const checkMembership = async (
   next: NextFunction
 ) => {
   const member = await Member.findOne({
-    groupRef: req.query.groupRef,
+    groupRef: req.body.groupRef ? req.body.groupRef : req.query.groupRef,
     memberId: req.user._id,
     status: true,
   });
@@ -77,12 +77,14 @@ export const checkAdmin = async (
     status: true,
   });
 
+  // Check if the currently logged in user is a member
   if (!member) {
     throw new AppError.UnAuthorized(
       'Your request cannot be handled by our server.'
     );
   }
 
+  // Checked if the currently logged in user has the group admin right.
   if (!['admin', 'owner'].includes(member?.role as string)) {
     throw new AppError.UnAuthorized(
       'Your request cannot be handled by our server.'

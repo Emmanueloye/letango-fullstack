@@ -1,0 +1,25 @@
+import { Router } from 'express';
+import * as withdrawalController from './withdrawalController';
+import * as authMiddleware from '../../middlewares/authMiddleware';
+import { checkAdmin } from '../members/memberController';
+
+const router = Router();
+
+router
+  .route('/')
+  .post(
+    authMiddleware.protect,
+    checkAdmin,
+    withdrawalController.createWithdrawal
+  )
+  .get(
+    authMiddleware.protect,
+    checkAdmin,
+    withdrawalController.getWithdrawalsPending
+  );
+
+router
+  .route('/:id')
+  .patch(authMiddleware.protect, withdrawalController.approveWithdrawal);
+
+export default router;

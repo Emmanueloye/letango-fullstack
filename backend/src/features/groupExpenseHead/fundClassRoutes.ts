@@ -1,13 +1,17 @@
 import { Router } from 'express';
 import * as authMiddleware from '../../middlewares/authMiddleware';
 import * as fundClassController from './fundClassController';
-import { checkAdmin } from '../members/memberController';
+import { checkAdmin, checkMembership } from '../members/memberController';
 
 const router = Router();
 
 router
   .route('/')
-  .get(authMiddleware.protect, checkAdmin, fundClassController.getFundClass)
+  .get(
+    authMiddleware.protect,
+    checkMembership,
+    fundClassController.getFundClass
+  )
   .post(
     authMiddleware.protect,
     fundClassController.validateCreateHead,

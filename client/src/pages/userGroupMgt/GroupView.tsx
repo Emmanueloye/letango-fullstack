@@ -124,7 +124,7 @@ const GroupView = () => {
           url={`/account/manage-group/view/${group?.groupRef}/fund-heads`}
         />
         <LinkBtn
-          btnText='pledge'
+          btnText='My pledge'
           url={`/account/manage-group/view/${group?.groupRef}/my-pledge`}
         />
       </div>
@@ -147,8 +147,14 @@ const GroupView = () => {
               {transactions?.map((item) => (
                 <TransactionBox
                   key={item?._id}
-                  description={`${item?.fromId?.surname} ${
-                    item?.fromId?.otherNames?.split(' ')[0]
+                  description={`${
+                    item?.fromId?.surname
+                      ? item?.fromId?.surname
+                      : `to ${item.to} - ${item.description}`
+                  } ${
+                    item?.fromId?.otherNames
+                      ? item?.fromId?.otherNames?.split(' ')[0]
+                      : ''
                   }: ${item?.head ? item?.head : item?.description}`}
                   date={formatDateWD(new Date(item?.createdAt))}
                   time={formatTime(new Date(item?.createdAt))}

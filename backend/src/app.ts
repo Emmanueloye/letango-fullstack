@@ -27,6 +27,8 @@ import groupRouter from './features/group/groupRoutes';
 import memberRouter from './features/members/memberRoutes';
 import fundClassRouter from './features/groupExpenseHead/fundClassRoutes';
 import groupTransactRouter from './features/transactions/groupTransactionRoutes';
+import approvalRouter from './features/approval/approvalRoutes';
+import withdrawalRouter from './features/withdrawal/withdrawalRoutes';
 
 // setup the application
 /**
@@ -96,6 +98,8 @@ app.use('/api/v1/groups', groupRouter);
 app.use('/api/v1/members', memberRouter);
 app.use('/api/v1/fundClasses', fundClassRouter);
 app.use('/api/v1/group-transacts', groupTransactRouter);
+app.use('/api/v1/approvals', approvalRouter);
+app.use('/api/v1/withdrawals', withdrawalRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {

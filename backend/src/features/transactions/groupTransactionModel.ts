@@ -13,7 +13,7 @@ const groupTransactionSchema = new Schema({
   fromId: {
     type: Types.ObjectId,
     ref: 'User',
-    required: true,
+    // required: true,
   },
   fromGroup: {
     type: Types.ObjectId,
@@ -22,7 +22,7 @@ const groupTransactionSchema = new Schema({
   toId: {
     type: Types.ObjectId,
     ref: 'Group',
-    required: true,
+    // required: true,
   },
   transactionRef: {
     type: String,
@@ -34,7 +34,6 @@ const groupTransactionSchema = new Schema({
   },
   bank: String,
   channel: String,
-  transactionId: Number,
   description: {
     type: String,
     required: true,

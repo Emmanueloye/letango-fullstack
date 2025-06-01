@@ -38,11 +38,7 @@ export const createGroup = async (req: Request, res: Response) => {
     );
 
     // Only create default expense and income head when it is not peer contribution.
-    if (
-      !['peer contribution', 'crowd funding'].includes(
-        req.body.groupType.toLowerCase()
-      )
-    ) {
+    if (['association', 'club'].includes(req.body.groupType.toLowerCase())) {
       // create default income and expense head
       const defaultIncomeHeads = [
         'annual subscription',

@@ -109,6 +109,7 @@ import EditFundHead, {
   action as editFundHeadAction,
 } from './pages/userGroupMgt/EditFundHead';
 import AddGroupBeneficiary from './pages/userGroupMgt/AddGroupBeneficiary';
+import MyPledge from './pages/userGroupMgt/MyPledge';
 
 const router = createBrowserRouter([
   {
@@ -282,7 +283,7 @@ const router = createBrowserRouter([
               {
                 path: 'my-pledge',
                 children: [
-                  { index: true, element: <p>pledge</p> },
+                  { index: true, element: <MyPledge /> },
                   { path: 'create', element: <p>create pledge</p> },
                 ],
               },

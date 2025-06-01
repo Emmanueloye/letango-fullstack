@@ -160,7 +160,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
         }
 
         await session.withTransaction(async () => {
-          const xyz = await GroupTransaction.create(
+          await GroupTransaction.create(
             [
               {
                 groupRef: data.metadata.groupRef,

@@ -1,4 +1,4 @@
-import { InferSchemaType, model, Schema, Types } from 'mongoose';
+import { InferSchemaType, model, Query, Schema, Types } from 'mongoose';
 
 const groupSchema = new Schema({
   groupRef: {
@@ -9,6 +9,7 @@ const groupSchema = new Schema({
     type: String,
     required: [true, 'Group name field is required.'],
     unique: true,
+    trim: true,
     lowercase: true,
   },
   groupType: {
@@ -41,6 +42,10 @@ const groupSchema = new Schema({
     ref: 'User',
     select: false,
   },
+  approvalLimit: {
+    type: Number,
+    default: 3,
+  },
   groupCode: {
     type: String,
     unique: true,
@@ -52,5 +57,12 @@ const groupSchema = new Schema({
 });
 
 export type IGroup = InferSchemaType<typeof groupSchema>;
+
+groupSchema.pre(/^find/, function (this: Query<{}, IGroup>) {
+  this.populate({
+    path: 'approvalAuthorities',
+    select: 'surname otherNames email',
+  });
+});
 
 export default model<IGroup>('Group', groupSchema);
