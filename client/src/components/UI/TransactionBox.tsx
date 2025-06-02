@@ -22,8 +22,12 @@ const TransactionBox = ({
           <h4 className='font-600 capitalize text-sm mb-2 font-ral'>
             {description}
           </h4>
-          <p className='text-xs  text-gray-500 dark:text-gray-400'>{date}</p>
-          <p className='text-xs  text-gray-500 dark:text-gray-400'>{time}</p>
+          <p className='text-xs  text-gray-500 dark:text-gray-400 mb-1'>
+            {date}
+          </p>
+          <p className='text-xs  text-gray-500 dark:text-gray-400 mb-1'>
+            {time}
+          </p>
         </div>
         <p className={`text-sm font-500 break-words ${amtColor}`}>
           &#8358;{formatNumber(amount)}
@@ -31,7 +35,7 @@ const TransactionBox = ({
       </div>
       {/* withdrawal approval tracker */}
       {show && (
-        <div className='border-t-1 text-sm'>
+        <div className='border-t-1 text-sm pt-2'>
           <span className='capitalize'>approvals: </span>
           <div className='text-sm font-500 flex gap-3 flex-wrap'>
             <span title='Osunkoya Mayowa'>Osunkoya M ✔✔</span>

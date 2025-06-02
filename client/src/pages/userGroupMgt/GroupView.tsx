@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { MdChat, MdOutlineContentCopy } from 'react-icons/md';
+import { MdChat, MdOutlineCheck, MdOutlineContentCopy } from 'react-icons/md';
 import GroupBanner from '../../components/DashboardComponents/GroupBanner';
 import LinkBtn from '../../components/UI/LinkBtn';
 import { useState } from 'react';
@@ -34,6 +34,7 @@ const GroupView = () => {
   const params = useLoaderData();
   const [showChat, setShowChat] = useState(false);
   const [showLink, setShowLink] = useState(false);
+  const [isCopy, setIsCopy] = useState(false);
 
   const { data } = useQuery({
     queryKey: ['fetchGroup', params.groupId],
@@ -51,7 +52,11 @@ const GroupView = () => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(data?.inviteLink);
-      setShowLink(false);
+      // setShowLink(false);
+      setIsCopy(true);
+      setTimeout(() => {
+        setIsCopy(false);
+      }, 1000);
       toast.success('Invite link copied to clipboard');
     } catch (error) {
       toast.error((error as Error).message);
@@ -87,11 +92,16 @@ const GroupView = () => {
             className='pr-8 font-poppins text-sm'
             defaultValue={data?.inviteLink}
           />
-          <MdOutlineContentCopy
-            title='Copy'
-            className='text-2xl absolute right-0 cursor-copy'
-            onClick={handleCopy}
-          />
+          {!isCopy && (
+            <MdOutlineContentCopy
+              title='Copy'
+              className='text-2xl absolute right-0 cursor-pointer'
+              onClick={handleCopy}
+            />
+          )}
+          {isCopy && (
+            <MdOutlineCheck className='text-2xl text-green-600 absolute right-0' />
+          )}
         </div>
       )}
       {/* Group action buttons/links */}
@@ -101,9 +111,14 @@ const GroupView = () => {
           btnText='contribute'
           url={`/account/manage-group/view/${group?.groupRef}/contribute`}
         />
-        <div>
-          <Button btnText='withdrawal' btnType='button' />
-        </div>
+        <LinkBtn
+          btnText='withdrawal'
+          url={`/account/manage-group/view/${group?.groupRef}/withdraw`}
+        />
+        <LinkBtn
+          btnText='members'
+          url={`/account/manage-group/view/${group?.groupRef}/members`}
+        />
         <div onClick={() => setShowLink(!showLink)}>
           <Button btnText='invite' btnType='button' />
         </div>

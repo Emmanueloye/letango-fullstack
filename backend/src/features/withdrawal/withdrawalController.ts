@@ -6,7 +6,19 @@ import GroupTransaction from '../transactions/groupTransactionModel';
 import statusCodes from '../../errors/statusCodes';
 import AppError from '../../errors';
 import { startSession } from 'mongoose';
-import { generateUniqueId } from '../../utils';
+import { checkForErrors, generateUniqueId } from '../../utils';
+const { body } = require('express-validator');
+
+export const validateWithdrawal = checkForErrors([
+  body('amount').notEmpty().withMessage('Amount field is required.'),
+  body('to').notEmpty().withMessage('Receiver name field is required.'),
+  body('bank').notEmpty().withMessage('Receiver bank field is required.'),
+  body('head').notEmpty().withMessage('Expense head field is required.'),
+  body('accountNumber')
+    .notEmpty()
+    .withMessage('Receiver account field is required.'),
+  body('description').notEmpty().withMessage('Description field is required.'),
+]);
 
 // Handler to create/place withdrawal
 export const createWithdrawal = async (req: Request, res: Response) => {

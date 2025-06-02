@@ -110,6 +110,13 @@ import EditFundHead, {
 } from './pages/userGroupMgt/EditFundHead';
 import AddGroupBeneficiary from './pages/userGroupMgt/AddGroupBeneficiary';
 import MyPledge from './pages/userGroupMgt/MyPledge';
+import GroupWithdrawalLanding from './pages/userGroupMgt/GroupWithdrawalLanding';
+import GroupWithdrawal, {
+  action as groupWithdrawalAction,
+} from './pages/userGroupMgt/GroupWithdrawal';
+import GroupPendingWithdrawals from './pages/userGroupMgt/GroupPendingWithdrawals';
+import GroupApprovedWithdrawals from './pages/userGroupMgt/GroupApprovedWithdrawals';
+import GroupRejectedWithdrawals from './pages/userGroupMgt/GroupRejectedWithdrawals';
 
 const router = createBrowserRouter([
   {
@@ -249,6 +256,20 @@ const router = createBrowserRouter([
                 element: <GroupPaymentConfirm />,
                 loader: groupPaymentConfirmLoader,
               },
+              {
+                path: 'withdraw',
+                children: [
+                  { index: true, element: <GroupWithdrawalLanding /> },
+                  {
+                    path: 'draw',
+                    element: <GroupWithdrawal />,
+                    action: groupWithdrawalAction,
+                  },
+                  { path: 'pending', element: <GroupPendingWithdrawals /> },
+                  { path: 'approved', element: <GroupApprovedWithdrawals /> },
+                  { path: 'rejected', element: <GroupRejectedWithdrawals /> },
+                ],
+              },
 
               {
                 path: 'members',
@@ -342,9 +363,10 @@ const router = createBrowserRouter([
               { path: 'open', element: <OpenWithdrawals /> },
               { path: 'closed', element: <ClosedWithdrawals /> },
               { path: 'pending', element: <PendingWithdrawals /> },
+              { path: 'closed-withdrawals', element: <ClosedWithdrawals /> },
             ],
           },
-          { path: 'closed-withdrawals', element: <ClosedWithdrawals /> },
+
           { path: 'kyc-review', element: <KYCReview /> },
           { path: 'statement', element: <Statements /> },
         ],

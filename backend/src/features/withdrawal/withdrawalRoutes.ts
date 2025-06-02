@@ -9,6 +9,7 @@ router
   .route('/')
   .post(
     authMiddleware.protect,
+    withdrawalController.validateWithdrawal,
     checkAdmin,
     withdrawalController.createWithdrawal
   )
