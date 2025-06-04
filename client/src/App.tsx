@@ -110,11 +110,15 @@ import EditFundHead, {
 } from './pages/userGroupMgt/EditFundHead';
 import AddGroupBeneficiary from './pages/userGroupMgt/AddGroupBeneficiary';
 import MyPledge from './pages/userGroupMgt/MyPledge';
-import GroupWithdrawalLanding from './pages/userGroupMgt/GroupWithdrawalLanding';
+import GroupWithdrawalLanding, {
+  loader as groupWithdrawalLandingLoader,
+} from './pages/userGroupMgt/GroupWithdrawalLanding';
 import GroupWithdrawal, {
   action as groupWithdrawalAction,
 } from './pages/userGroupMgt/GroupWithdrawal';
-import GroupPendingWithdrawals from './pages/userGroupMgt/GroupPendingWithdrawals';
+import GroupPendingWithdrawals, {
+  loader as groupPendingWithdrawalsLoader,
+} from './pages/userGroupMgt/GroupPendingWithdrawals';
 import GroupApprovedWithdrawals from './pages/userGroupMgt/GroupApprovedWithdrawals';
 import GroupRejectedWithdrawals from './pages/userGroupMgt/GroupRejectedWithdrawals';
 
@@ -259,13 +263,21 @@ const router = createBrowserRouter([
               {
                 path: 'withdraw',
                 children: [
-                  { index: true, element: <GroupWithdrawalLanding /> },
+                  {
+                    index: true,
+                    element: <GroupWithdrawalLanding />,
+                    loader: groupWithdrawalLandingLoader,
+                  },
                   {
                     path: 'draw',
                     element: <GroupWithdrawal />,
                     action: groupWithdrawalAction,
                   },
-                  { path: 'pending', element: <GroupPendingWithdrawals /> },
+                  {
+                    path: 'pending',
+                    element: <GroupPendingWithdrawals />,
+                    loader: groupPendingWithdrawalsLoader,
+                  },
                   { path: 'approved', element: <GroupApprovedWithdrawals /> },
                   { path: 'rejected', element: <GroupRejectedWithdrawals /> },
                 ],

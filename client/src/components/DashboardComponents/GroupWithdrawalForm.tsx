@@ -1,10 +1,25 @@
-import { Form, useParams } from 'react-router-dom';
+import { Form, useActionData, useParams } from 'react-router-dom';
 import LinkBtn from '../UI/LinkBtn';
 import Title from '../UI/Title';
 import Button from '../UI/Button';
+import { FormActionType } from '../../dtos/formAction';
+import FormError from '../UI/FormError';
+import { useQuery } from '@tanstack/react-query';
+import { fetchOnlyData } from '../../helperFunc.ts/apiRequest';
+import { IFundHead } from '../../dtos/groupDto';
 
 const GroupWithdrawalForm = () => {
   const params = useParams();
+
+  const error = useActionData() as FormActionType;
+
+  const { data } = useQuery({
+    queryKey: ['fetchFundHead', params.groupId, 'expense'],
+    queryFn: () =>
+      fetchOnlyData({
+        url: `/fundClasses?groupRef=${params.groupId}&headType=expense&isActive=true`,
+      }),
+  });
 
   return (
     <>
@@ -15,10 +30,17 @@ const GroupWithdrawalForm = () => {
         />
       </div>
       <Title title='withdrawal form' />
+      {/* Withdrawal notice */}
+      <div className='bg-amber-600 text-white text-[15px] md:w-3/5 w-full mx-auto mb-3 px-6 py-3 rounded-2xl'>
+        Please note that your withdrawal will be credited your account in within
+        24 hours of placement and approval
+      </div>
       <Form
         method='post'
+        id='withdrawalForm'
         className='w-full md:w-3/5 md:mx-auto bg-gray-100 dark:bg-slate-800 py-4 px-6 rounded-2xl'
       >
+        {error?.status === 'fail' && <FormError error={error?.message} />}
         <div className='mb-2'>
           <label
             htmlFor='to'
@@ -71,12 +93,15 @@ const GroupWithdrawalForm = () => {
           >
             expense head
           </label>
-          <select>
+          <select className='capitalize' name='head'>
             <option value='' hidden>
               Select expense
             </option>
-            <option value=''>event</option>
-            <option value=''>event</option>
+            {data?.fundClasses.map((item: IFundHead) => (
+              <option value={item._id} key={item._id}>
+                {item.head}
+              </option>
+            ))}
           </select>
         </div>
         <div className='mb-2'>

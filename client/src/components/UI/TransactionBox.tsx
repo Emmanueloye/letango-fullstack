@@ -1,3 +1,4 @@
+import { Approval } from '../../dtos/paymentDto';
 import { formatNumber } from '../../helperFunc.ts/utilsFunc';
 
 const TransactionBox = ({
@@ -5,14 +6,18 @@ const TransactionBox = ({
   date,
   time,
   amount,
+  approvals,
   show = false,
 }: {
   description: string;
   date: string;
   time: string;
   amount: number;
+  approvals: Approval[];
   show?: boolean;
 }) => {
+  console.log(approvals);
+
   const amtColor = amount > 0 ? 'text-green-600' : 'text-amber-600';
 
   return (
@@ -38,9 +43,37 @@ const TransactionBox = ({
         <div className='border-t-1 text-sm pt-2'>
           <span className='capitalize'>approvals: </span>
           <div className='text-sm font-500 flex gap-3 flex-wrap'>
-            <span title='Osunkoya Mayowa'>Osunkoya M ✔✔</span>
-            <span title='Oyediran Emmanuel'>Oyediran E ✔✔</span>
-            <span title='Lamidi Adekola'>Lamidi A ...</span>
+            {approvals.map((item, index) => {
+              let approvalStatus;
+              if (item?.status === 'pending') {
+                approvalStatus = <span className='text-amber-600'>...</span>;
+              }
+
+              if (item?.status === 'approve') {
+                approvalStatus = <span className='text-green-600'>✔</span>;
+              }
+
+              if (item?.status === 'reject') {
+                approvalStatus = (
+                  <span className='text-green-600 text-sm'>❌</span>
+                );
+              }
+
+              return (
+                <span
+                  key={index}
+                  className='capitalize'
+                  title={`${item?.userId?.surname.toUpperCase()} ${item?.userId?.otherNames.toUpperCase()}`}
+                >
+                  {item?.userId?.surname}{' '}
+                  {item?.userId?.otherNames.split(' ')[0].charAt(0)}{' '}
+                  {approvalStatus}
+                </span>
+              );
+            })}
+
+            {/* <span title='Oyediran Emmanuel'>Oyediran E ✔✔</span>
+            <span title='Lamidi Adekola'>Lamidi A ...</span> */}
           </div>
         </div>
       )}

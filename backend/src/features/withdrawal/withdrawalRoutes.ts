@@ -16,7 +16,7 @@ router
   .get(
     authMiddleware.protect,
     checkAdmin,
-    withdrawalController.getWithdrawalsPending
+    withdrawalController.getGroupPendingWithdrawals
   );
 
 router
