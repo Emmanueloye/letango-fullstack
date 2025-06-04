@@ -20,6 +20,7 @@ const ClosedWithdrawals = () => {
             date='April 17, 2025'
             time='11:23am'
             amount={40_000}
+            approvals={[]}
           />
         </div>
         {/* Second */}

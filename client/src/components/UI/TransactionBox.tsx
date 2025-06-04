@@ -13,11 +13,9 @@ const TransactionBox = ({
   date: string;
   time: string;
   amount: number;
-  approvals: Approval[];
+  approvals?: Approval[];
   show?: boolean;
 }) => {
-  console.log(approvals);
-
   const amtColor = amount > 0 ? 'text-green-600' : 'text-amber-600';
 
   return (
@@ -43,7 +41,7 @@ const TransactionBox = ({
         <div className='border-t-1 text-sm pt-2'>
           <span className='capitalize'>approvals: </span>
           <div className='text-sm font-500 flex gap-3 flex-wrap'>
-            {approvals.map((item, index) => {
+            {approvals?.map((item, index) => {
               let approvalStatus;
               if (item?.status === 'pending') {
                 approvalStatus = <span className='text-amber-600'>...</span>;
