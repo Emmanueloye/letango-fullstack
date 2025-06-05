@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Approval } from '../../dtos/paymentDto';
 import { formatNumber } from '../../helperFunc.ts/utilsFunc';
 import Button from './Button';
-import { FaTimesCircle } from 'react-icons/fa';
+
 
 const TransactionBox = ({
   description,
