@@ -1,9 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
-import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
+import {
+  LoaderFunctionArgs,
+  redirect,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
 import Title from '../../components/UI/Title';
 import TransactionBox from '../../components/UI/TransactionBox';
 import {
+  extractParams,
   fetchOnlyData,
   getData,
   queryClient,
@@ -12,19 +18,24 @@ import { useQuery } from '@tanstack/react-query';
 import { Withdrawal } from '../../dtos/paymentDto';
 import { formatDate, formatTime } from '../../helperFunc.ts/utilsFunc';
 import Empty from '../../components/UI/Empty';
+import Pagination from '../../components/UI/Pagination';
 
 const GroupPendingWithdrawals = () => {
   const params = useParams();
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get('page');
 
   const { data } = useQuery({
-    queryKey: ['fetchWithdrawal', 'pending', params.groupId],
+    queryKey: ['fetchWithdrawal', 'pending', params.groupId, page ?? 1],
     queryFn: () =>
       getData({
-        url: `/withdrawals?groupRef=${params.groupId}&status=pending`,
+        url: `/withdrawals?groupRef=${
+          params.groupId
+        }&approvalStatus=pending&page=${page || 1}&limit=10`,
       }),
   });
 
-  console.log(data);
+  const { totalPages, currentPage, nextPage, previousPage } = data?.page || {};
 
   return (
     <section>
@@ -51,6 +62,14 @@ const GroupPendingWithdrawals = () => {
               />
             );
           })}
+          {/* Pagination */}
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            nextPage={nextPage}
+            previousPage={previousPage}
+            baseLink={`/account/manage-group/view/${params.groupId}/withdraw/pending`}
+          />
         </div>
       ) : (
         <Empty message='No pending withdrawals awaiting approval.' />
@@ -61,12 +80,16 @@ const GroupPendingWithdrawals = () => {
 
 export default GroupPendingWithdrawals;
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  const { page } = extractParams(request);
+
   await queryClient.ensureQueryData({
-    queryKey: ['fetchWithdrawal', 'pending', params.groupId],
+    queryKey: ['fetchWithdrawal', 'pending', params.groupId, page ?? 1],
     queryFn: () =>
       getData({
-        url: `/withdrawals?groupRef=${params.groupId}&status=pending`,
+        url: `/withdrawals?groupRef=${
+          params.groupId
+        }&approvalStatus=pending&page=${page || 1}&limit=10`,
       }),
   });
 
@@ -79,5 +102,5 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     return redirect(`/account/manage-group/view/${params.groupId}`);
   }
 
-  return params;
+  return page;
 };

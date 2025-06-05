@@ -7,6 +7,7 @@ import statusCodes from '../../errors/statusCodes';
 import AppError from '../../errors';
 import { startSession } from 'mongoose';
 import { checkForErrors, generateUniqueId } from '../../utils';
+import GetRequestAPI, { paginateDetails } from '../../utils/getRequestAPI';
 const { body } = require('express-validator');
 
 export const validateWithdrawal = checkForErrors([
@@ -189,25 +190,44 @@ export const getGroupPendingWithdrawals = async (
   res: Response
 ) => {
   // Get group reference and withdrawal status from user via query params.
-  const { groupRef, status } = req.query;
+  const { groupRef, approvalStatus } = req.query;
 
-  // Check if the groupRef and status are set in the params, otherwise, we throw error.
-  if (!groupRef || !status) {
+  // Check if the groupRef and approvalStatus are set in the params, otherwise, we throw error.
+  if (!groupRef || !approvalStatus) {
     throw new AppError.BadRequest(
       'Your request is invalid. Please, try again.'
     );
   }
 
   // Get all the withdrawal that matches the group, where approval status matches the incoming status (pending|reject|approve), approvedBy.userId matches the logged in user and populate the approveBy.
-  const withdrawals = await Withdrawal.find({
-    groupRef,
-    approvalStatus: 'pending',
-  }).populate({ path: 'approvedBy.userId', select: 'surname otherNames' });
+
+  const getFeatures = new GetRequestAPI(Withdrawal.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .limitDocuments()
+    .paginate();
+
+  const withdrawals = await getFeatures.query.populate({
+    path: 'approvedBy.userId',
+    select: 'surname otherNames',
+  });
+
+  const queryReq = new GetRequestAPI(Withdrawal.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields();
+
+  const documentCount = await queryReq.query.countDocuments();
+
+  let page;
+  if (req.query.page) page = paginateDetails(documentCount, req);
 
   // Respond to user
   res.status(statusCodes.OK).json({
     status: 'success',
     noHits: withdrawals.length,
+    page,
     withdrawals,
   });
 };
