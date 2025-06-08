@@ -35,7 +35,7 @@ export const AddApprovalAuthority = async (req: Request, res: Response) => {
 
   res.status(statusCodes.OK).json({
     status: 'success',
-    message: `Approval authority added to ${group.groupName} ${group.groupType}`,
+    message: `Approval authority added to ${group.groupName}`,
   });
 };
 

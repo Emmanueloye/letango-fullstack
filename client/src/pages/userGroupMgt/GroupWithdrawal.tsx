@@ -20,7 +20,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   return postData({
     url: `/withdrawals`,
     data,
-    redirectTo: '/account/manage-group/view/GP-LUCFZLVK/withdraw',
+    redirectTo: `/account/manage-group/view/${params.groupId}/withdraw`,
     setToast: true,
   });
 };

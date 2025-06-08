@@ -70,6 +70,8 @@ export const runCheckForUpdatedApprovalAuthority = ({
 
   // Check to ensure there is no duplicated approval authority.
   if (groupAuthorities.includes(req.body.approvalAuthority)) {
-    throw new AppError.BadRequest('Approval authority already exist.');
+    throw new AppError.BadRequest(
+      'Approval authority already exist. Please choose another approval authority.'
+    );
   }
 };

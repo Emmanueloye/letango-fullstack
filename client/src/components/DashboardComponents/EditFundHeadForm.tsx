@@ -34,7 +34,7 @@ const EditFundHeadForm = () => {
       <div className='flex justify-end mb-3'>
         <LinkBtn
           btnText='Back'
-          url='/account/manage-group/view/GP-LUCFZLVK/fund-heads'
+          url={`/account/manage-group/view/${params.groupId}/fund-heads`}
         />
       </div>
       {/* Title */}

@@ -40,7 +40,7 @@ export const updateMember = factory.updateOne({
   Model: Member,
   label: 'member',
   includedFields: ['status', 'role'],
-  queryKey: 'memberId',
+  // queryKey: 'memberId',
   log: true,
 });
 

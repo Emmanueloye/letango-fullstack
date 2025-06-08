@@ -158,33 +158,6 @@ export const createWithdrawal = async (req: Request, res: Response) => {
 };
 
 // Get withdrawal based on status and logged in user.
-export const getWithdrawalsPending = async (req: Request, res: Response) => {
-  // Get group reference and withdrawal status from user via query params.
-  const { groupRef, status } = req.query;
-
-  // Check if the groupRef and status are set in the params, otherwise, we throw error.
-  if (!groupRef || !status) {
-    throw new AppError.BadRequest(
-      'Your request is invalid. Please, try again.'
-    );
-  }
-
-  // Get all the withdrawal that matches the group, where approval status matches the incoming status (pending|reject|approve), approvedBy.userId matches the logged in user and populate the approveBy.
-  const withdrawals = await Withdrawal.find({
-    groupRef,
-    'approvedBy.status': status, //this query the withdrawal by the nested approvedBy object.
-    'approvedBy.userId': req.user.id,
-  }).populate({ path: 'approvedBy.userId', select: 'surname otherNames' });
-
-  // Respond to user
-  res.status(statusCodes.OK).json({
-    status: 'success',
-    noHits: withdrawals.length,
-    withdrawals,
-  });
-};
-
-// Get withdrawal based on status and logged in user.
 export const getGroupPendingWithdrawals = async (
   req: Request,
   res: Response
@@ -240,10 +213,12 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
   const session = await startSession();
 
   // Throw error if there is no groupRef and status update
-  if (!groupRef || !status) {
-    throw new AppError.BadRequest(
-      'Your request is invalid. Please, try again later.'
-    );
+  if (!status) {
+    throw new AppError.BadRequest('Please select action.');
+  }
+
+  if (!groupRef) {
+    throw new AppError.BadRequest('Invalid request. Please try again later.');
   }
 
   // Get the group
@@ -265,7 +240,7 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
     (item) => (item?.userId as any)._id.toString() === req.user.id.toString()
   );
 
-  // If there is none, that means the user have no access.
+  // If there is none, that means the user have no access or the approval is not pending with the current user.
   if (!currentApproval) {
     throw new AppError.UnAuthorized('You cannot perform this action.');
   }
@@ -343,7 +318,13 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
 
   // If there is rejection from any approval authority, the approval work flow stops there.
   if (status === 'reject') {
+    if (!comment) {
+      throw new AppError.BadRequest('Please state rejection reason.');
+    }
+
     withdrawal.approvedBy[currentIndex!].status = status;
+    withdrawal.approvedBy[currentIndex!].comment = comment;
+    withdrawal.approvedBy![currentIndex!].approvedAt = new Date(Date.now());
     withdrawal.approvalStatus = 'reject';
     await withdrawal.save();
     res

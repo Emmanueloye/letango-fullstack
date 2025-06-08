@@ -75,7 +75,6 @@ export const getAll = ({
     // This enable us to pass additional queries to the getAll function. Only specify the properties on database as the queryKeys and the name of the value(s) coming from the user as values.
     if (queryKeys && values) {
       queryKeys.map((el, i) => (filterObj[el] = req.query[values[i]]));
-      // console.log(filterObj);
     }
 
     // Get requested data. Where querykeys and values are set and not available on the request, this query return an empty array.

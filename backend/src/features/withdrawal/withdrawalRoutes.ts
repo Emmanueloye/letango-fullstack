@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as withdrawalController from './withdrawalController';
 import * as authMiddleware from '../../middlewares/authMiddleware';
-import { checkAdmin } from '../members/memberController';
+import { checkAdmin, checkMembership } from '../members/memberController';
 
 const router = Router();
 
@@ -15,7 +15,7 @@ router
   )
   .get(
     authMiddleware.protect,
-    checkAdmin,
+    checkMembership,
     withdrawalController.getGroupPendingWithdrawals
   );
 

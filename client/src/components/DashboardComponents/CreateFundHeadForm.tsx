@@ -1,4 +1,9 @@
-import { Form, useActionData, useLoaderData } from 'react-router-dom';
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useParams,
+} from 'react-router-dom';
 import Title from '../UI/Title';
 import LinkBtn from '../UI/LinkBtn';
 import Button from '../UI/Button';
@@ -7,6 +12,7 @@ import FormError from '../UI/FormError';
 
 const CreateFundHeadForm = () => {
   const member = useLoaderData();
+  const params = useParams();
   const error = useActionData() as FormActionType;
 
   return (
@@ -15,7 +21,7 @@ const CreateFundHeadForm = () => {
       <div className='flex justify-end mb-3'>
         <LinkBtn
           btnText='Back'
-          url='/account/manage-group/view/GP-LUCFZLVK/fund-heads'
+          url={`/account/manage-group/view/${params.groupId}/fund-heads`}
         />
       </div>
       {/* Title */}

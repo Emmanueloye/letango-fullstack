@@ -4,6 +4,7 @@ const Button = ({
   bg = 'green-600',
   color = 'text-white',
   disabled = false,
+  className = 'px-3 py-2',
   onTrigger,
 }: {
   btnText: string;
@@ -11,6 +12,7 @@ const Button = ({
   bg?: string;
   color?: string;
   disabled?: boolean;
+  className?: string;
   onTrigger?: () => void;
 }) => {
   return (
@@ -18,7 +20,7 @@ const Button = ({
       onClick={() => onTrigger?.()}
       type={btnType}
       disabled={disabled}
-      className={`bg-${bg} hover:bg-green-400 px-3 py-2 rounded-md w-full capitalize ${color} font-600 cursor-pointer disabled:bg-gray-500`}
+      className={`bg-${bg} hover:bg-green-400 rounded-md w-full capitalize ${color} font-600 cursor-pointer disabled:bg-gray-500 ${className}`}
     >
       {btnText}
     </button>

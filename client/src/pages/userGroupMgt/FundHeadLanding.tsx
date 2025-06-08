@@ -113,7 +113,7 @@ const FundHeadLanding = () => {
       </Link>
 
       {/* search */}
-      <div className='w-full md:w-3/6 md:mx-auto mb-6 relative'>
+      <div className='w-full md:w-3/6 mt-4 md:mx-auto mb-6 relative'>
         <input
           type='text'
           id='search'
@@ -146,7 +146,7 @@ const FundHeadLanding = () => {
               <p className='mb-2 font-500 capitalize text-center'>
                 {item.headType}
               </p>
-              {/* /account/manage-group/view/GP-LUCFZLVK/fund-heads */}
+
               <div className='flex justify-center items-center gap-8'>
                 <Link
                   to={`/account/manage-group/view/${params.groupId}/fund-heads/edit/${item._id}`}

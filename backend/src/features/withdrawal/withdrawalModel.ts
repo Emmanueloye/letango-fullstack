@@ -68,8 +68,8 @@ const withdrawalSchema = new Schema({
 });
 
 type IWithdrawal = InferSchemaType<typeof withdrawalSchema>;
-// withdrawalSchema.pre(/^find/, function (this: Query<{}, IWithdrawal>) {
-//   this.populate({ path: 'approveBy.userId' });
-// });
+withdrawalSchema.pre(/^find/, function (this: Query<{}, IWithdrawal>) {
+  this.populate({ path: 'requester', select: 'surname otherNames' });
+});
 
 export default model('Withdrawal', withdrawalSchema);

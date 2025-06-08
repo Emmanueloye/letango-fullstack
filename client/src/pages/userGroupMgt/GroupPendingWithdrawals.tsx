@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import {
+  ActionFunctionArgs,
   LoaderFunctionArgs,
   redirect,
   useParams,
@@ -9,9 +10,11 @@ import LinkBtn from '../../components/UI/LinkBtn';
 import Title from '../../components/UI/Title';
 import TransactionBox from '../../components/UI/TransactionBox';
 import {
+  extractFormData,
   extractParams,
   fetchOnlyData,
   getData,
+  patchData,
   queryClient,
 } from '../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
@@ -58,6 +61,8 @@ const GroupPendingWithdrawals = () => {
                 time={formatTime(new Date(item?.createdAt))}
                 amount={-`${item?.contribution}`}
                 approvals={item.approvedBy}
+                transaction={item}
+                id={item._id}
                 show
               />
             );
@@ -103,4 +108,15 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   }
 
   return page;
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const { id, ...data } = await extractFormData(request);
+
+  return patchData({
+    url: `/withdrawals/${id}`,
+    data,
+    invalidate: ['fetchWithdrawal'],
+    setToast: true,
+  });
 };

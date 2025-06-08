@@ -36,7 +36,11 @@ export type GroupTransaction = {
 export type Withdrawal = {
   _id: string;
   groupRef: string;
-  requester: string;
+  requester: {
+    _id: string;
+    surname: string;
+    otherNames: string;
+  };
   from: string;
   to: string;
   fromGroup: string;

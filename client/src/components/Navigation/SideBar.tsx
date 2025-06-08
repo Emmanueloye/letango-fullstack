@@ -20,7 +20,7 @@ const SideBar = ({ user }: { user: User }) => {
 
   return (
     <aside
-      className={`bg-gray-100 dark:bg-slate-800 lg:w-63 fixed -left-[200%] ${showSidebarLg} ${showMobileSidebar} h-full transition-all duration-700 ease-in-out shadow-sm overflow-y-auto`}
+      className={`bg-gray-100 dark:bg-slate-800 lg:w-63 fixed -left-[200%] ${showSidebarLg} ${showMobileSidebar} h-full transition-all duration-700 ease-in-out shadow-sm overflow-y-auto aside`}
     >
       {/*=================================================================================
         ========================= Sidebar top card ===================================== */}

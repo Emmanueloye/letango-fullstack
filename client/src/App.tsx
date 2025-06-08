@@ -118,9 +118,21 @@ import GroupWithdrawal, {
 } from './pages/userGroupMgt/GroupWithdrawal';
 import GroupPendingWithdrawals, {
   loader as groupPendingWithdrawalsLoader,
+  action as groupPendingWithdrawalAction,
 } from './pages/userGroupMgt/GroupPendingWithdrawals';
-import GroupApprovedWithdrawals from './pages/userGroupMgt/GroupApprovedWithdrawals';
-import GroupRejectedWithdrawals from './pages/userGroupMgt/GroupRejectedWithdrawals';
+import GroupApprovedWithdrawals, {
+  loader as groupApprovedWithdrawalLoader,
+} from './pages/userGroupMgt/GroupApprovedWithdrawals';
+import GroupRejectedWithdrawals, {
+  loader as groupRejectWithdrawalLoader,
+} from './pages/userGroupMgt/GroupRejectedWithdrawals';
+import GroupApprovalAuths, {
+  loader as approvalAuthLoader,
+  action as approvalAuthAction,
+} from './pages/userGroupMgt/GroupApprovalAuths';
+import UpdateApprovalAuths, {
+  action as updateApprovalAuthsAction,
+} from './pages/userGroupMgt/UpdateApprovalAuths';
 
 const router = createBrowserRouter([
   {
@@ -277,9 +289,18 @@ const router = createBrowserRouter([
                     path: 'pending',
                     element: <GroupPendingWithdrawals />,
                     loader: groupPendingWithdrawalsLoader,
+                    action: groupPendingWithdrawalAction,
                   },
-                  { path: 'approved', element: <GroupApprovedWithdrawals /> },
-                  { path: 'rejected', element: <GroupRejectedWithdrawals /> },
+                  {
+                    path: 'approved',
+                    element: <GroupApprovedWithdrawals />,
+                    loader: groupApprovedWithdrawalLoader,
+                  },
+                  {
+                    path: 'rejected',
+                    element: <GroupRejectedWithdrawals />,
+                    loader: groupRejectWithdrawalLoader,
+                  },
                 ],
               },
 
@@ -307,6 +328,22 @@ const router = createBrowserRouter([
                     element: <EditFundHead />,
                     loader: editFundHeadLoader,
                     action: editFundHeadAction,
+                  },
+                ],
+              },
+              {
+                path: 'approvals',
+                children: [
+                  {
+                    index: true,
+                    element: <GroupApprovalAuths />,
+                    loader: approvalAuthLoader,
+                    action: approvalAuthAction,
+                  },
+                  {
+                    path: ':id',
+                    element: <UpdateApprovalAuths />,
+                    action: updateApprovalAuthsAction,
                   },
                 ],
               },

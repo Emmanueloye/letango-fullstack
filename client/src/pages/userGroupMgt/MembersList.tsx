@@ -80,7 +80,7 @@ const MembersList = () => {
     id: string
   ) => {
     // Get the target member from list of members
-    const targetMember = members.find((item) => item.memberId._id === id);
+    const targetMember = members.find((item) => item._id === id);
     // get out the user full name
     const name = `${targetMember?.memberId?.surname.toUpperCase()} ${targetMember?.memberId?.otherNames
       .split(' ')[0]
@@ -113,7 +113,7 @@ const MembersList = () => {
     if (e.currentTarget.id === 'activate') data = { status: true };
 
     // Get the target member from list of members
-    const targetMember = members.find((item) => item.memberId._id === id);
+    const targetMember = members.find((item) => item._id === id);
     // get out the user full name
     const name = `${targetMember?.memberId?.surname.toUpperCase()} ${targetMember?.memberId?.otherNames
       .split(' ')[0]
@@ -195,7 +195,7 @@ const MembersList = () => {
                     name='role'
                     id={member?._id}
                     className='capitalize w-30 py-1 text-sm'
-                    onChange={(e) => handleRoleChange(e, member?.memberId?._id)}
+                    onChange={(e) => handleRoleChange(e, member?._id)}
                   >
                     <option value={member?.role}>{member?.role}</option>
                     {role
@@ -209,9 +209,7 @@ const MembersList = () => {
                   <div className='flex justify-center'>
                     {member?.status ? (
                       <button
-                        onClick={(e) =>
-                          handleMemberStatus(e, member?.memberId?._id)
-                        }
+                        onClick={(e) => handleMemberStatus(e, member?._id)}
                         id='deactivate'
                         className='bg-rose-600 px-3 py-1 rounded-2xl mt-2 capitalize text-sm'
                         title='Deactive Member'
@@ -220,9 +218,7 @@ const MembersList = () => {
                       </button>
                     ) : (
                       <button
-                        onClick={(e) =>
-                          handleMemberStatus(e, member?.memberId?._id)
-                        }
+                        onClick={(e) => handleMemberStatus(e, member?._id)}
                         className='bg-green-600 px-3 py-1 rounded-2xl mt-2 capitalize text-sm'
                         title='Activate Member'
                         id='activate'

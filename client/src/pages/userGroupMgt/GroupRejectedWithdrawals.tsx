@@ -27,12 +27,12 @@ const GroupRejectedWithdrawals = () => {
   const page = searchParams.get('page');
 
   const { data } = useQuery({
-    queryKey: ['fetchWithdrawal', 'approved', params.groupId, page ?? 1],
+    queryKey: ['fetchWithdrawal', 'reject', params.groupId, page ?? 1],
     queryFn: () =>
       getData({
         url: `/withdrawals?groupRef=${
           params.groupId
-        }&approvalStatus=approved&page=${page || 1}&limit=10`,
+        }&approvalStatus=reject&page=${page || 1}&limit=10`,
       }),
   });
 
@@ -59,6 +59,7 @@ const GroupRejectedWithdrawals = () => {
                 time={formatTime(new Date(item?.createdAt))}
                 amount={-`${item?.contribution}`}
                 approvals={item.approvedBy}
+                transaction={item}
                 show
               />
             );
@@ -85,12 +86,12 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { page } = extractParams(request);
 
   await queryClient.ensureQueryData({
-    queryKey: ['fetchWithdrawal', 'approved', params.groupId, page ?? 1],
+    queryKey: ['fetchWithdrawal', 'reject', params.groupId, page ?? 1],
     queryFn: () =>
       getData({
         url: `/withdrawals?groupRef=${
           params.groupId
-        }&approvalStatus=approve&page=${page || 1}&limit=10`,
+        }&approvalStatus=reject&page=${page || 1}&limit=10`,
       }),
   });
 

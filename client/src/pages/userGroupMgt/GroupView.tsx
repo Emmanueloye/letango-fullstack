@@ -49,10 +49,30 @@ const GroupView = () => {
       }),
   });
 
+  const { data: pendingWithdrawals } = useQuery({
+    queryKey: ['fetchWithdrawal', 'pending', params.groupId],
+    queryFn: () =>
+      getData({
+        url: `/withdrawals?groupRef=${params.groupId}&approvalStatus=pending`,
+      }),
+  });
+
+  const { data: currentMember } = useQuery({
+    queryKey: ['fetchMember', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
+  });
+
+  console.log(currentMember);
+
+  const withdrawalsPending = pendingWithdrawals?.withdrawals?.reduce(
+    (acc: number, curr: { contribution: number }) => acc + curr.contribution,
+    0
+  );
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(data?.inviteLink);
-      // setShowLink(false);
+
       setIsCopy(true);
       setTimeout(() => {
         setIsCopy(false);
@@ -66,6 +86,10 @@ const GroupView = () => {
   const transactions: GroupTransaction[] = transactData.transactions;
   const group: Group = data?.group;
 
+  console.log(currentMember?.member?.role);
+
+  const roles = ['admin', 'owner'];
+
   return (
     <section>
       <div className='flex justify-end mb-3'>
@@ -75,11 +99,26 @@ const GroupView = () => {
       <GroupBanner group={group} />
       {/* Balance & report line */}
       <div className='bg-gray-100 dark:bg-slate-800 flex justify-between items-center flex-wrap mt-0.5 p-1.5 border-b-2 border-t-2 border-green-600'>
-        <div className='font-poppins text-sm'>
-          <span className='font-500'>Account Balance: </span>
-          <span className='font-600 text-green-600'>
-            &#8358;{formatNumber(group?.groupBalance || 0)}
-          </span>
+        <div>
+          <div className='font-poppins text-sm'>
+            <span className='font-500'>Account Balance: </span>
+            <span className='font-600 text-green-600'>
+              &#8358;{formatNumber(group?.groupBalance || 0)}
+            </span>
+          </div>
+          <div className='font-poppins text-sm'>
+            <span className='font-500'>Pending withdrawal: </span>
+            <span className='font-600 text-green-600'>
+              &#8358;{formatNumber(withdrawalsPending || 0)}
+            </span>
+          </div>
+          <div className='font-poppins text-sm'>
+            <span className='font-500'>Effective Balance: </span>
+            <span className='font-600 text-green-600'>
+              &#8358;
+              {formatNumber(group?.groupBalance - withdrawalsPending || 0)}
+            </span>
+          </div>
         </div>
 
         <LinkBtn btnText='report' url='/account/manage-group/view/1/reports' />
@@ -111,10 +150,12 @@ const GroupView = () => {
           btnText='contribute'
           url={`/account/manage-group/view/${group?.groupRef}/contribute`}
         />
-        <LinkBtn
-          btnText='withdrawal'
-          url={`/account/manage-group/view/${group?.groupRef}/withdraw`}
-        />
+        {roles.includes(currentMember?.member?.role) && (
+          <LinkBtn
+            btnText='withdrawal'
+            url={`/account/manage-group/view/${group?.groupRef}/withdraw`}
+          />
+        )}
         <LinkBtn
           btnText='members'
           url={`/account/manage-group/view/${group?.groupRef}/members`}
@@ -122,22 +163,23 @@ const GroupView = () => {
         <div onClick={() => setShowLink(!showLink)}>
           <Button btnText='invite' btnType='button' />
         </div>
-        <LinkBtn
-          btnText='members'
-          url={`/account/manage-group/view/${group?.groupRef}/members`}
-        />
+
         {/* <LinkBtn
           btnText='beneficiaries'
           url={`/account/manage-group/view/${group?.groupRef}/beneficiaries`}
         /> */}
-        <LinkBtn
-          btnText='approvals'
-          url='/account/manage-group/view/1/beneficiaries'
-        />
-        <LinkBtn
-          btnText='fund class'
-          url={`/account/manage-group/view/${group?.groupRef}/fund-heads`}
-        />
+        {roles.includes(currentMember?.member?.role) && (
+          <LinkBtn
+            btnText='approvals'
+            url={`/account/manage-group/view/${group?.groupRef}/approvals`}
+          />
+        )}
+        {roles.includes(currentMember?.member?.role) && (
+          <LinkBtn
+            btnText='fund class'
+            url={`/account/manage-group/view/${group?.groupRef}/fund-heads`}
+          />
+        )}
         <LinkBtn
           btnText='My pledge'
           url={`/account/manage-group/view/${group?.groupRef}/my-pledge`}
@@ -229,6 +271,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   await queryClient.ensureQueryData({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+  });
+
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchWithdrawal', 'pending', params.groupId],
+    queryFn: () =>
+      fetchOnlyData({
+        url: `/withdrawals?groupRef=${params.groupId}&approvalStatus=pending`,
+      }),
   });
 
   await queryClient.ensureQueryData({
