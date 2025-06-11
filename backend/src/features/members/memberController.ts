@@ -3,14 +3,35 @@ import * as factory from '../../utils/handlerFactory';
 import { NextFunction, Request, Response } from 'express';
 import statusCodes from '../../errors/statusCodes';
 import AppError from '../../errors';
+import GetRequestAPI, { paginateDetails } from '../../utils/getRequestAPI';
 
 // Get group that the currently logged in user belongs to.
 export const getUserGroups = async (req: Request, res: Response) => {
-  const userGroups = await Member.find({
-    memberId: req.user.id,
-    status: true,
-  });
-  res.status(statusCodes.OK).json({ status: 'success', userGroups });
+  const filter = { memberId: req.user.id };
+  const getFeatures = new GetRequestAPI(Member.find(filter), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .limitDocuments()
+    .paginate();
+
+  const userGroups = await getFeatures.query;
+
+  const queryReq = new GetRequestAPI(Member.find(filter), req.query)
+    .filter()
+    .sort()
+    .limitFields();
+
+  const documentCount = await queryReq.query.countDocuments();
+  let page;
+  if (req.query.page) page = paginateDetails(documentCount, req);
+  // const userGroups = await Member.find({
+  //   memberId: req.user.id,
+  //   status: true,
+  // });
+  res
+    .status(statusCodes.OK)
+    .json({ status: 'success', noHits: userGroups.length, page, userGroups });
 };
 
 // Get membership details for a specific group and user.

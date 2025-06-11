@@ -3,13 +3,16 @@ import Group from '../group/groupModel';
 import FundClass from '../groupExpenseHead/FundClassificationModel';
 import Withdrawal from './withdrawalModel';
 import GroupTransaction from '../transactions/groupTransactionModel';
+import User from '../users/userModel';
 import statusCodes from '../../errors/statusCodes';
 import AppError from '../../errors';
 import { startSession } from 'mongoose';
 import { checkForErrors, generateUniqueId } from '../../utils';
 import GetRequestAPI, { paginateDetails } from '../../utils/getRequestAPI';
+import * as utils from '../../utils';
 const { body } = require('express-validator');
 
+// Validate withdrawal creation inputs.
 export const validateWithdrawal = checkForErrors([
   body('amount').notEmpty().withMessage('Amount field is required.'),
   body('to').notEmpty().withMessage('Receiver name field is required.'),
@@ -26,6 +29,12 @@ export const createWithdrawal = async (req: Request, res: Response) => {
   // Get info from body: to-Receiving account name
   const { groupRef, to, amount, head, bank, description, accountNumber } =
     req.body;
+
+  if (amount <= 0) {
+    throw new AppError.BadRequest(
+      'Withdrawal amount cannot be less or equal to zero.'
+    );
+  }
 
   // To start mongoose session
   const session = await startSession();
@@ -58,6 +67,8 @@ export const createWithdrawal = async (req: Request, res: Response) => {
       authority._id.toString()
     );
 
+    const user = await User.findById(groupAuthorities.at(0));
+
     // Check to ensure that withdrawal requester is not part of approval authority for control purpose.
     if (groupAuthorities.includes(req.user.id)) {
       throw new AppError.UnAuthorized(
@@ -86,6 +97,19 @@ export const createWithdrawal = async (req: Request, res: Response) => {
         },
       ],
     });
+
+    // Set up the data for the email
+    const data = {
+      name: user?.otherNames?.split(' ')[0],
+      groupName: group.groupName,
+      requester: `${req.user.surname} ${req.user.otherNames}`,
+      amount: new Intl.NumberFormat().format(amount),
+      description,
+      email: user?.email,
+    };
+
+    // Send notification to the approval authority to approve.
+    await utils.Email.sendWithdrawalNotice(data);
 
     // Respond to user and return.
     res.status(statusCodes.OK).json({
@@ -181,6 +205,7 @@ export const getGroupPendingWithdrawals = async (
     .limitDocuments()
     .paginate();
 
+  // populate nested data in the approvedBy
   const withdrawals = await getFeatures.query.populate({
     path: 'approvedBy.userId',
     select: 'surname otherNames',
@@ -225,6 +250,7 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
   const group = await Group.findOne({ groupRef });
   // Get the withdrawal
   const withdrawal = await Withdrawal.findById(req.params.id);
+
   // get the approval authorities ids in an array
   const approvalAuthorities = group?.approvalAuthorities.map((item) =>
     item._id.toString()
@@ -260,6 +286,9 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
     // checking that the current index + 1 is still within approvalAuths lengths. With this we know that there is more approvals required.
     if (currentIndex! + 1 < approvalAuthorities!.length) {
       // Set the withdrawal approval values and push in new approval to the workflow.
+
+      const user = await User.findById(approvalAuthorities![currentIndex! + 1]);
+
       withdrawal.approvedBy[currentIndex!].status = status;
       withdrawal.approvedBy![currentIndex!].approvedAt = new Date(Date.now());
       withdrawal.approvedBy![currentIndex!].comment = comment;
@@ -269,10 +298,32 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
         status: 'pending',
       });
       await withdrawal.save();
+
+      // Set up the data for the email
+      const data = {
+        name: user?.otherNames?.split(' ')[0],
+        groupName: group?.groupName,
+        requester: `${(withdrawal.requester as any).surname} ${
+          (withdrawal.requester as any).otherNames
+        }`,
+        amount: new Intl.NumberFormat().format(withdrawal.contribution),
+        description: withdrawal.description,
+        email: user?.email,
+      };
+
+      // Send notification to the approval authority to approve.
+      await utils.Email.sendWithdrawalNotice(data);
+
+      res
+        .status(statusCodes.OK)
+        .json({ status: 'success', message: 'withdrawal has been approved.' });
+      return;
     }
 
     // If current index plus 1 is same as the length of approval authorities, At this point, we know this is the final approval. We want to create the transaction for the withdrawal.
     if (currentIndex! + 1 === approvalAuthorities?.length) {
+      const user = await User.findById(approvalAuthorities![currentIndex! + 1]);
+
       await session.withTransaction(async () => {
         withdrawal.approvedBy[currentIndex!].status = status;
         withdrawal.approvedBy![currentIndex!].approvedAt = new Date(Date.now());
@@ -303,6 +354,34 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
         group!.groupBalance += withdrawal.contribution * -1;
         await group!.save({ session });
       });
+
+      // Set up the data for the email
+      const approvals = [
+        ...approvalAuthorities,
+        (withdrawal.requester as any)._id,
+      ];
+      for (const item of approvals) {
+        const user = await User.findById(item);
+
+        const data = {
+          name: user?.otherNames?.split(' ')[0],
+          groupName: group?.groupName,
+          requester: `${(withdrawal.requester as any).surname} ${
+            (withdrawal.requester as any).otherNames
+          }`,
+          amount: new Intl.NumberFormat().format(withdrawal.contribution),
+          description: withdrawal.description,
+          email: user?.email,
+        };
+
+        // Send notification to the approval authority to approve.
+        await utils.Email.sendWithdrawalApproval(data);
+      }
+
+      res
+        .status(statusCodes.OK)
+        .json({ status: 'success', message: 'withdrawal has been approved.' });
+      return;
     }
 
     if (currentIndex! + 1 > approvalAuthorities!.length) {
@@ -310,10 +389,6 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
         'Approval is completed for this withdrawal.'
       );
     }
-    res
-      .status(statusCodes.OK)
-      .json({ status: 'success', message: 'withdrawal has been approved.' });
-    return;
   }
 
   // If there is rejection from any approval authority, the approval work flow stops there.
@@ -327,6 +402,30 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
     withdrawal.approvedBy![currentIndex!].approvedAt = new Date(Date.now());
     withdrawal.approvalStatus = 'reject';
     await withdrawal.save();
+
+    // Set up the data for the email
+    const approvals = [
+      ...(approvalAuthorities as string[]),
+      (withdrawal.requester as any)._id,
+    ];
+    for (const item of approvals) {
+      const user = await User.findById(item);
+
+      const data = {
+        name: user?.otherNames?.split(' ')[0],
+        groupName: group?.groupName,
+        requester: `${(withdrawal.requester as any).surname} ${
+          (withdrawal.requester as any).otherNames
+        }`,
+        amount: new Intl.NumberFormat().format(withdrawal.contribution),
+        description: withdrawal.description,
+        email: user?.email,
+      };
+
+      // Send notification to the approval authority to approve.
+      await utils.Email.sendWithdrawalRejection(data);
+    }
+
     res
       .status(statusCodes.OK)
       .json({ status: 'success', message: 'withdrawal has been rejected.' });

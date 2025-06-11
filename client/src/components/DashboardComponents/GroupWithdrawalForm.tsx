@@ -97,9 +97,9 @@ const GroupWithdrawalForm = () => {
             <option value='' hidden>
               Select expense
             </option>
-            {data?.fundClasses.map((item: IFundHead) => (
-              <option value={item._id} key={item._id}>
-                {item.head}
+            {data?.fundClasses?.map((item: IFundHead) => (
+              <option value={item?._id} key={item?._id}>
+                {item?.head}
               </option>
             ))}
           </select>

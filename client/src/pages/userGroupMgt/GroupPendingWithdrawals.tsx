@@ -94,7 +94,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       getData({
         url: `/withdrawals?groupRef=${
           params.groupId
-        }&approvalStatus=pending&page=${page || 1}&limit=10`,
+        }&approvalStatus=pending&page=${page || 1}&limit=10&sort=-createdAt`,
       }),
   });
 

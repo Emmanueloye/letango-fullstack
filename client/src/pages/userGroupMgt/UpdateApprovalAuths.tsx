@@ -156,7 +156,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 export const action = async ({ request, params }: ActionFunctionArgs) => {
   const formData = await extractFormData(request);
   const data = { ...formData, groupRef: params.groupId };
-  console.log(data);
 
   return postData({
     url: `/approvals/update`,

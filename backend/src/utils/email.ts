@@ -92,6 +92,19 @@ class Email {
   async sendTransactionAlert(data: any) {
     await this.send('transactionAlert', 'Transaction Alert', data);
   }
+
+  async sendWithdrawalNotice(data: any) {
+    await this.send('withdrawalNotice', 'Pending Withdrawal Approval', data);
+  }
+
+  async sendWithdrawalApproval(data: any) {
+    await this.send('withdrawalApproval', 'Approved Withdrawal Notice', data);
+  }
+
+  async sendWithdrawalRejection(data: any) {
+    await this.send('withdrawalRejection', 'Withdrawal Rejection Notice', data);
+  }
 }
 
 export default new Email();
+// name, groupName, requester, amount, description

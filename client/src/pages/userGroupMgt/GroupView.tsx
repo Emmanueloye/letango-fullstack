@@ -62,8 +62,6 @@ const GroupView = () => {
     queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
   });
 
-  console.log(currentMember);
-
   const withdrawalsPending = pendingWithdrawals?.withdrawals?.reduce(
     (acc: number, curr: { contribution: number }) => acc + curr.contribution,
     0
@@ -85,8 +83,6 @@ const GroupView = () => {
 
   const transactions: GroupTransaction[] = transactData.transactions;
   const group: Group = data?.group;
-
-  console.log(currentMember?.member?.role);
 
   const roles = ['admin', 'owner'];
 
@@ -213,8 +209,12 @@ const GroupView = () => {
                       ? item?.fromId?.otherNames?.split(' ')[0]
                       : ''
                   }: ${item?.head ? item?.head : item?.description}`}
-                  date={formatDateWD(new Date(item?.createdAt))}
-                  time={formatTime(new Date(item?.createdAt))}
+                  date={
+                    item?.createdAt && formatDateWD(new Date(item?.createdAt))
+                  }
+                  time={
+                    item?.createdAt && formatTime(new Date(item?.createdAt))
+                  }
                   amount={item?.contribution}
                 />
               ))}

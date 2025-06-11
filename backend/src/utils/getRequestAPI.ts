@@ -8,6 +8,7 @@ class GetRequestAPI {
     this.query = query;
     this.reqQuery = reqQuery;
   }
+
   filter() {
     // Basic sorting
     // Make a copy of the request query
