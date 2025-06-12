@@ -13,6 +13,8 @@ const groupChatSchema = new Schema({
     type: String,
     required: [true, 'Message field is required.'],
   },
+  likesCount: Number,
+  dislikeCount: Number,
   createdAt: {
     type: Date,
     default: Date.now(),
