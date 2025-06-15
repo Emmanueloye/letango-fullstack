@@ -20,6 +20,7 @@ export const createChat = async (req: Request, res: Response) => {
   res.status(201).json({ status: 'success', chat });
 };
 
+// Handler to get all chats.
 export const getChats = factory.getAll({ Model: GroupChat, label: 'chats' });
 
 // Controller to handle chat update.
@@ -30,8 +31,21 @@ export const updateChat = async (req: Request, res: Response) => {
     throw new AppError.NotFound('No chat found.');
   }
 
-  chat.likesCount += req.body.like;
-  chat.dislikesCount + req.body.dislike;
-  await chat.save();
-  res.status(statusCodes.OK).json({ status: 'success' });
+  const { like, dislike, ...others } = req.body;
+  let likesCount, dislikesCount;
+  if (like) likesCount = chat.likesCount + Number(like);
+  if (dislike) dislikesCount = chat.dislikesCount + Number(dislike);
+
+  const body = { ...others, likesCount, dislikesCount };
+
+  const updatedChat = await GroupChat.findByIdAndUpdate(chat._id, body, {
+    new: true,
+    runValidators: true,
+  });
+
+  socketIo.to(chat.groupRef as string).emit('updatedChat', updatedChat);
+
+  // socketIo.to(groupRef).emit('receivedChat', chat);
+
+  res.status(statusCodes.OK).json({ status: 'success', updatedChat });
 };

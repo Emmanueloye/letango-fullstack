@@ -55,16 +55,18 @@ export type IFundHead = {
   createdAt: Date;
 };
 
+export type Sender = {
+  _id: string;
+  surname: string;
+  otherNames: string;
+  photo: string;
+};
+
 export type IChat = {
   _id: string;
   groupId: string;
   groupRef: string;
-  sender: {
-    _id: string;
-    surname: string;
-    otherNames: string;
-    photo: string;
-  };
+  sender: string;
   senderName: string;
   content: string;
   likesCount?: number;

@@ -16,16 +16,22 @@ const groupChatSchema = new Schema(
       type: String,
       required: [true, 'Message field is required.'],
     },
-    likesCount: Number,
-    dislikesCount: Number,
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+    dislikesCount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
 
-type IChat = InferSchemaType<typeof groupChatSchema>;
+// type IChat = InferSchemaType<typeof groupChatSchema>;
 
-groupChatSchema.pre(/^find/, function (this: Query<{}, IChat>) {
-  this.populate({ path: 'sender', select: 'surname otherNames photo' });
-});
+// groupChatSchema.pre(/^find/, function (this: Query<{}, IChat>) {
+//   this.populate({ path: 'sender', select: 'surname otherNames photo' });
+// });
 
 export default model('GroupChat', groupChatSchema);

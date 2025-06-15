@@ -1,23 +1,46 @@
-import { useRef } from 'react';
-import { FaThumbsUp } from 'react-icons/fa';
+import { useRef, useState } from 'react';
+import { FaCheck, FaPenAlt, FaThumbsUp, FaTimes } from 'react-icons/fa';
 import { IChat } from '../../dtos/groupDto';
 import avater from '../../assets/userjpg.jpg';
+import { useOutletContext } from 'react-router-dom';
+import { User } from '../../dtos/UserDto';
+import { patchData } from '../../helperFunc.ts/apiRequest';
 
 const ChatBox = ({
   bgColor,
   ml,
   chatMsg,
   showFooter = true,
+  handleInput,
 }: {
   bgColor: string;
   ml?: string;
   chatMsg: IChat;
   showFooter?: boolean;
-  //   setCurrentMsg: (data: string) => void;
+  handleInput: () => void;
 }) => {
+  const user = useOutletContext() as User;
   const messageRef = useRef<HTMLParagraphElement>(null);
+  const [isEdited, setIsEdited] = useState(false);
+  const [editedMessage, setEditedMessage] = useState(chatMsg?.content);
+  // const params = useParams();
 
-  const handleClick = () => {};
+  const handleClick = async (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+    if (e.currentTarget?.id === 'like') {
+      await patchData({
+        url: `/chats/${chatMsg?._id}`,
+        data: { like: 1 },
+        invalidate: ['fetchChat'],
+      });
+    }
+    if (e.currentTarget?.id === 'dislike') {
+      await patchData({
+        url: `/chats/${chatMsg?._id}`,
+        data: { dislike: 1 },
+        invalidate: ['fetchChat'],
+      });
+    }
+  };
 
   const name =
     chatMsg?.senderName.length > 18
@@ -26,54 +49,92 @@ const ChatBox = ({
           .charAt(0)}`
       : chatMsg?.senderName;
 
-  return (
-    <div
-      className={`${bgColor} ${ml}  dark:text-primary-500 px-4 py-2 mb-1 rounded-2xl text-[14px] font-500 shadow`}
-    >
-      <div className='flex items-center gap-3 flex-wrap'>
-        <img
-          src={chatMsg?.sender?.photo || avater}
-          alt='user image'
-          width={30}
-          height={30}
-          className='rounded-full object-cover'
-        />
-        <p className='font-600 capitalize'>{name}</p>
-      </div>
-      <p className='pb-2 msgBox' ref={messageRef}>
-        {chatMsg?.content}
-      </p>
-      {showFooter && (
-        <div className='flex items-center justify-evenly gap-4 pt-3'>
-          <div className='flex gap-2 font-poppins text-xs cursor-pointer'>
-            <FaThumbsUp onClick={handleClick} />
-            <span>
-              {chatMsg?.likesCount && chatMsg?.likesCount > 0
-                ? chatMsg?.likesCount
-                : 0}
-            </span>
-          </div>
-          <div className='flex gap-2 font-poppins text-xs cursor-pointer'>
-            <FaThumbsUp className='rotate-180 mt-1' />
-            <span>
-              {chatMsg?.dislikesCount && chatMsg?.dislikesCount > 0
-                ? chatMsg?.dislikesCount
-                : 0}
-            </span>
-          </div>
+  const photo = chatMsg?.sender === user?._id && user.photo; //to be improved.
 
-          {/* <div
-            className='flex gap-2 text-xs cursor-pointer replyBtn'
-            // onClick={handleClick}
-          >
-            <FaReply className='replyBtn' />
-            <span className='font-poppins replyBtn'>
-              {chatMsg?.reply > 0 ? chatMsg?.reply : 0}
-            </span>
-          </div> */}
+  const handleEditSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    await patchData({
+      url: `/chats/${chatMsg?._id}`,
+      data: { content: editedMessage },
+      invalidate: ['fetchChat'],
+    });
+
+    setIsEdited(false);
+  };
+
+  return (
+    <>
+      {!isEdited ? (
+        <div
+          className={`${bgColor} ${ml}  dark:text-primary-500 px-4 py-2 mb-1 rounded-2xl text-[14px] font-500 shadow`}
+        >
+          <div className='flex items-center gap-3 flex-wrap'>
+            <img
+              src={photo || avater}
+              alt='user image'
+              width={30}
+              height={30}
+              className='rounded-full object-cover'
+            />
+            <p className='font-600 capitalize'>{name}</p>
+          </div>
+          <p className='pb-2 msgBox' ref={messageRef}>
+            {chatMsg?.content}
+          </p>
+          {showFooter && (
+            <div className='flex items-center justify-evenly gap-4 pt-3'>
+              <div className='flex gap-2 font-poppins text-xs cursor-pointer'>
+                <FaThumbsUp id='like' onClick={handleClick} />
+                <span>
+                  {chatMsg?.likesCount && chatMsg?.likesCount > 0
+                    ? chatMsg?.likesCount
+                    : 0}
+                </span>
+              </div>
+              <div className='flex gap-2 font-poppins text-xs cursor-pointer'>
+                <FaThumbsUp
+                  id='dislike'
+                  className='rotate-180 mt-1 dislike'
+                  onClick={handleClick}
+                />
+                <span>
+                  {chatMsg?.dislikesCount && chatMsg?.dislikesCount > 0
+                    ? chatMsg?.dislikesCount
+                    : 0}
+                </span>
+              </div>
+              {chatMsg?.sender === user._id && (
+                <FaPenAlt onClick={() => setIsEdited(true)} />
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div id='chatForm' className='relative mb-2'>
+          <textarea
+            rows={3}
+            name='chat'
+            id='message'
+            placeholder='Type your message here...'
+            className='placeholder:text-sm mb-2 resize-none overflow-hidden'
+            onInput={handleInput}
+            value={editedMessage}
+            onChange={(e) => setEditedMessage(e.target.value)}
+          ></textarea>
+          <div className='flex gap-3 absolute bottom-0 right-2'>
+            <button type='button' onClick={() => setIsEdited(false)}>
+              <FaTimes className='text-2xl text-rose-500 cursor-pointer' />
+            </button>
+            <button type='submit' onClick={handleEditSubmit}>
+              <FaCheck className='text-2xl text-green-600 cursor-pointer' />
+            </button>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

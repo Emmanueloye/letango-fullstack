@@ -26,16 +26,22 @@ const GroupViewAside = ({
 }) => {
   const user = useOutletContext() as User;
   const [chats, setChats] = useState<IChat[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLElement>(null);
 
   const pageParams = useParams();
 
+  // Connect to group
   useEffect(() => {
     if (!socket) return;
     socket.emit('joinGroup', pageParams.groupId);
   }, [pageParams.groupId]);
 
+  // Function to get chat
   useEffect(() => {
+    setIsLoading(true);
     const fetchChats = async () => {
       const resp = await queryClient.fetchQuery({
         queryKey: ['fetchChat', pageParams.groupId],
@@ -47,6 +53,9 @@ const GroupViewAside = ({
       });
 
       setChats(resp?.chats);
+      if (resp?.status === 'success') {
+        setIsLoading(false);
+      }
     };
 
     fetchChats();
@@ -55,11 +64,29 @@ const GroupViewAside = ({
       setChats((prevChats) => [chat, ...prevChats]);
     });
 
+    // Get updated data back and replace it in the existing chat list
+    socket.on('updatedChat', (updatedChat) => {
+      setChats((prevChats) => {
+        // Get the index of the updated chat
+        const index = prevChats.findIndex(
+          (item) => item._id === updatedChat._id
+        );
+
+        // checks that the object was found in the array, then replace existing on with the updatedChat
+        if (index !== -1) {
+          prevChats[index] = updatedChat;
+        }
+
+        return [...prevChats];
+      });
+    });
+
     return () => {
       socket.off('receivedChat');
     };
   }, [pageParams.groupId]);
 
+  // Function to send chat to the server
   const sendChatHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -82,6 +109,7 @@ const GroupViewAside = ({
     }
   };
 
+  // Function to expand chat input
   const handleInput = () => {
     const textarea = textAreaRef.current;
     if (textarea) {
@@ -92,6 +120,7 @@ const GroupViewAside = ({
 
   return (
     <aside
+      ref={formRef}
       className={`bg-gray-100 dark:bg-slate-800 basis-full w-full lg:basis-2/5 absolute ${
         showChat ? 'block' : 'hidden'
       } lg:block top-0 lg:sticky lg:top-0 h-screen md:h-[${mainHeight}px] overflow-y-auto aside transition-all duration-500 ease-in-out`}
@@ -101,7 +130,7 @@ const GroupViewAside = ({
 
         <div className='sticky top-0 z-10 bg-gray-100 dark:bg-slate-600 p-2'>
           <div className='flex justify-between items-center border-b-2 border-green-600 mb-3'>
-            <h3 className='font-600 '>Group conversation</h3>
+            <h3 className='font-600 '>Group Conversation</h3>
             <FaTimesCircle
               className='text-2xl block lg:hidden'
               onClick={() => setShowChat(false)}
@@ -125,27 +154,34 @@ const GroupViewAside = ({
           {chats.length > 0 ? (
             <article className='p-2'>
               {chats.map((item) => {
-                if (item.sender._id === user._id) {
+                if (item.sender === user._id) {
                   return (
                     <ChatBox
                       key={item._id}
                       chatMsg={item}
                       bgColor='bg-slate-200 dark:bg-slate-200'
                       ml='ml-5'
+                      handleInput={handleInput}
+                    />
+                  );
+                } else {
+                  return (
+                    <ChatBox
+                      key={item._id}
+                      chatMsg={item}
+                      bgColor='bg-green-200 dark:bg-green-200'
+                      handleInput={handleInput}
                     />
                   );
                 }
-                return (
-                  <ChatBox
-                    key={item._id}
-                    chatMsg={item}
-                    bgColor='bg-green-200 dark:bg-green-200'
-                  />
-                );
               })}
             </article>
           ) : (
-            <Empty message='No conversion yet.' />
+            <Empty
+              message={
+                isLoading ? 'Loading messages...' : 'No group conversation'
+              }
+            />
           )}
         </div>
       </div>
