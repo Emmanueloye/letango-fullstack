@@ -54,3 +54,19 @@ export type IFundHead = {
   isActive: boolean;
   createdAt: Date;
 };
+
+export type IChat = {
+  _id: string;
+  groupId: string;
+  groupRef: string;
+  sender: {
+    _id: string;
+    surname: string;
+    otherNames: string;
+    photo: string;
+  };
+  senderName: string;
+  content: string;
+  likesCount?: number;
+  dislikesCount?: number;
+};

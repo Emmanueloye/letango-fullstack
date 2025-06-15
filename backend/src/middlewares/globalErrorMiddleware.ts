@@ -70,7 +70,7 @@ const globalErrorMiddleware = async (
   if (err.code === 11000) error = handleDuplicationError(err);
 
   // To delete user photo on cloudinary if the request encounter error.
-  if (req.body.photo) {
+  if (req.body?.photo) {
     await cloudinary.uploader.destroy(req.body.photoPublicId);
   }
   sendProdError(error, res);

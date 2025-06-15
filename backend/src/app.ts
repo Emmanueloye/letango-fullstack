@@ -29,6 +29,7 @@ import fundClassRouter from './features/groupExpenseHead/fundClassRoutes';
 import groupTransactRouter from './features/transactions/groupTransactionRoutes';
 import approvalRouter from './features/approval/approvalRoutes';
 import withdrawalRouter from './features/withdrawal/withdrawalRoutes';
+import chatRouter from './features/chat/chatRoutes';
 
 // setup the application
 /**
@@ -57,7 +58,7 @@ app.set('trust proxy', 1);
 app.use(
   rateLimit({
     windowMs: Number(process.env.APP_RATE_LIMIT) * 60 * 1000, //30 minutes request
-    limit: 200,
+    limit: 400,
     legacyHeaders: false,
     // This help use the global error handler for the error thrown here.
     handler: (req, res, next) => {
@@ -100,6 +101,7 @@ app.use('/api/v1/fundClasses', fundClassRouter);
 app.use('/api/v1/group-transacts', groupTransactRouter);
 app.use('/api/v1/approvals', approvalRouter);
 app.use('/api/v1/withdrawals', withdrawalRouter);
+app.use('/api/v1/chats', chatRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {

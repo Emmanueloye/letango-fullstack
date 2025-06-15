@@ -1,19 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
-import { MdChat, MdOutlineCheck, MdOutlineContentCopy } from 'react-icons/md';
+import { MdChat } from 'react-icons/md';
 import GroupBanner from '../../components/DashboardComponents/GroupBanner';
 import LinkBtn from '../../components/UI/LinkBtn';
-import { useState } from 'react';
-import {
-  Form,
-  LoaderFunctionArgs,
-  redirect,
-  useLoaderData,
-} from 'react-router-dom';
-import Button from '../../components/UI/Button';
-import ChatBox from '../../components/DashboardComponents/ChatBox';
-import TransactionBox from '../../components/UI/TransactionBox';
-import { chatMessages } from '../../assets/tempData/chatData';
-import { FaTimesCircle } from 'react-icons/fa';
+import { useEffect, useRef, useState } from 'react';
+import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
+
 import {
   fetchOnlyData,
   getData,
@@ -21,51 +12,67 @@ import {
 } from '../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
 import { Group } from '../../dtos/groupDto';
-import {
-  formatDateWD,
-  formatNumber,
-  formatTime,
-} from '../../helperFunc.ts/utilsFunc';
+import { formatDateWD, formatTime } from '../../helperFunc.ts/utilsFunc';
 import { GroupTransaction } from '../../dtos/paymentDto';
 import Empty from '../../components/UI/Empty';
 import { toast } from 'react-toastify';
+import GroupBalanceDisplay from '../../components/DashboardComponents/GroupBalanceDisplay';
+import GroupInvitationLink from '../../components/DashboardComponents/GroupInvitationLink';
+import GroupActionsLinks from '../../components/DashboardComponents/GroupActionsLinks';
+import GroupViewAside from '../../components/DashboardComponents/GroupViewAside';
+import TransactionBox from '../../components/UI/TransactionBox';
+
+// import crypto from 'crypto';
 
 const GroupView = () => {
-  const params = useLoaderData();
-  const [showChat, setShowChat] = useState(false);
+  // const params = useLoaderData();
+  const mainRef = useRef<HTMLElement>(null);
+
+  const PageParams = useParams();
   const [showLink, setShowLink] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [isCopy, setIsCopy] = useState(false);
+  const [mainHeight, setMainHeight] = useState<number | null>();
 
   const { data } = useQuery({
-    queryKey: ['fetchGroup', params.groupId],
-    queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+    queryKey: ['fetchGroup', PageParams.groupId],
+    queryFn: () => getData({ url: `/groups/${PageParams.groupId}` }),
   });
 
   const { data: transactData } = useQuery({
-    queryKey: ['fetchTransactions', params.groupId],
+    queryKey: ['fetchTransactions', PageParams.groupId],
     queryFn: () =>
       getData({
-        url: `/group-transacts?groupRef=${params.groupId}&sort=-createdAt&limit=10`,
+        url: `/group-transacts?groupRef=${PageParams.groupId}&sort=-createdAt&limit=10`,
       }),
   });
 
   const { data: pendingWithdrawals } = useQuery({
-    queryKey: ['fetchWithdrawal', 'pending', params.groupId],
+    queryKey: ['fetchWithdrawal', 'pending', PageParams.groupId],
     queryFn: () =>
       getData({
-        url: `/withdrawals?groupRef=${params.groupId}&approvalStatus=pending`,
+        url: `/withdrawals?groupRef=${PageParams.groupId}&approvalStatus=pending`,
       }),
   });
 
   const { data: currentMember } = useQuery({
-    queryKey: ['fetchMember', params.groupId],
-    queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
+    queryKey: ['fetchMember', PageParams.groupId],
+    queryFn: () => fetchOnlyData({ url: `/members/${PageParams.groupId}` }),
   });
 
   const withdrawalsPending = pendingWithdrawals?.withdrawals?.reduce(
     (acc: number, curr: { contribution: number }) => acc + curr.contribution,
     0
   );
+
+  useEffect(() => {
+    if (mainRef.current) {
+      const height = mainRef.current.getBoundingClientRect().height;
+      // console.log(height);
+
+      setMainHeight(height);
+    }
+  }, [mainRef]);
 
   const handleCopy = async () => {
     try {
@@ -88,103 +95,36 @@ const GroupView = () => {
 
   return (
     <section>
-      <div className='flex justify-end mb-3'>
-        <LinkBtn btnText='Back' url='/account/manage-group' />
-      </div>
-      {/* Group banner */}
-      <GroupBanner group={group} />
-      {/* Balance & report line */}
-      <div className='bg-gray-100 dark:bg-slate-800 flex justify-between items-center flex-wrap mt-0.5 p-1.5 border-b-2 border-t-2 border-green-600'>
-        <div>
-          <div className='font-poppins text-sm'>
-            <span className='font-500'>Account Balance: </span>
-            <span className='font-600 text-green-600'>
-              &#8358;{formatNumber(group?.groupBalance || 0)}
-            </span>
-          </div>
-          <div className='font-poppins text-sm'>
-            <span className='font-500'>Pending withdrawal: </span>
-            <span className='font-600 text-green-600'>
-              &#8358;{formatNumber(withdrawalsPending || 0)}
-            </span>
-          </div>
-          <div className='font-poppins text-sm'>
-            <span className='font-500'>Effective Balance: </span>
-            <span className='font-600 text-green-600'>
-              &#8358;
-              {formatNumber(group?.groupBalance - withdrawalsPending || 0)}
-            </span>
-          </div>
+      <>
+        <div className='flex justify-end mb-3'>
+          <LinkBtn btnText='Back' url='/account/manage-group' />
         </div>
-
-        <LinkBtn btnText='report' url='/account/manage-group/view/1/reports' />
-      </div>
-      {/* Group link copy interface */}
-      {showLink && (
-        <div className='flex items-center relative mt-3'>
-          <input
-            type='text'
-            className='pr-8 font-poppins text-sm'
-            defaultValue={data?.inviteLink}
-          />
-          {!isCopy && (
-            <MdOutlineContentCopy
-              title='Copy'
-              className='text-2xl absolute right-0 cursor-pointer'
-              onClick={handleCopy}
-            />
-          )}
-          {isCopy && (
-            <MdOutlineCheck className='text-2xl text-green-600 absolute right-0' />
-          )}
-        </div>
-      )}
-      {/* Group action buttons/links */}
-
-      <div className='flex flex-wrap gap-3 mt-4 text-sm'>
-        <LinkBtn
-          btnText='contribute'
-          url={`/account/manage-group/view/${group?.groupRef}/contribute`}
+        {/* Group banner */}
+        <GroupBanner group={group} />
+        {/* Balance & report line */}
+        <GroupBalanceDisplay
+          group={group}
+          withdrawalsPending={withdrawalsPending}
         />
-        {roles.includes(currentMember?.member?.role) && (
-          <LinkBtn
-            btnText='withdrawal'
-            url={`/account/manage-group/view/${group?.groupRef}/withdraw`}
-          />
-        )}
-        <LinkBtn
-          btnText='members'
-          url={`/account/manage-group/view/${group?.groupRef}/members`}
+        {/* Group link copy interface */}
+        <GroupInvitationLink
+          showLink={showLink}
+          isCopy={isCopy}
+          handleCopy={handleCopy}
+          invitationLink={data?.inviteLink}
         />
-        <div onClick={() => setShowLink(!showLink)}>
-          <Button btnText='invite' btnType='button' />
-        </div>
-
-        {/* <LinkBtn
-          btnText='beneficiaries'
-          url={`/account/manage-group/view/${group?.groupRef}/beneficiaries`}
-        /> */}
-        {roles.includes(currentMember?.member?.role) && (
-          <LinkBtn
-            btnText='approvals'
-            url={`/account/manage-group/view/${group?.groupRef}/approvals`}
-          />
-        )}
-        {roles.includes(currentMember?.member?.role) && (
-          <LinkBtn
-            btnText='fund class'
-            url={`/account/manage-group/view/${group?.groupRef}/fund-heads`}
-          />
-        )}
-        <LinkBtn
-          btnText='My pledge'
-          url={`/account/manage-group/view/${group?.groupRef}/my-pledge`}
+        {/* Group action buttons/links */}
+        <GroupActionsLinks
+          roles={roles}
+          member={currentMember?.member}
+          group={group}
+          showLink={showLink}
+          setShowLink={setShowLink}
         />
-      </div>
-
+      </>
       {/* Main body */}
       <div className='lg:flex lg:gap-3 relative mt-6'>
-        <main className='lg:basis-3/5 basis-full'>
+        <main className='lg:basis-3/5 basis-full' ref={mainRef}>
           <div className='flex justify-between flex-wrap items-center'>
             <h3 className='font-600'>Recent Transactions</h3>
             <MdChat
@@ -224,42 +164,12 @@ const GroupView = () => {
           )}
         </main>
         {/* Group chat */}
-        <aside
-          className={`bg-gray-100 dark:bg-slate-800 basis-full w-full lg:basis-2/5 absolute ${
-            showChat ? 'block' : 'hidden'
-          } lg:block top-0 lg:sticky lg:top-0 h-screen overflow-y-auto aside transition-all duration-500 ease-in-out`}
-        >
-          <div>
-            {/* Chat text box */}
-
-            <div className='sticky top-0 z-10 bg-gray-100 dark:bg-slate-600 p-2'>
-              <div className='flex justify-between items-center border-b-2 border-green-600 mb-3'>
-                <h3 className='font-600 '>Group conversation</h3>
-                <FaTimesCircle
-                  className='text-2xl block lg:hidden'
-                  onClick={() => setShowChat(false)}
-                />
-              </div>
-              <Form id='chatForm' className='relative'>
-                <textarea
-                  name='chat'
-                  id='message'
-                  placeholder='Type your message here...'
-                  className='placeholder:text-sm mb-2 resize'
-                ></textarea>
-                <Button btnText='send' btnType='submit' />
-              </Form>
-            </div>
-            {/* Chat card */}
-            <article className='p-2 *:odd:ml-3'>
-              {chatMessages.map((item) => {
-                return (
-                  <ChatBox key={item.id} chatMsg={item} bgColor='bg-gray-50' />
-                );
-              })}
-            </article>
-          </div>
-        </aside>
+        <GroupViewAside
+          groupId={group?._id}
+          showChat={showChat}
+          setShowChat={setShowChat}
+          mainHeight={mainHeight}
+        />
       </div>
     </section>
   );
@@ -271,6 +181,15 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   await queryClient.ensureQueryData({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),
+  });
+
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchChat', params.groupId],
+    queryFn: () =>
+      getData({
+        url: `/chats?sort=-createdAt`,
+        params: { groupRef: params.groupId as string },
+      }),
   });
 
   await queryClient.ensureQueryData({
@@ -297,5 +216,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   if (resp.status === 'fail') {
     return redirect('/account/manage-group');
   }
+
   return params;
 };

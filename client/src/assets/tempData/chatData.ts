@@ -31,4 +31,20 @@ export const chatMessages = [
     dislikes: 2,
     reply: 1,
   },
+  {
+    id: 5,
+    message:
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat new advean',
+    likes: 3,
+    dislikes: 2,
+    reply: 1,
+  },
+  {
+    id: 6,
+    message:
+      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat new advean',
+    likes: 3,
+    dislikes: 2,
+    reply: 1,
+  },
 ];

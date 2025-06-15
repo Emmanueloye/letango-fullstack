@@ -4,12 +4,12 @@ import dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 dotenv.config();
 
-// This to handle uncaught exceptions but typescript should handle this but in case it doesn't
-process.on('uncaughtException', (err) => {
-  // Log the errors
-  console.error(`Uncaught Exception ⚠⚠⚠`);
-  console.error(`${err.name}: ${err.message}`);
-});
+// Packages and modules imports
+import { Server } from 'socket.io';
+import http from 'http';
+import app from './app';
+import mongoose from 'mongoose';
+import { io } from './utils/socket';
 
 // Cloudinary setup
 cloudinary.config({
@@ -18,9 +18,13 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET,
 });
 
-// Packages and modules imports
-import app from './app';
-import mongoose from 'mongoose';
+const server = http.createServer(app);
+
+export const socketIo = new Server(server, {
+  cors: { origin: 'http://localhost:5173', methods: ['GET', 'POST'] },
+});
+
+export const socket = io(socketIo);
 
 // Connection to mongodb via mongoose
 mongoose
@@ -36,7 +40,7 @@ const PORT = process.env.PORT || 8000;
 /**
  * Setup environment variables and initialize the server
  */
-const server = app.listen(PORT, () =>
+const appServer = server.listen(PORT, () =>
   console.log(`Server running on port ${PORT}`)
 );
 
@@ -46,7 +50,7 @@ process.on('unhandledRejection', (err: Error) => {
   console.error(`Unhandled Rejection ⚠⚠⚠`);
   console.error(`${err.name}: ${err.message}`);
   //   Gracefully shut down the server and exit the process
-  server.close(() => {
+  appServer.close(() => {
     process.exit(1);
   });
 });
