@@ -10,7 +10,7 @@ const GroupBalanceDisplay = ({
   withdrawalsPending: number;
 }) => {
   return (
-    <div className='bg-gray-100 dark:bg-slate-800 flex justify-between items-center flex-wrap mt-0.5 p-1.5 border-b-2 border-t-2 border-green-600'>
+    <div className='bg-gray-100 dark:bg-slate-800 flex justify-between items-center flex-wrap mt-0.5 p-1.5 border-b-2 border-t-2 border-green-600 min-h-full'>
       <div>
         <div className='font-poppins text-sm'>
           <span className='font-500'>Account Balance: </span>
@@ -33,7 +33,10 @@ const GroupBalanceDisplay = ({
         </div>
       </div>
 
-      <LinkBtn btnText='report' url='/account/manage-group/view/1/reports' />
+      <LinkBtn
+        btnText='report'
+        url={`/account/manage-group/view/${group?.groupRef}/reports`}
+      />
     </div>
   );
 };

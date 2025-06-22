@@ -33,6 +33,14 @@ export type GroupTransaction = {
   createdAt: Date;
 };
 
+export type IGroupTransaction = {
+  status: string;
+  openingBal: number;
+  noHits: number;
+  statement: GroupTransaction[];
+  date: { startDate: Date; endDate: Date };
+};
+
 export type Withdrawal = {
   _id: string;
   groupRef: string;

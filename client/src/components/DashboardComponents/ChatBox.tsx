@@ -5,6 +5,7 @@ import avater from '../../assets/userjpg.jpg';
 import { useOutletContext } from 'react-router-dom';
 import { User } from '../../dtos/UserDto';
 import { patchData } from '../../helperFunc.ts/apiRequest';
+import { MAXWORD } from '../../Actions/constant';
 
 const ChatBox = ({
   bgColor,
@@ -23,20 +24,12 @@ const ChatBox = ({
   const messageRef = useRef<HTMLParagraphElement>(null);
   const [isEdited, setIsEdited] = useState(false);
   const [editedMessage, setEditedMessage] = useState(chatMsg?.content);
-  // const params = useParams();
 
   const handleClick = async (e: React.MouseEvent<SVGElement, MouseEvent>) => {
     if (e.currentTarget?.id === 'like') {
       await patchData({
         url: `/chats/${chatMsg?._id}`,
         data: { like: 1 },
-        invalidate: ['fetchChat'],
-      });
-    }
-    if (e.currentTarget?.id === 'dislike') {
-      await patchData({
-        url: `/chats/${chatMsg?._id}`,
-        data: { dislike: 1 },
         invalidate: ['fetchChat'],
       });
     }
@@ -50,6 +43,13 @@ const ChatBox = ({
       : chatMsg?.senderName;
 
   const photo = chatMsg?.sender === user?._id && user.photo; //to be improved.
+
+  const handleChatChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const wordArray = e.target.value.trim().split(' ');
+    if (wordArray.length <= MAXWORD) {
+      setEditedMessage(e.target.value);
+    }
+  };
 
   const handleEditSubmit = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -86,34 +86,30 @@ const ChatBox = ({
           </p>
           {showFooter && (
             <div className='flex items-center justify-evenly gap-4 pt-3'>
-              <div className='flex gap-2 font-poppins text-xs cursor-pointer'>
+              <div className='flex gap-1 font-poppins text-[16px] cursor-pointer'>
                 <FaThumbsUp id='like' onClick={handleClick} />
-                <span>
+                <span className='text-sm'>
                   {chatMsg?.likesCount && chatMsg?.likesCount > 0
                     ? chatMsg?.likesCount
                     : 0}
                 </span>
               </div>
-              <div className='flex gap-2 font-poppins text-xs cursor-pointer'>
-                <FaThumbsUp
-                  id='dislike'
-                  className='rotate-180 mt-1 dislike'
-                  onClick={handleClick}
-                />
-                <span>
-                  {chatMsg?.dislikesCount && chatMsg?.dislikesCount > 0
-                    ? chatMsg?.dislikesCount
-                    : 0}
-                </span>
-              </div>
+
               {chatMsg?.sender === user._id && (
-                <FaPenAlt onClick={() => setIsEdited(true)} />
+                <FaPenAlt
+                  className='text-[16px]'
+                  onClick={() => setIsEdited(true)}
+                />
               )}
             </div>
           )}
         </div>
       ) : (
         <div id='chatForm' className='relative mb-2'>
+          <small className='text-amber-600 font-600'>
+            Word limit: {MAXWORD}. Remaining words:
+            {MAXWORD - editedMessage.trim().split(' ').length}
+          </small>
           <textarea
             rows={3}
             name='chat'
@@ -122,7 +118,7 @@ const ChatBox = ({
             className='placeholder:text-sm mb-2 resize-none overflow-hidden'
             onInput={handleInput}
             value={editedMessage}
-            onChange={(e) => setEditedMessage(e.target.value)}
+            onChange={handleChatChange}
           ></textarea>
           <div className='flex gap-3 absolute bottom-0 right-2'>
             <button type='button' onClick={() => setIsEdited(false)}>

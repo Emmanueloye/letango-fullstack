@@ -44,8 +44,12 @@ import GroupView, {
 import CreateGroupRules from './pages/userGroupMgt/CreateGroupRules';
 import ViewGroupRules from './pages/userGroupMgt/ViewGroupRules';
 import GroupReportLanding from './pages/report/GroupReportLanding';
-import GroupTransactions from './pages/report/GroupTransactions';
-import GroupStatement from './pages/report/GroupStatement';
+import GroupTransactions, {
+  loader as groupTransactionLoader,
+} from './pages/report/GroupTransactions';
+import GroupStatement, {
+  loader as groupStatementLoader,
+} from './pages/report/GroupStatement';
 import UserManager, {
   loader as userManagerLoader,
   action as userManagerAction,
@@ -361,8 +365,16 @@ const router = createBrowserRouter([
                 path: 'reports',
                 children: [
                   { index: true, element: <GroupReportLanding /> },
-                  { path: 'transaction', element: <GroupTransactions /> },
-                  { path: 'statement', element: <GroupStatement /> },
+                  {
+                    path: 'transaction',
+                    element: <GroupTransactions />,
+                    loader: groupTransactionLoader,
+                  },
+                  {
+                    path: 'statement',
+                    element: <GroupStatement />,
+                    loader: groupStatementLoader,
+                  },
                 ],
               },
             ],

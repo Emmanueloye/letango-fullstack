@@ -72,3 +72,11 @@ export type IChat = {
   likesCount?: number;
   dislikesCount?: number;
 };
+
+export type IIncomeAndExpense = {
+  _id: {
+    head: string;
+    headType: string;
+  };
+  amount: number;
+};

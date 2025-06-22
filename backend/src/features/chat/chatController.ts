@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import GroupChat from './groupChatModel';
+import ChatReaction from './chatReactionModel';
 import * as factory from '../../utils/handlerFactory';
 import { socketIo } from '../../server';
 import AppError from '../../errors';
 import statusCodes from '../../errors/statusCodes';
 
+// Handler to create a new chat
 export const createChat = async (req: Request, res: Response) => {
   const { groupId, groupRef, content } = req.body;
   const chat = await GroupChat.create({
@@ -31,12 +33,30 @@ export const updateChat = async (req: Request, res: Response) => {
     throw new AppError.NotFound('No chat found.');
   }
 
-  const { like, dislike, ...others } = req.body;
-  let likesCount, dislikesCount;
-  if (like) likesCount = chat.likesCount + Number(like);
-  if (dislike) dislikesCount = chat.dislikesCount + Number(dislike);
+  const { like, ...others } = req.body;
+  let likesCount;
 
-  const body = { ...others, likesCount, dislikesCount };
+  const chatReaction = await ChatReaction.findOne({
+    userId: req.user.id,
+    chatId: chat._id,
+  });
+
+  if (chatReaction) {
+    likesCount = chat.likesCount -= 1;
+
+    await chatReaction.deleteOne();
+  }
+
+  if (!chatReaction) {
+    likesCount = chat.likesCount += 1;
+    await ChatReaction.create({
+      userId: req.user.id,
+      chatId: chat._id,
+      reaction: 'like',
+    });
+  }
+
+  const body = { ...others, likesCount };
 
   const updatedChat = await GroupChat.findByIdAndUpdate(chat._id, body, {
     new: true,

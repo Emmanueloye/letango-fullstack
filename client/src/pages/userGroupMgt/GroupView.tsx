@@ -68,7 +68,6 @@ const GroupView = () => {
   useEffect(() => {
     if (mainRef.current) {
       const height = mainRef.current.getBoundingClientRect().height;
-      // console.log(height);
 
       setMainHeight(height);
     }

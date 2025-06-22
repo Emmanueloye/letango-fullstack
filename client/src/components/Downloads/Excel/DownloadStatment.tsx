@@ -3,18 +3,21 @@ import { StatementType } from '../../../dtos/statementDto';
 import { User } from '../../../dtos/UserDto';
 import { formatDate } from '../../../helperFunc.ts/utilsFunc';
 import { FaFileExcel } from 'react-icons/fa';
+import { Group } from '../../../dtos/groupDto';
 
 const DownloadStatment = ({
   closingBal,
   openingBal,
   customerDetails,
+  group,
   statementContent,
   dateRange,
 }: {
   closingBal: number;
   openingBal: number;
   statementContent: StatementType[];
-  customerDetails: User;
+  customerDetails?: User;
+  group?: Group;
   dateRange: { startDate: Date; endDate: Date };
 }) => {
   const handleExport = () => {
@@ -32,7 +35,9 @@ const DownloadStatment = ({
     // Customer Details
     data.push([
       'Customer Name',
-      `${customerDetails.surname} ${customerDetails.otherNames}`,
+      customerDetails
+        ? `${customerDetails.surname?.toUpperCase()} ${customerDetails.otherNames?.toUpperCase()}`
+        : group?.groupName?.toUpperCase(),
     ]);
     data.push(['Opening Balance', openingBal || 0]);
     data.push(['Closing Balance', closingBal || 0]);
@@ -70,10 +75,37 @@ const DownloadStatment = ({
         debit = item.contribution * -1;
       }
 
+      let from, to;
+
+      if (item.contribution > 0 && customerDetails) {
+        from = `${item.fromId?.surname} ${
+          item?.fromId?.otherNames?.split(' ')[0]
+        }`;
+      }
+
+      if (item.contribution < 0 && customerDetails) {
+        to = '';
+        // to = `${item.toId?.surname} ${item?.toId?.otherNames?.split(' ')[0]}`;
+      }
+
+      if (item.contribution > 0 && group) {
+        from = `${item.fromId?.surname} ${
+          item?.fromId?.otherNames?.split(' ')[0]
+        }`;
+      }
+
+      if (item.contribution < 0 && group) {
+        to = `:to ${item.to}`;
+      }
+
+      const description = `${item.description} ${
+        from ? `: from ${from}` : `${to}`
+      }`;
+
       data.push([
         formatDate(new Date(item.createdAt)),
         item.transactionRef,
-        item.description,
+        description,
         debit,
         credit,
         runningBalance,
@@ -98,13 +130,13 @@ const DownloadStatment = ({
       { wch: 20 }, // Width for the sixth column
     ];
 
-    XLSX.utils.book_append_sheet(
-      wb,
-      ws,
-      `${customerDetails.userRef}-Statement`
-    );
+    const fileName = customerDetails
+      ? `${customerDetails.userRef}`
+      : `${group?.groupRef}`;
 
-    XLSX.writeFile(wb, `${customerDetails.userRef}-Statement.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, `${fileName}-Statement`);
+
+    XLSX.writeFile(wb, `${fileName}-Statement.xlsx`);
   };
   return (
     <button

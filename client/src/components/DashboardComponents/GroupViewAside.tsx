@@ -12,6 +12,7 @@ import { useOutletContext, useParams } from 'react-router-dom';
 import Button from '../UI/Button';
 import Empty from '../UI/Empty';
 import { socket } from '../../helperFunc.ts/socketIo';
+import { MAXWORD } from '../../Actions/constant';
 
 const GroupViewAside = ({
   groupId,
@@ -26,6 +27,7 @@ const GroupViewAside = ({
 }) => {
   const user = useOutletContext() as User;
   const [chats, setChats] = useState<IChat[]>([]);
+  const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -101,11 +103,19 @@ const GroupViewAside = ({
       };
 
       e.currentTarget.reset();
+      setText('');
       queryClient.invalidateQueries({ queryKey: ['fetchChat'] });
       await postData({
         url: '/chats',
         data,
       });
+    }
+  };
+
+  const handleChatChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const wordArray = e.target.value.trim().split(' ');
+    if (wordArray.length <= MAXWORD) {
+      setText(e.target.value);
     }
   };
 
@@ -123,7 +133,9 @@ const GroupViewAside = ({
       ref={formRef}
       className={`bg-gray-100 dark:bg-slate-800 basis-full w-full lg:basis-2/5 absolute ${
         showChat ? 'block' : 'hidden'
-      } lg:block top-0 lg:sticky lg:top-0 h-screen md:h-[${mainHeight}px] overflow-y-auto aside transition-all duration-500 ease-in-out`}
+      } lg:block top-0 lg:sticky lg:top-0 h-screen md:h-[${
+        mainHeight! + 200
+      }px] overflow-y-auto aside transition-all duration-500 ease-in-out`}
     >
       <div>
         {/* Chat text box */}
@@ -137,15 +149,22 @@ const GroupViewAside = ({
             />
           </div>
           <form id='chatForm' className='relative' onSubmit={sendChatHandler}>
+            <small className='text-amber-600 font-600'>
+              Word limit: {MAXWORD}. Remaining words:
+              {MAXWORD - text.trim().split(' ').length}
+            </small>
             <textarea
               rows={1}
               name='chat'
               id='message'
               placeholder='Type your message here...'
-              className='placeholder:text-sm mb-2 resize-none overflow-hidden'
+              className='placeholder:text-sm text-sm mb-2 resize-none overflow-hidden'
+              onChange={handleChatChange}
+              value={text}
               ref={textAreaRef}
               onInput={handleInput}
             ></textarea>
+
             <Button btnText='send' btnType='submit' />
           </form>
         </div>

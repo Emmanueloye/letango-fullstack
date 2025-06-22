@@ -14,14 +14,14 @@ const DateRangeSelector = ({
 }: {
   showCustomer?: boolean;
   title?: string;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   error?: string;
-  isLoading: boolean;
+  isLoading?: boolean;
 }) => {
   const [isDateBoxOpen, setIsDateBoxOpen] = useState(false);
   return (
     <div className='grid gap-3 mx-auto w-full lg:w-2/4 cursor-pointer'>
-      {error === 'fail' && <FormError error={error} />}
+      {error === 'fail' || (error && <FormError error={error} />)}
       <div
         className='flex justify-between items-center flex-wrap font-500 border p-2 rounded-md'
         onClick={() => setIsDateBoxOpen(!isDateBoxOpen)}

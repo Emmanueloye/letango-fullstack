@@ -15,12 +15,9 @@ const groupChatSchema = new Schema(
     content: {
       type: String,
       required: [true, 'Message field is required.'],
+      trim: true,
     },
     likesCount: {
-      type: Number,
-      default: 0,
-    },
-    dislikesCount: {
       type: Number,
       default: 0,
     },

@@ -5,6 +5,7 @@ import { StatementType } from '../../../dtos/statementDto';
 import { formatDate, formatNumber } from '../../../helperFunc.ts/utilsFunc';
 import { User } from '../../../dtos/UserDto';
 import { FaFilePdf } from 'react-icons/fa6';
+import { Group } from '../../../dtos/groupDto';
 
 // Set virtual font file system
 pdfMake.vfs = pdFonts.vfs;
@@ -13,16 +14,22 @@ const DownloadStatementPDF = ({
   closingBal,
   openingBal,
   customerDetails,
+  group,
   statementContent,
   dateRange,
 }: {
   closingBal: number;
   openingBal: number;
   statementContent: StatementType[];
-  customerDetails: User;
+  customerDetails?: User;
+  group?: Group;
   dateRange: { startDate: Date; endDate: Date };
 }) => {
   let balance = openingBal || 0;
+
+  const customer = customerDetails
+    ? `${customerDetails?.surname?.toUpperCase()} ${customerDetails?.otherNames?.toUpperCase()}`
+    : group?.groupName?.toUpperCase();
 
   const data = statementContent?.map((item) => {
     const debit = item.contribution < 0 ? item.contribution : 0.0;
@@ -30,10 +37,37 @@ const DownloadStatementPDF = ({
 
     balance = balance += item.contribution;
 
+    let from, to;
+
+    if (item.contribution > 0 && customerDetails) {
+      from = `${item.fromId?.surname} ${
+        item?.fromId?.otherNames?.split(' ')[0]
+      }`;
+    }
+
+    if (item.contribution < 0 && customerDetails) {
+      to = '';
+      // to = `${item.toId?.surname} ${item?.toId?.otherNames?.split(' ')[0]}`;
+    }
+
+    if (item.contribution > 0 && group) {
+      from = `${item.fromId?.surname} ${
+        item?.fromId?.otherNames?.split(' ')[0]
+      }`;
+    }
+
+    if (item.contribution < 0 && group) {
+      to = `:to ${item.to}`;
+    }
+
+    const description = `${item.description} ${
+      from ? `: from ${from}` : `${to}`
+    }`;
+
     return [
       formatDate(new Date(item.createdAt)),
       item.transactionRef,
-      item.description,
+      description,
       formatNumber(debit === 0 ? 0 : debit * -1),
       formatNumber(credit),
       formatNumber(balance),
@@ -82,10 +116,7 @@ const DownloadStatementPDF = ({
         // Customer details
         // Customer name
         {
-          text: [
-            { text: 'Customer Name: ', bold: true },
-            `${customerDetails.surname.toUpperCase()} ${customerDetails.otherNames.toUpperCase()}`,
-          ],
+          text: [{ text: 'Customer Name: ', bold: true }, `${customer}`],
           margin: [0, 0, 0, 4],
           fontSize: 11,
         },

@@ -20,8 +20,11 @@ cloudinary.config({
 
 const server = http.createServer(app);
 
+// const LOCALHOST = 'http://localhost:5173';
+const PRODHOST = 'https://letango.onrender.com';
+
 export const socketIo = new Server(server, {
-  cors: { origin: 'https://letango.onrender.com', methods: ['GET', 'POST'] },
+  cors: { origin: PRODHOST, methods: ['GET', 'POST'] },
 });
 
 export const socket = io(socketIo);

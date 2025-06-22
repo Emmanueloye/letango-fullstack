@@ -1,77 +1,180 @@
-import { useRef } from 'react';
-import Button from '../../components/UI/Button';
-// import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import LinkBtn from '../../components/UI/LinkBtn';
-import Table from '../../components/UI/Table';
 import TransactionBox from '../../components/UI/TransactionBox';
-import html2pdf from 'html2pdf.js';
+import DateRangeSelector from '../../components/UI/DateRangeSelector';
+import {
+  LoaderFunctionArgs,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
+import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
+import { useState } from 'react';
+import { IGroupTransaction } from '../../dtos/paymentDto';
+import Empty from '../../components/UI/Empty';
+import {
+  formatDate,
+  formatDateWD,
+  formatNumber,
+  formatTime,
+  paginate,
+} from '../../helperFunc.ts/utilsFunc';
+import ReportPagination from '../../components/UI/ReportPagination';
+import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
+import { useQuery } from '@tanstack/react-query';
+import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
 
 const GroupTransactions = () => {
-  const tableRef = useRef<HTMLDivElement>(null);
-  const handleDownloadLg = async () => {
-    if (tableRef.current)
-      html2pdf(tableRef.current, {
-        margin: Number(10),
-        filename: 'statement',
-        html2canvas: { scale: 2 as number, useCORS: true as boolean },
-      });
+  const params = useParams();
+  const [report, setReport] = useState<IGroupTransaction>();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [searchParams] = useSearchParams();
+
+  const { startIndex, endIndex } = paginate(searchParams);
+
+  const statements = report?.statement || [];
+  const paginateStatements = statements?.slice(startIndex, endIndex);
+
+  const { data: groupData } = useQuery({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const form = Object.fromEntries(formData);
+    const data = { ...form, groupRef: params.groupId };
+
+    setIsLoading(true);
+
+    const result = await fetchOnlyData({
+      url: `/group-reports/statement`,
+      params: data,
+    });
+
+    if (result.status === 'success') {
+      setReport(result);
+      setIsLoading(false);
+    }
+    if (result.status === 'fail') {
+      setError(result.message);
+      setIsLoading(false);
+    }
   };
+
+  const closingBal =
+    report &&
+    report?.openingBal +
+      report?.statement.reduce((acc, curr) => acc + curr.contribution, 0);
+
   return (
     <>
       <div className='flex justify-end mb-4'>
-        <LinkBtn btnText='back' url='/account/manage-group/view/1/reports' />
+        <LinkBtn
+          btnText='back'
+          url={`/account/manage-group/view/${params.groupId}/reports`}
+        />
       </div>
-      {/* <DateRangeSelector /> */}
-      <div className='flex justify-center'>
-        <div className='md:w-2/5 w-full mt-5'>
-          <Button
-            btnText='download'
-            btnType='button'
-            onTrigger={handleDownloadLg}
-          />
-        </div>
-      </div>
-      {/* Table */}
-      <div className='hidden lg:block' ref={tableRef}>
-        <h4 className='text-center mt-8 font-600'>Transaction history</h4>
-        <Table
-          columns='1fr 2fr 1fr 1fr'
-          headers={['date', 'description', 'debit', 'credit']}
-        >
-          <>
-            <p className='border border-[#d1d5dc]'>April 12, 2025: 11:45pm</p>
-            <p className='border border-[#d1d5dc]'>
-              transaction description goes here
-            </p>
-            <p className='border border-[#d1d5dc]'>&#8358;20,000</p>
-            <p className='border border-[#d1d5dc]'>&#8358;0.00</p>
-          </>
-        </Table>
-      </div>
+      <DateRangeSelector
+        handleSubmit={handleSubmit}
+        error={error}
+        isLoading={isLoading}
+      />
+
       {/* Transaction cards */}
-      <div className='block lg:hidden'>
-        <h4 className='text-center mt-8 font-600'>Transaction history</h4>
-        <TransactionBox
-          description='transaction description goes here'
-          date='Thursday, April 4, 2025'
-          time='11:45pm'
-          amount={20_000}
-        />
-        <TransactionBox
-          description='transaction description goes here'
-          date='Thursday, April 4, 2025'
-          time='11:45pm'
-          amount={20_000}
-        />
-        <TransactionBox
-          description='transaction description goes here'
-          date='Thursday, April 4, 2025'
-          time='11:45pm'
-          amount={20_000}
-        />
+      <div className='block'>
+        {report?.status === 'success' && report.statement ? (
+          <>
+            <div className='flex gap-2 flex-wrap'>
+              <DownloadStatementPDF
+                openingBal={report?.openingBal}
+                closingBal={closingBal as number}
+                statementContent={report?.statement}
+                dateRange={report?.date}
+                group={groupData.group}
+              />
+              <DownloadStatment
+                openingBal={report?.openingBal}
+                closingBal={closingBal as number}
+                group={groupData?.group}
+                statementContent={report?.statement}
+                dateRange={report?.date}
+              />
+            </div>
+            <h4 className='text-center mt-8 font-600'>Transaction history</h4>
+            {/* Report date range */}
+            <div className='mb-2 text-[13px] border-2 border-green-500 p-2 rounded-md'>
+              <p className='font-poppins capitalize mb-2'>
+                start Date: {formatDate(new Date(report?.date?.startDate))}
+              </p>
+              <p className='font-poppins capitalize'>
+                end Date: {formatDate(new Date(report?.date?.endDate))}
+              </p>
+            </div>
+            {/* Opening balance section */}
+            <div className=' mb-2 text-[13px] border-2 border-green-500 p-2 rounded-md font-600'>
+              <div className='flex justify-between'>
+                <p className='font-poppins capitalize'>opening Balance:</p>
+                <p className='font-poppins capitalize'>
+                  {report?.openingBal
+                    ? formatNumber(report?.openingBal)
+                    : '0.00'}
+                </p>
+              </div>
+              <div className='flex justify-between mt-1.5'>
+                <p className='font-poppins capitalize'>closing Balance:</p>
+                <p className='font-poppins capitalize'>
+                  {formatNumber(closingBal || 0)}
+                </p>
+              </div>
+            </div>
+
+            {paginateStatements?.map((item) => {
+              return (
+                <TransactionBox
+                  key={item._id}
+                  description={item.description}
+                  date={
+                    item?.createdAt && formatDateWD(new Date(item?.createdAt))
+                  }
+                  time={
+                    item?.createdAt && formatTime(new Date(item?.createdAt))
+                  }
+                  amount={item?.contribution}
+                  from={
+                    item?.contribution > 0
+                      ? `${item?.fromId?.surname} ${
+                          item?.fromId?.otherNames?.split(' ')[0]
+                        }`
+                      : `${item?.to}`
+                  }
+                />
+              );
+            })}
+            {/* closing balance section */}
+            <div className='flex justify-between mt-2 text-[13px] border-2 border-green-500 p-2 rounded-md font-600'>
+              <p className='font-poppins capitalize'>closing Balance:</p>
+              <p className='font-poppins capitalize'>
+                {formatNumber(closingBal || 0)}
+              </p>
+            </div>
+            <ReportPagination numOfResults={report?.statement?.length} />
+          </>
+        ) : (
+          <Empty message='No group transaction' />
+        )}
       </div>
     </>
   );
 };
 
 export default GroupTransactions;
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
+};

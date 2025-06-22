@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
 
-export const socket = io(`https://letango.onrender.com`);
-
-// http://localhost:3000
+// const LOCALHOST = 'http://localhost:3000';
+const PRODHOST = 'https://letango.onrender.com';
+export const socket = io(PRODHOST);
