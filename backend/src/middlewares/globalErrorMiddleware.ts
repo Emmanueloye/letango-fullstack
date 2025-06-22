@@ -73,8 +73,8 @@ const globalErrorMiddleware = async (
   if (req.body?.photo) {
     await cloudinary.uploader.destroy(req.body.photoPublicId);
   }
-  // sendProdError(error, res);
-  sendDevError(err, res);
+  sendProdError(error, res);
+  // sendDevError(err, res);
 };
 
 export default globalErrorMiddleware;
