@@ -113,8 +113,8 @@ const GroupViewAside = ({
   };
 
   const handleChatChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const wordArray = e.target.value.trim().split(' ');
-    if (wordArray.length <= MAXWORD) {
+    const word = e.target.value;
+    if (word.length <= MAXWORD) {
       setText(e.target.value);
     }
   };
@@ -150,8 +150,8 @@ const GroupViewAside = ({
           </div>
           <form id='chatForm' className='relative' onSubmit={sendChatHandler}>
             <small className='text-amber-600 font-600'>
-              Word limit: {MAXWORD}. Remaining words:
-              {MAXWORD - text.trim().split(' ').length}
+              Character limit: {MAXWORD}. Remaining:
+              {MAXWORD - text.length}
             </small>
             <textarea
               rows={1}

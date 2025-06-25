@@ -27,8 +27,6 @@ export const statement = async (req: Request, res: Response) => {
     0
   );
 
-  console.log(lastDate);
-
   // Get transactions within the start and end date
   const statement = await GroupTransaction.find({
     groupRef: req.query.groupRef,

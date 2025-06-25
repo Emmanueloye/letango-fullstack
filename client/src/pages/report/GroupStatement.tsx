@@ -7,12 +7,14 @@ import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
 import Empty from '../../components/UI/Empty';
 import { formatDate, formatNumber } from '../../helperFunc.ts/utilsFunc';
 import { useQuery } from '@tanstack/react-query';
+import DownloadIncomeExpenseExcel from '../../components/Downloads/Excel/DownloadIncomeExpenseExcel';
 
 const GroupStatement = () => {
   const params = useParams();
   const [report, setReport] = useState<IIncomeAndExpense[]>();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
   const { data } = useQuery({
@@ -25,7 +27,9 @@ const GroupStatement = () => {
     const formData = new FormData(e.currentTarget);
     const form = Object.fromEntries(formData);
     const data = { ...form, groupRef: params.groupId };
+
     setEndDate(`${form.endDate}`);
+    setStartDate(`${form.startDate}`);
     setIsLoading(true);
 
     const result = await fetchOnlyData({
@@ -76,12 +80,21 @@ const GroupStatement = () => {
       />
       {report && report?.length > 0 ? (
         <>
+          <div className='flex gap-2 flex-wrap'>
+            <DownloadIncomeExpenseExcel
+              group={data?.group}
+              statement={report}
+              dateRange={{ startDate, endDate }}
+            />
+          </div>
           <div className='mt-5'>
-            <p className='capitalize font-poppins font-500'>
-              {data?.group?.groupName}
+            <p className='capitalize font-500'>{data?.group?.groupName}</p>
+            <p className='capitalize font-500'>Income & Expense Statement</p>
+            <p className='capitalize font-500'>
+              Start Date: {formatDate(new Date(startDate))}
             </p>
-            <p className='capitalize font-poppins font-500'>
-              Income & Expense as of {formatDate(new Date(endDate))}
+            <p className='capitalize font-500'>
+              End Date: {formatDate(new Date(endDate))}
             </p>
           </div>
           <div className='grid mt-4'>

@@ -31,6 +31,7 @@ const DownloadStatementPDF = ({
     ? `${customerDetails?.surname?.toUpperCase()} ${customerDetails?.otherNames?.toUpperCase()}`
     : group?.groupName?.toUpperCase();
 
+  // statement data
   const data = statementContent?.map((item) => {
     const debit = item.contribution < 0 ? item.contribution : 0.0;
     const credit = item.contribution > 0 ? item.contribution : 0.0;

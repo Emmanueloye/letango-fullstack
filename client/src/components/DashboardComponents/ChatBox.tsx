@@ -45,8 +45,8 @@ const ChatBox = ({
   const photo = chatMsg?.sender === user?._id && user.photo; //to be improved.
 
   const handleChatChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const wordArray = e.target.value.trim().split(' ');
-    if (wordArray.length <= MAXWORD) {
+    const word = e.target.value;
+    if (word.length <= MAXWORD) {
       setEditedMessage(e.target.value);
     }
   };
@@ -63,6 +63,11 @@ const ChatBox = ({
     });
 
     setIsEdited(false);
+  };
+
+  const handleCancel = () => {
+    setIsEdited(false);
+    setEditedMessage(chatMsg?.content);
   };
 
   return (
@@ -108,20 +113,20 @@ const ChatBox = ({
         <div id='chatForm' className='relative mb-2'>
           <small className='text-amber-600 font-600'>
             Word limit: {MAXWORD}. Remaining words:
-            {MAXWORD - editedMessage.trim().split(' ').length}
+            {MAXWORD - editedMessage.length}
           </small>
           <textarea
             rows={3}
             name='chat'
             id='message'
             placeholder='Type your message here...'
-            className='placeholder:text-sm mb-2 resize-none overflow-hidden'
+            className='placeholder:text-sm mb-2 resize-none overflow-hidden text-sm'
             onInput={handleInput}
             value={editedMessage}
             onChange={handleChatChange}
           ></textarea>
           <div className='flex gap-3 absolute bottom-0 right-2'>
-            <button type='button' onClick={() => setIsEdited(false)}>
+            <button type='button' onClick={handleCancel}>
               <FaTimes className='text-2xl text-rose-500 cursor-pointer' />
             </button>
             <button type='submit' onClick={handleEditSubmit}>
