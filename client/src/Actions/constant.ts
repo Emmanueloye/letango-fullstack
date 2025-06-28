@@ -11,15 +11,13 @@ export const customStyles = {
     style: {
       paddingLeft: '8px', // override the cell padding for head cells
       paddingRight: '8px',
-      // fontFamily: 'Poppins',
-      // color: 'rgb(1, 19, 89)',
+      fontWeight: '600',
     },
   },
   cells: {
     style: {
       paddingLeft: '8px', // override the cell padding for data cells
       paddingRight: '8px',
-      // color: 'rgb(1, 19, 89)',
     },
   },
 };

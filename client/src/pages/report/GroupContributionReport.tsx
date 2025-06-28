@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
 import DateRangeSelector from '../../components/UI/DateRangeSelector';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ContributionReport } from '../../dtos/groupDto';
 import { fetchOnlyData } from '../../helperFunc.ts/apiRequest';
 import DataTable, { createTheme } from 'react-data-table-component';
@@ -9,6 +9,7 @@ import { customStyles } from '../../Actions/constant';
 import { formatDate, formatNumber } from '../../helperFunc.ts/utilsFunc';
 import { useAppSelector } from '../../Actions/store';
 import Empty from '../../components/UI/Empty';
+import Title from '../../components/UI/Title';
 
 const GroupContributionReport = () => {
   const params = useParams();
@@ -62,6 +63,7 @@ const GroupContributionReport = () => {
     };
   });
 
+  // Table Dark theme
   createTheme(
     'solarized',
     {
@@ -78,12 +80,14 @@ const GroupContributionReport = () => {
 
   return (
     <>
+      <Title title='Members Contribution Report' />
       <div className='flex justify-end mb-4'>
         <LinkBtn
           btnText='back'
           url={`/account/manage-group/view/${params.groupId}/reports`}
         />
       </div>
+
       <DateRangeSelector
         handleSubmit={handleSubmit}
         error={error}

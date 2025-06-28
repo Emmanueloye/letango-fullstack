@@ -21,6 +21,7 @@ import ReportPagination from '../../components/UI/ReportPagination';
 import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
 import { useQuery } from '@tanstack/react-query';
 import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
+import Title from '../../components/UI/Title';
 
 const GroupTransactions = () => {
   const params = useParams();
@@ -70,6 +71,7 @@ const GroupTransactions = () => {
 
   return (
     <>
+      <Title title='Group Statement' />
       <div className='flex justify-end mb-4'>
         <LinkBtn
           btnText='back'

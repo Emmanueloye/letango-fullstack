@@ -8,6 +8,7 @@ import Empty from '../../components/UI/Empty';
 import { formatDate, formatNumber } from '../../helperFunc.ts/utilsFunc';
 import { useQuery } from '@tanstack/react-query';
 import DownloadIncomeExpenseExcel from '../../components/Downloads/Excel/DownloadIncomeExpenseExcel';
+import Title from '../../components/UI/Title';
 
 const GroupStatement = () => {
   const params = useParams();
@@ -67,6 +68,7 @@ const GroupStatement = () => {
 
   return (
     <>
+      <Title title='Income & Expense Report' />
       <div className='flex justify-end mb-4'>
         <LinkBtn
           btnText='back'
