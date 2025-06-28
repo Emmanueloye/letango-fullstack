@@ -1,14 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import coloredLogo from '../../assets/logo-no-bg.png';
 import whiteLogo from '../../assets/whiteLogo-nobg.png';
+import { useAppDispatch, useAppSelector } from '../../Actions/store';
+import { modeAction } from '../../Actions/modeAction';
 
 const SiteMode = ({ setLogo }: { setLogo?: (image: string) => void }) => {
-  const [isDarkMode, setIsDarkMode] = useState<boolean | undefined>(undefined);
+  const { isDarkMode } = useAppSelector((state) => state.mode);
+  const dispatch = useAppDispatch();
+  // const [isDarkMode, setIsDarkMode] = useState<boolean | undefined>(undefined);
 
   // Switing site mode
   const switchMode = () => {
-    setIsDarkMode(!isDarkMode);
+    dispatch(modeAction.updateMode(!isDarkMode));
   };
 
   // Set darkmode in local storage and also set html tag to dark mode for tailwindcss to use for dark utilities.
@@ -20,9 +24,11 @@ const SiteMode = ({ setLogo }: { setLogo?: (image: string) => void }) => {
       localStorage.setItem('darkMode', 'false');
       window.document.documentElement.classList.remove('dark');
     } else {
-      setIsDarkMode(localStorage.getItem('darkMode') === 'true');
+      dispatch(
+        modeAction.updateMode(localStorage.getItem('darkMode') === 'true')
+      );
     }
-  }, [isDarkMode]);
+  }, [dispatch, isDarkMode]);
 
   // Function is setting brand logo depending on whether we are in light or dark mode.
   useEffect(() => {

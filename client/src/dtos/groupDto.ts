@@ -80,3 +80,8 @@ export type IIncomeAndExpense = {
   };
   amount: number;
 };
+
+export type ContributionReport = {
+  memberName: string;
+  [key: string]: number | string;
+};

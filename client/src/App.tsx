@@ -137,6 +137,7 @@ import GroupApprovalAuths, {
 import UpdateApprovalAuths, {
   action as updateApprovalAuthsAction,
 } from './pages/userGroupMgt/UpdateApprovalAuths';
+import GroupContributionReport from './pages/report/GroupContributionReport';
 
 const router = createBrowserRouter([
   {
@@ -374,6 +375,11 @@ const router = createBrowserRouter([
                     path: 'statement',
                     element: <GroupStatement />,
                     loader: groupStatementLoader,
+                  },
+                  {
+                    path: 'contributions',
+                    element: <GroupContributionReport />,
+                    // loader: groupStatementLoader,
                   },
                 ],
               },

@@ -1,4 +1,5 @@
 import { TbListDetails } from 'react-icons/tb';
+import { PiHandCoins } from 'react-icons/pi';
 import Card from '../../components/UI/Card';
 import { Link, useParams } from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
@@ -23,6 +24,11 @@ const GroupReportLanding = () => {
           to={`/account/manage-group/view/${params.groupId}/reports/statement`}
         >
           <Card cardDesc='income and expenses' icon={<TbListDetails />} />
+        </Link>
+        <Link
+          to={`/account/manage-group/view/${params.groupId}/reports/contributions`}
+        >
+          <Card cardDesc='Contributions Report' icon={<PiHandCoins />} />
         </Link>
       </div>
     </>

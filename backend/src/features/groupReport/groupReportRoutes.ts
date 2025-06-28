@@ -24,4 +24,13 @@ router
     groupReportController.incomeAndExpense
   );
 
+router
+  .route('/contributions')
+  .get(
+    authMiddleware.protect,
+    switchDate,
+    checkMembership,
+    groupReportController.contributionReport
+  );
+
 export default router;

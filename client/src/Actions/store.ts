@@ -2,11 +2,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useSelector, useDispatch } from 'react-redux';
 import dashbordReducer from './DashboardAction';
 import authReducer from './authAction';
+import modeReducer from './modeAction';
 
 const store = configureStore({
   reducer: {
     ui: dashbordReducer,
     auth: authReducer,
+    mode: modeReducer,
   },
 });
 

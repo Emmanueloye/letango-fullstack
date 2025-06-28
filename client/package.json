@@ -20,6 +20,7 @@
     "html2pdf.js": "^0.9.0",
     "pdfmake": "^0.2.20",
     "react": "^19.0.0",
+    "react-data-table-component": "^7.7.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
@@ -27,6 +28,7 @@
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.2",
     "socket.io-client": "^4.8.1",
+    "styled-components": "^6.1.19",
     "tailwindcss": "^4.0.17",
     "xlsx": "^0.18.5"
   },
