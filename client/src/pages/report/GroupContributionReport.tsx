@@ -8,6 +8,7 @@ import DataTable, { createTheme } from 'react-data-table-component';
 import { customStyles } from '../../Actions/constant';
 import { formatDate, formatNumber } from '../../helperFunc.ts/utilsFunc';
 import { useAppSelector } from '../../Actions/store';
+import Empty from '../../components/UI/Empty';
 
 const GroupContributionReport = () => {
   const params = useParams();
@@ -88,24 +89,28 @@ const GroupContributionReport = () => {
         error={error}
         isLoading={isLoading}
       />
-      <div
-        className='aside'
-        style={{ width: '100%', overflowX: 'auto', marginTop: '20px' }}
-      >
-        <div className='text-center capitalize mb-3 font-500'>
-          <p>Members contribution List</p>
-          <p>start Date: {formatDate(new Date(startDate))}</p>
-          <p>end Date: {formatDate(new Date(endDate))}</p>
+      {report && report?.length > 0 ? (
+        <div
+          className='aside'
+          style={{ width: '100%', overflowX: 'auto', marginTop: '20px' }}
+        >
+          <div className='text-center capitalize mb-3 font-500'>
+            <p>Members contribution List</p>
+            <p>start Date: {startDate && formatDate(new Date(startDate))}</p>
+            <p>end Date: {endDate && formatDate(new Date(endDate))}</p>
+          </div>
+          <DataTable
+            columns={columns || []}
+            data={report || []}
+            customStyles={customStyles}
+            pagination
+            theme={isDarkMode ? 'solarized' : 'light'}
+            fixedHeader={true}
+          />
         </div>
-        <DataTable
-          columns={columns || []}
-          data={report || []}
-          customStyles={customStyles}
-          pagination
-          theme={isDarkMode ? 'solarized' : 'light'}
-          fixedHeader={true}
-        />
-      </div>
+      ) : (
+        <Empty message='No record available.' />
+      )}
     </>
   );
 };
