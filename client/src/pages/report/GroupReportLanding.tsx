@@ -1,11 +1,19 @@
 import { TbListDetails } from 'react-icons/tb';
 import { PiHandCoins } from 'react-icons/pi';
 import Card from '../../components/UI/Card';
-import { Link, useParams } from 'react-router-dom';
+import { Link, LoaderFunctionArgs, useParams } from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
+import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
 
 const GroupReportLanding = () => {
   const params = useParams();
+
+  const { data } = useQuery({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
+
   return (
     <>
       <div className='flex justify-end mb-4'>
@@ -18,13 +26,17 @@ const GroupReportLanding = () => {
         <Link
           to={`/account/manage-group/view/${params.groupId}/reports/transaction`}
         >
-          <Card cardDesc='Transaction details' icon={<TbListDetails />} />
+          <Card cardDesc='Group Statement' icon={<TbListDetails />} />
         </Link>
-        <Link
-          to={`/account/manage-group/view/${params.groupId}/reports/statement`}
-        >
-          <Card cardDesc='income and expenses' icon={<TbListDetails />} />
-        </Link>
+        {['ASSOCIATION', 'CLUB'].includes(
+          data?.group?.groupType?.toUpperCase()
+        ) && (
+          <Link
+            to={`/account/manage-group/view/${params.groupId}/reports/statement`}
+          >
+            <Card cardDesc='income and expenses' icon={<TbListDetails />} />
+          </Link>
+        )}
         <Link
           to={`/account/manage-group/view/${params.groupId}/reports/contributions`}
         >
@@ -36,3 +48,11 @@ const GroupReportLanding = () => {
 };
 
 export default GroupReportLanding;
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
+};

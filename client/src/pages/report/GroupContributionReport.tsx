@@ -1,15 +1,17 @@
-import { useParams } from 'react-router-dom';
+import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
 import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import React, { useState } from 'react';
 import { ContributionReport } from '../../dtos/groupDto';
-import { fetchOnlyData } from '../../helperFunc.ts/apiRequest';
+import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
 import DataTable, { createTheme } from 'react-data-table-component';
 import { customStyles } from '../../Actions/constant';
 import { formatDate, formatNumber } from '../../helperFunc.ts/utilsFunc';
 import { useAppSelector } from '../../Actions/store';
 import Empty from '../../components/UI/Empty';
 import Title from '../../components/UI/Title';
+import { useQuery } from '@tanstack/react-query';
+import DownloadContributionExcel from '../../components/Downloads/Excel/DownloadContributionExcel';
 
 const GroupContributionReport = () => {
   const params = useParams();
@@ -20,6 +22,11 @@ const GroupContributionReport = () => {
   const [endDate, setEndDate] = useState('');
 
   const { isDarkMode } = useAppSelector((state) => state.mode);
+
+  const { data } = useQuery({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -94,24 +101,32 @@ const GroupContributionReport = () => {
         isLoading={isLoading}
       />
       {report && report?.length > 0 ? (
-        <div
-          className='aside'
-          style={{ width: '100%', overflowX: 'auto', marginTop: '20px' }}
-        >
-          <div className='text-center capitalize mb-3 font-500'>
-            <p>Members contribution List</p>
-            <p>start Date: {startDate && formatDate(new Date(startDate))}</p>
-            <p>end Date: {endDate && formatDate(new Date(endDate))}</p>
-          </div>
-          <DataTable
-            columns={columns || []}
-            data={report || []}
-            customStyles={customStyles}
-            pagination
-            theme={isDarkMode ? 'solarized' : 'light'}
-            fixedHeader={true}
+        <>
+          <DownloadContributionExcel
+            group={data?.group}
+            headers={tableHeaders as string[]}
+            statement={report}
+            dateRange={{ startDate, endDate }}
           />
-        </div>
+          <div
+            className='aside'
+            style={{ width: '100%', overflowX: 'auto', marginTop: '20px' }}
+          >
+            <div className='text-center capitalize mb-3 font-500'>
+              <p>Members contribution List</p>
+              <p>start Date: {startDate && formatDate(new Date(startDate))}</p>
+              <p>end Date: {endDate && formatDate(new Date(endDate))}</p>
+            </div>
+            <DataTable
+              columns={columns || []}
+              data={report || []}
+              customStyles={customStyles}
+              pagination
+              theme={isDarkMode ? 'solarized' : 'light'}
+              fixedHeader={true}
+            />
+          </div>
+        </>
       ) : (
         <Empty message='No record available.' />
       )}
@@ -120,3 +135,11 @@ const GroupContributionReport = () => {
 };
 
 export default GroupContributionReport;
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchGroup', params.groupId],
+    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  });
+};

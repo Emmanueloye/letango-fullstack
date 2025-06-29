@@ -1,5 +1,5 @@
 import DateRangeSelector from '../../components/UI/DateRangeSelector';
-import { LoaderFunctionArgs, useParams } from 'react-router-dom';
+import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
 import { useState } from 'react';
 import { IIncomeAndExpense } from '../../dtos/groupDto';
@@ -179,8 +179,20 @@ export default GroupStatement;
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  await queryClient.ensureQueryData({
+  const resp = await queryClient.ensureQueryData({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
   });
+
+  console.log(
+    !['ASSOCIATION', 'CLUB'].includes(resp?.group?.groupType?.toUpperCase())
+  );
+  console.log(resp.group?.groupType.toUpperCase());
+
+  if (
+    !['ASSOCIATION', 'CLUB'].includes(resp?.group?.groupType?.toUpperCase())
+  ) {
+    return redirect(`/account/manage-group/view/${params.groupId}/reports`);
+  }
+  return resp;
 };

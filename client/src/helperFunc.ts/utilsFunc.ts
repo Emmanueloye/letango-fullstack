@@ -41,3 +41,11 @@ export const paginate = (searchParams: URLSearchParams) => {
 
   return { currentPage, startIndex, endIndex };
 };
+
+// To capitalized every first letter of each word
+export const capitalized = (str: string) => {
+  const words = str.split(' ');
+  return words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

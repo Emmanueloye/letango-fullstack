@@ -43,7 +43,9 @@ import GroupView, {
 } from './pages/userGroupMgt/GroupView';
 import CreateGroupRules from './pages/userGroupMgt/CreateGroupRules';
 import ViewGroupRules from './pages/userGroupMgt/ViewGroupRules';
-import GroupReportLanding from './pages/report/GroupReportLanding';
+import GroupReportLanding, {
+  loader as groupReportLanding,
+} from './pages/report/GroupReportLanding';
 import GroupTransactions, {
   loader as groupTransactionLoader,
 } from './pages/report/GroupTransactions';
@@ -137,7 +139,9 @@ import GroupApprovalAuths, {
 import UpdateApprovalAuths, {
   action as updateApprovalAuthsAction,
 } from './pages/userGroupMgt/UpdateApprovalAuths';
-import GroupContributionReport from './pages/report/GroupContributionReport';
+import GroupContributionReport, {
+  loader as groupContributionReportLoader,
+} from './pages/report/GroupContributionReport';
 
 const router = createBrowserRouter([
   {
@@ -365,7 +369,11 @@ const router = createBrowserRouter([
               {
                 path: 'reports',
                 children: [
-                  { index: true, element: <GroupReportLanding /> },
+                  {
+                    index: true,
+                    element: <GroupReportLanding />,
+                    loader: groupReportLanding,
+                  },
                   {
                     path: 'transaction',
                     element: <GroupTransactions />,
@@ -379,7 +387,7 @@ const router = createBrowserRouter([
                   {
                     path: 'contributions',
                     element: <GroupContributionReport />,
-                    // loader: groupStatementLoader,
+                    loader: groupContributionReportLoader,
                   },
                 ],
               },
