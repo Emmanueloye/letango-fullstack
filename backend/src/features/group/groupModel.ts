@@ -29,7 +29,7 @@ const groupSchema = new Schema({
     required: [true, 'Group description field is required.'],
   },
   owner: {
-    type: [Types.ObjectId],
+    type: Types.ObjectId,
     ref: 'User',
     required: true,
   },
@@ -62,7 +62,7 @@ groupSchema.pre(/^find/, function (this: Query<{}, IGroup>) {
   this.populate({
     path: 'approvalAuthorities',
     select: 'surname otherNames email',
-  });
+  }).populate({ path: 'owner', select: 'surname otherNames' });
 });
 
 export default model<IGroup>('Group', groupSchema);

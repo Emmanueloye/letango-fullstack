@@ -12,9 +12,32 @@ router
     groupController.uploadImage,
     groupController.processImage,
     groupController.createGroup
+  )
+  .get(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('super-admin', 'admin'),
+    groupController.getGroups
   );
 
 router.route('/join').post(authMiddleware.protect, groupController.joinGroup);
+
+router
+  .route('/admin/:id')
+  .get(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('admin', 'super-admin'),
+    groupController.getAdminGroups
+  );
+
+router
+  .route('/admin/:id')
+  .patch(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('super-admin', 'admin'),
+    groupController.uploadImage,
+    groupController.processImage,
+    groupController.adminUpdateGroup
+  );
 
 router
   .route('/:id')

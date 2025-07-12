@@ -1,17 +1,16 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import { LoaderFunctionArgs, useParams } from 'react-router-dom';
 import LinkBtn from '../../components/UI/LinkBtn';
 import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import React, { useState } from 'react';
 import { ContributionReport } from '../../dtos/groupDto';
 import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
-import DataTable, { createTheme } from 'react-data-table-component';
-import { customStyles } from '../../Actions/constant';
 import { formatDate, formatNumber } from '../../helperFunc.ts/utilsFunc';
-import { useAppSelector } from '../../Actions/store';
 import Empty from '../../components/UI/Empty';
 import Title from '../../components/UI/Title';
 import { useQuery } from '@tanstack/react-query';
 import DownloadContributionExcel from '../../components/Downloads/Excel/DownloadContributionExcel';
+import DataTableUI, { Row } from '../../components/UI/DataTable';
 
 const GroupContributionReport = () => {
   const params = useParams();
@@ -20,8 +19,6 @@ const GroupContributionReport = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
-  const { isDarkMode } = useAppSelector((state) => state.mode);
 
   const { data } = useQuery({
     queryKey: ['fetchGroup', params.groupId],
@@ -44,7 +41,27 @@ const GroupContributionReport = () => {
     });
 
     if (result.status === 'success') {
-      setReport(result?.contributions);
+      // For total rows
+      const totalRow = result?.contributions?.reduce(
+        (
+          acc: Record<string, number | string>,
+          item: { [x: string]: string | number }
+        ) => {
+          for (const key in item) {
+            if (typeof item[key] === 'number') {
+              acc[key] = ((acc[key] || 0) as string) + item[key];
+            } else {
+              acc[key] = acc[key] || (key === 'memberName' ? 'Total' : '');
+            }
+          }
+          return acc;
+        },
+        {}
+      );
+
+      const updatedResults = [...result?.contributions, totalRow];
+
+      setReport(updatedResults);
       setIsLoading(false);
     }
     if (result.status === 'fail') {
@@ -53,37 +70,26 @@ const GroupContributionReport = () => {
     }
   };
 
-  type Row = {
-    [key: string]: number | string;
-  };
+  // type Row = {
+  //   [key: string]: number | string;
+  // };
 
-  const tableHeaders = report && Object.keys(report?.[0] as object);
+  const tableHeaders = report && Object?.keys(report?.[0] as object);
   const columns = tableHeaders?.map((item) => {
     return {
       name: item.toUpperCase(),
       cell: (row: Row) => (
         <div style={{ textTransform: 'capitalize' }}>
-          {typeof row[item] === 'string' ? row[item] : formatNumber(row[item])}
+          {typeof row[item] === 'string'
+            ? row[item]
+            : typeof row[item] === 'number'
+            ? formatNumber(row[item])
+            : row[item]?.toString?.()}
         </div>
       ),
       sortable: true,
     };
   });
-
-  // Table Dark theme
-  createTheme(
-    'solarized',
-    {
-      text: {
-        primary: '#f8fafc',
-        secondary: '#f8fafc',
-      },
-      background: {
-        default: 'oklch(27.9% 0.041 260.031)',
-      },
-    },
-    'dark'
-  );
 
   return (
     <>
@@ -117,14 +123,7 @@ const GroupContributionReport = () => {
               <p>start Date: {startDate && formatDate(new Date(startDate))}</p>
               <p>end Date: {endDate && formatDate(new Date(endDate))}</p>
             </div>
-            <DataTable
-              columns={columns || []}
-              data={report || []}
-              customStyles={customStyles}
-              pagination
-              theme={isDarkMode ? 'solarized' : 'light'}
-              fixedHeader={true}
-            />
+            <DataTableUI columns={columns ?? []} data={report || []} />
           </div>
         </>
       ) : (

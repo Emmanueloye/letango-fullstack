@@ -133,7 +133,7 @@ const GroupView = () => {
             />
           </div>
           {/* Recent transactions */}
-          {/* 'Osunkoya Mayowa: contribution for Jan 2025' */}
+
           {transactions?.length > 0 ? (
             <div>
               {transactions?.map((item) => (

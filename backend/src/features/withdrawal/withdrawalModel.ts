@@ -41,7 +41,7 @@ const withdrawalSchema = new Schema({
   approvalStatus: {
     type: String,
     enum: {
-      values: ['pending', 'reject', 'approve'],
+      values: ['pending', 'reject', 'approve', 'processing', 'closed'],
       message: 'Invalid status',
     },
     default: 'pending',
@@ -69,7 +69,12 @@ const withdrawalSchema = new Schema({
 
 type IWithdrawal = InferSchemaType<typeof withdrawalSchema>;
 withdrawalSchema.pre(/^find/, function (this: Query<{}, IWithdrawal>) {
-  this.populate({ path: 'requester', select: 'surname otherNames' });
+  this.populate({ path: 'requester', select: 'surname otherNames' })
+    .populate({
+      path: 'fromGroup',
+      select: 'groupName',
+    })
+    .populate({ path: 'approvedBy.userId' });
 });
 
 export default model('Withdrawal', withdrawalSchema);

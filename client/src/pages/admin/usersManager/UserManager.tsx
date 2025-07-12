@@ -1,8 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
-import Table from '../../../components/UI/Table';
+
 import Title from '../../../components/UI/Title';
-import TableAction from '../../../components/UI/TableAction';
-import TableCard from '../../../components/UI/TableCard';
 import {
   extractFormData,
   extractParams,
@@ -15,11 +13,13 @@ import {
   LoaderFunctionArgs,
   useLoaderData,
 } from 'react-router-dom';
-import { User } from '../../../dtos/UserDto';
+import { TableUser } from '../../../dtos/UserDto';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
 import { formatDate } from '../../../helperFunc.ts/utilsFunc';
 import Empty from '../../../components/UI/Empty';
+import Pagination from '../../../components/UI/Pagination';
+import DataTableUI, { Row } from '../../../components/UI/DataTable';
+import TableAction from '../../../components/UI/TableAction';
 
 const UserManager = () => {
   const params = useLoaderData();
@@ -33,77 +33,79 @@ const UserManager = () => {
     ],
     queryFn: () =>
       getData({
-        url: `/users?page=${params?.page || 1}&sort=${
+        url: `/users?page=${params?.page || 1}&limit=3&sort=${
           params?.sort || '-createdAt'
         }`,
       }),
   });
 
-  const { users }: { users: User[] } = data || [];
+  const { users }: { users: TableUser[] } = data || [];
 
-  //  const { totalPages, currentPage, nextPage, previousPage } = data.page;
+  const updatedUsers = users?.map((item) => {
+    if (item.createdAt) item.createdAt.toString();
+    return item;
+  });
 
-  const headers = ['username', 'email', 'reg date', 'action'];
-  const columns = '1fr 1fr 1fr 1.2fr';
+  const { totalPages, currentPage, nextPage, previousPage } = data.page;
+
+  const columns = [
+    {
+      name: 'USER NAME',
+      cell: (row: Row) => (
+        <div
+          style={{ textTransform: 'capitalize' }}
+        >{`${row.surname} ${row.otherNames}`}</div>
+      ),
+      sortable: true,
+    },
+    {
+      name: 'EMAIL',
+      selector: (row: Row) => row.email,
+      sortable: true,
+    },
+    {
+      name: 'REG DATE',
+      cell: (row: Row) => (
+        <div>{formatDate(new Date(row.createdAt?.toLocaleString()))}</div>
+      ),
+      sortable: true,
+    },
+    {
+      name: 'ACTION',
+      cell: (row: Row) => {
+        return (
+          <TableAction
+            editUrl={`/account/admin/user-manager/edit/${row?.userRef}`}
+            viewUrl={`/account/admin/user-manager/view/${row?.userRef}`}
+            showUserAction
+            userStatus={row?.status as string}
+            id={row?._id as string}
+          />
+        );
+      },
+    },
+  ];
+
   return (
     <section>
       <Title title='manage users' />
-      {/* Large screen table view */}
+
       {users?.length > 0 ? (
-        <div className='w-full overflow-x-auto hidden lg:block'>
-          <Table headers={headers} columns={columns}>
-            {users?.map((user) => (
-              <React.Fragment key={user._id}>
-                <p className='border border-[#d1d5dc] capitalize '>
-                  {user?.surname} {user?.otherNames.split(' ')[0]}
-                </p>
-                <p className='border lowercase border-[#d1d5dc] '>
-                  {user?.email}
-                </p>
-                <p className='border  border-[#d1d5dc] '>
-                  {user?.createdAt && formatDate(new Date(user?.createdAt))}
-                </p>
-                <TableAction
-                  editUrl={`/account/admin/user-manager/edit/${user?.userRef}`}
-                  viewUrl={`/account/admin/user-manager/view/${user?.userRef}`}
-                  showUserAction
-                  userStatus={user?.status}
-                  id={user?.userRef}
-                />
-              </React.Fragment>
-            ))}
-          </Table>
-        </div>
-      ) : (
-        <Empty message='No user data in our records.' />
-      )}
-      {/*End Large screen table view */}
-      {/*================= Small screen table view =============== */}
-      {users?.length > 0 ? (
-        <div className='block lg:hidden'>
-          {/* Table card header */}
-          <TableCard className='font-600 uppercase'>
-            <p>username</p>
-            <p className='break-all'>email</p>
-            <p>reg date</p>
-          </TableCard>
+        <div className='block'>
           {/* Table card row */}
-          {users?.map((user) => (
-            <TableCard
-              key={user._id}
-              editUrl={`/account/admin/user-manager/edit/${user?.userRef}`}
-              viewUrl={`/account/admin/user-manager/view/${user?.userRef}`}
-              showAction
-              userStatus={user?.status}
-              id={user?.userRef}
-            >
-              <p className='capitalize'>
-                {user?.surname} {user?.otherNames.split(' ')[0]}
-              </p>
-              <p className='break-all'> {user?.email}</p>
-              <p>{user?.createdAt && formatDate(new Date(user?.createdAt))}</p>
-            </TableCard>
-          ))}
+          <DataTableUI
+            columns={columns || []}
+            data={updatedUsers}
+            pagination={false}
+          />
+
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            previousPage={previousPage}
+            nextPage={nextPage}
+            baseLink='/account/admin/user-manager'
+          />
         </div>
       ) : (
         <Empty message='No user data in our records.' />
@@ -122,7 +124,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     queryKey: ['fetchUser', 'users', page ?? 1, sort ?? '-createdAt'],
     queryFn: () =>
       getData({
-        url: `/users?page=${page || 1}&sort=${sort || '-createdAt'}`,
+        url: `/users?page=${page || 1}&limit=3&sort=${sort || '-createdAt'}`,
       }),
   });
 

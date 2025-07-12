@@ -1,7 +1,25 @@
+/* eslint-disable react-refresh/only-export-components */
+import { LoaderFunctionArgs, redirect, useParams } from 'react-router-dom';
 import LinkBtn from '../../../components/UI/LinkBtn';
 import Title from '../../../components/UI/Title';
+import {
+  fetchOnlyData,
+  getData,
+  queryClient,
+} from '../../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
 
 const ViewAdminGroup = () => {
+  const params = useParams();
+
+  const { data } = useQuery({
+    queryKey: ['fetchGroup', 'group', params?.id],
+    queryFn: () =>
+      getData({
+        url: `/groups/admin/${params?.id}`,
+      }),
+  });
+
   return (
     <section>
       <div className='flex justify-end mb-2'>
@@ -16,7 +34,7 @@ const ViewAdminGroup = () => {
             type='text'
             id='groupName'
             name='groupName'
-            defaultValue={''}
+            defaultValue={data?.group?.groupName}
             autoComplete='off'
             disabled
           />
@@ -27,7 +45,7 @@ const ViewAdminGroup = () => {
             type='text'
             id='groupType'
             name='groupType'
-            defaultValue={''}
+            defaultValue={data?.group?.groupType}
             autoComplete='off'
             disabled
           />
@@ -38,29 +56,39 @@ const ViewAdminGroup = () => {
             type='text'
             id='groupObjective'
             name='groupObjective'
-            defaultValue={''}
+            defaultValue={data?.group?.groupPurpose}
             autoComplete='off'
             disabled
           />
         </div>
         <div className='w-full mb-4 lg:mb-0'>
-          <label htmlFor='group logo'>group logo</label>
+          <label htmlFor='owner'>Owner</label>
           <input
-            type='file'
-            id='group logo'
-            name='group logo'
+            type='text'
+            id='owner'
+            name='owner'
+            defaultValue={
+              data?.group?.owner &&
+              `${data?.group?.owner?.surname} ${data?.group?.owner?.otherNames}`
+            }
             autoComplete='off'
-            className='p-0'
             disabled
+            className='capitalize'
           />
         </div>
+        {data?.group?.photo && (
+          <div className='w-full mb-4 lg:mb-0'>
+            <label htmlFor='group logo'>group logo</label>
+            <img src={data?.group?.photo} alt='logo' width={40} height={40} />
+          </div>
+        )}
       </div>
       <div className='w-full mt-4 lg:mb-0'>
         <label htmlFor='description'>group description</label>
         <textarea
           name='description'
           id='description'
-          defaultValue={''}
+          defaultValue={data?.group?.groupDescription}
           cols={10}
           rows={5}
           className='resize-y'
@@ -72,3 +100,26 @@ const ViewAdminGroup = () => {
 };
 
 export default ViewAdminGroup;
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchGroup', 'group', params?.id],
+    queryFn: () =>
+      getData({
+        url: `/groups/admin/${params?.id}`,
+      }),
+  });
+
+  const resp = await queryClient.ensureQueryData({
+    queryKey: ['user'],
+    queryFn: () => fetchOnlyData({ url: '/users/me' }),
+  });
+
+  const roles = ['super-admin', 'admin'];
+
+  if (resp?.user && !roles.includes(resp?.user?.role)) {
+    return redirect('/login');
+  }
+
+  return null;
+};

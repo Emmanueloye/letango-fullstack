@@ -51,10 +51,10 @@ const GroupActionsLinks = ({
           url={`/account/manage-group/view/${group?.groupRef}/fund-heads`}
         />
       )}
-      <LinkBtn
+      {/* <LinkBtn
         btnText='My pledge'
         url={`/account/manage-group/view/${group?.groupRef}/my-pledge`}
-      />
+      /> */}
     </div>
   );
 };

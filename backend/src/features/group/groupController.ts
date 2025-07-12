@@ -108,6 +108,7 @@ export const createGroup = async (req: Request, res: Response) => {
   });
 };
 
+// update group by group owner
 export const updateGroup = factory.updateOne({
   Model: Group,
   label: 'group',
@@ -116,8 +117,26 @@ export const updateGroup = factory.updateOne({
   log: true,
 });
 
+// update group by page admin
+export const adminUpdateGroup = factory.updateOne({
+  Model: Group,
+  label: 'group',
+  queryKey: 'groupRef',
+  excludedFields: ['groupBalance', 'approvalAuthorities', 'groupCode', 'owner'],
+  log: true,
+});
+
+export const getGroups = factory.getAll({ Model: Group, label: 'groups' });
+
+export const getAdminGroups = factory.getOne({
+  Model: Group,
+  queryKey: 'groupRef',
+  label: 'group',
+});
+
 export const getGroup = async (req: Request, res: Response) => {
   // Get the current group
+
   const group = await Group.findOne({ groupRef: req.params.id });
 
   if (!group) {

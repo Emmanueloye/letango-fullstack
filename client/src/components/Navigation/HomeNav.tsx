@@ -118,14 +118,16 @@ const HomeNav = ({
                   Contact
                 </button>
               </li>
-              <li className=' dark:text-slate-50'>
-                <NavLink
-                  to='/account'
-                  className={({ isActive }) => (isActive ? 'font-700' : '')}
-                >
-                  Account
-                </NavLink>
-              </li>
+              {isAuth && (
+                <li className=' dark:text-slate-50'>
+                  <NavLink
+                    to='/account'
+                    className={({ isActive }) => (isActive ? 'font-700' : '')}
+                  >
+                    Account
+                  </NavLink>
+                </li>
+              )}
             </ul>
             {/*=================================================================================
         ======================== Auth and call to action links================================= */}

@@ -28,7 +28,7 @@ const memberSchema = new Schema({
   },
   status: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   joinedAt: {
     type: Date,

@@ -6,7 +6,7 @@ export type User = {
   email: string;
   password?: string;
   isVerified: boolean;
-  verifiedDate: Date;
+  verificationDate?: Date;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   passwordChangedAt?: Date;
@@ -19,4 +19,23 @@ export type User = {
   outflow: number;
   status: string;
   createdAt: Date;
+};
+
+export type TableUser = {
+  _id: string;
+  userRef: string;
+  surname: string;
+  otherNames: string;
+  email: string;
+  password?: string;
+  isVerified: boolean;
+  photo?: string;
+  phone: string;
+  photoPublicId?: string;
+  role: string;
+  personalWallet: number;
+  inflow: number;
+  outflow: number;
+  status: string;
+  createdAt: string;
 };

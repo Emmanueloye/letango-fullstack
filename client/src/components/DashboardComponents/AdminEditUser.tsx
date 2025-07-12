@@ -10,6 +10,8 @@ const AdminEditUser = ({ user }: { user: User }) => {
   const data = useActionData() as FormActionType;
   const status = ['active', 'suspend', 'banned'];
 
+  console.log(user);
+
   return (
     <section>
       <div className='flex justify-end mb-2'>

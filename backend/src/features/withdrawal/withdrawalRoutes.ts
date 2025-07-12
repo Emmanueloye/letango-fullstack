@@ -20,7 +20,32 @@ router
   );
 
 router
+  .route('/admin')
+  .get(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('super-admin', 'admin'),
+    withdrawalController.adminGetWithdrawals
+  );
+
+router
+  .route('/admin/:id')
+  .get(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('super-admin', 'admin'),
+    withdrawalController.adminGetWithdrawal
+  )
+  .patch(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('super-admin', 'admin'),
+    withdrawalController.adminUpdateWithdrawal
+  );
+
+router
   .route('/:id')
-  .patch(authMiddleware.protect, withdrawalController.approveWithdrawal);
+  .patch(
+    authMiddleware.protect,
+    checkAdmin,
+    withdrawalController.approveWithdrawal
+  );
 
 export default router;

@@ -56,8 +56,13 @@ import UserManager, {
   loader as userManagerLoader,
   action as userManagerAction,
 } from './pages/admin/usersManager/UserManager';
-import GroupManager from './pages/admin/groupManager/GroupManager';
-import OpenWithdrawals from './pages/admin/withdrawals/OpenWithdrawals';
+import GroupManager, {
+  loader as groupManagerLoader,
+} from './pages/admin/groupManager/GroupManager';
+import OpenWithdrawals, {
+  loader as openWithdrawalsLoader,
+  action as openWithdrawalsAction,
+} from './pages/admin/withdrawals/OpenWithdrawals';
 import ClosedWithdrawals from './pages/admin/withdrawals/ClosedWithdrawals';
 import Statements from './pages/report/Statements';
 import EditUser, {
@@ -67,9 +72,16 @@ import EditUser, {
 import ViewUser, {
   loader as viewUserLoader,
 } from './pages/admin/usersManager/ViewUser';
-import EditAdminGroup from './pages/admin/groupManager/EditAdminGroup';
-import ViewAdminGroup from './pages/admin/groupManager/ViewAdminGroup';
-import WithdrawalLanding from './pages/admin/withdrawals/WithdrawalLanding';
+import EditAdminGroup, {
+  loader as editAdminGroupLoader,
+  action as updateAdminGroupAction,
+} from './pages/admin/groupManager/EditAdminGroup';
+import ViewAdminGroup, {
+  loader as viewAdminGroupLoader,
+} from './pages/admin/groupManager/ViewAdminGroup';
+import WithdrawalLanding, {
+  loader as withdrawalLandingLoader,
+} from './pages/admin/withdrawals/WithdrawalLanding';
 import PendingWithdrawals from './pages/admin/withdrawals/PendingWithdrawals';
 import KYCReview from './pages/admin/usersManager/KYCReview';
 import ReportUser from './pages/userGroupMgt/ReportUser';
@@ -142,6 +154,9 @@ import UpdateApprovalAuths, {
 import GroupContributionReport, {
   loader as groupContributionReportLoader,
 } from './pages/report/GroupContributionReport';
+import ViewWithdrawals, {
+  loader as viewWithdrawalLoader,
+} from './pages/admin/withdrawals/ViewWithdrawals';
 
 const router = createBrowserRouter([
   {
@@ -426,19 +441,51 @@ const router = createBrowserRouter([
           {
             path: 'group-manager',
             children: [
-              { index: true, element: <GroupManager /> },
-              { path: 'edit/:id', element: <EditAdminGroup /> },
-              { path: 'view/:id', element: <ViewAdminGroup /> },
+              {
+                index: true,
+                element: <GroupManager />,
+                loader: groupManagerLoader,
+              },
+              {
+                path: 'edit/:id',
+                element: <EditAdminGroup />,
+                loader: editAdminGroupLoader,
+                action: updateAdminGroupAction,
+              },
+              {
+                path: 'view/:id',
+                element: <ViewAdminGroup />,
+                loader: viewAdminGroupLoader,
+              },
             ],
           },
           {
             path: 'withdrawals',
             children: [
-              { index: true, element: <WithdrawalLanding /> },
-              { path: 'open', element: <OpenWithdrawals /> },
+              {
+                index: true,
+                element: <WithdrawalLanding />,
+                loader: withdrawalLandingLoader,
+              },
+              {
+                path: 'open',
+                children: [
+                  {
+                    index: true,
+                    element: <OpenWithdrawals />,
+                    loader: openWithdrawalsLoader,
+                    action: openWithdrawalsAction,
+                  },
+                  {
+                    path: ':id',
+                    element: <ViewWithdrawals />,
+                    loader: viewWithdrawalLoader,
+                  },
+                ],
+              },
               { path: 'closed', element: <ClosedWithdrawals /> },
               { path: 'pending', element: <PendingWithdrawals /> },
-              { path: 'closed-withdrawals', element: <ClosedWithdrawals /> },
+              { path: 'rejected', element: <ClosedWithdrawals /> },
             ],
           },
 

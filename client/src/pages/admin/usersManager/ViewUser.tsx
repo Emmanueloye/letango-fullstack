@@ -4,6 +4,7 @@ import LinkBtn from '../../../components/UI/LinkBtn';
 import Title from '../../../components/UI/Title';
 import { getData, queryClient } from '../../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
+import { formatDate } from '../../../helperFunc.ts/utilsFunc';
 
 const ViewUser = () => {
   const params = useLoaderData();
@@ -72,6 +73,21 @@ const ViewUser = () => {
             autoComplete='off'
             disabled
             defaultValue={data?.user?.status}
+            className='capitalize'
+          />
+        </div>
+
+        <div className='w-full mb-4 lg:mb-0'>
+          <label htmlFor='verifiedDate'>verifiedDate</label>
+          <input
+            id='verifiedDate'
+            name='verifiedDate'
+            autoComplete='off'
+            disabled
+            defaultValue={
+              data?.user?.verificationDate &&
+              formatDate(new Date(data?.user?.verificationDate))
+            }
             className='capitalize'
           />
         </div>

@@ -10,6 +10,7 @@ import { startSession } from 'mongoose';
 import { checkForErrors, generateUniqueId } from '../../utils';
 import GetRequestAPI, { paginateDetails } from '../../utils/getRequestAPI';
 import * as utils from '../../utils';
+import * as factory from '../../utils/handlerFactory';
 const { body } = require('express-validator');
 
 // Validate withdrawal creation inputs.
@@ -23,6 +24,8 @@ export const validateWithdrawal = checkForErrors([
     .withMessage('Receiver account field is required.'),
   body('description').notEmpty().withMessage('Description field is required.'),
 ]);
+
+// Handler to get all approved withdrawals
 
 // Handler to create/place withdrawal
 export const createWithdrawal = async (req: Request, res: Response) => {
@@ -180,6 +183,24 @@ export const createWithdrawal = async (req: Request, res: Response) => {
   }
   throw new AppError.BadRequest('Sorry, we cannot handle your request.');
 };
+
+// Get withdrawals for admin
+export const adminGetWithdrawals = factory.getAll({
+  Model: Withdrawal,
+  label: 'withdrawals',
+});
+
+// Get single withdrawal for admin
+export const adminGetWithdrawal = factory.getOne({
+  Model: Withdrawal,
+  label: 'withdrawal',
+});
+
+export const adminUpdateWithdrawal = factory.updateOne({
+  Model: Withdrawal,
+  label: 'withdrawal',
+  includedFields: ['approvalStatus'],
+});
 
 // Get withdrawal based on status and logged in user.
 export const getGroupPendingWithdrawals = async (

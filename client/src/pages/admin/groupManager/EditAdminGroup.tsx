@@ -1,9 +1,47 @@
-import { Form } from 'react-router-dom';
+/* eslint-disable react-refresh/only-export-components */
+import {
+  ActionFunctionArgs,
+  Form,
+  LoaderFunctionArgs,
+  redirect,
+  useParams,
+} from 'react-router-dom';
 import LinkBtn from '../../../components/UI/LinkBtn';
 import Title from '../../../components/UI/Title';
 import Button from '../../../components/UI/Button';
+import {
+  fetchOnlyData,
+  getData,
+  patchData,
+  queryClient,
+} from '../../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
 
 const EditAdminGroup = () => {
+  const params = useParams();
+
+  const { data } = useQuery({
+    queryKey: ['fetchGroup', 'group', params?.id],
+    queryFn: () =>
+      getData({
+        url: `/groups/admin/${params?.id}`,
+      }),
+  });
+
+  const groupType = [
+    'Peer Contribution',
+    'Association',
+    'Club',
+    'Crowd funding',
+  ];
+
+  const groupPurpose = [
+    'Group contribution',
+    'Community portfolio',
+    'Special project',
+    'Fund raising',
+  ];
+
   return (
     <section>
       <div className='flex justify-end mb-2'>
@@ -11,7 +49,7 @@ const EditAdminGroup = () => {
       </div>
       <Title title='update group' />
 
-      <Form id='updateGroupForm'>
+      <Form id='updateGroupForm' method='patch'>
         <div className='lg:grid lg:grid-cols-2 gap-4'>
           <div className='w-full mb-4 lg:mb-0'>
             <label htmlFor='groupName'>group name</label>
@@ -19,33 +57,41 @@ const EditAdminGroup = () => {
               type='text'
               id='groupName'
               name='groupName'
-              defaultValue={''}
+              defaultValue={data?.group?.groupName}
               autoComplete='off'
+              className='capitalize'
             />
           </div>
           <div className='w-full mb-4 lg:mb-0'>
             <label htmlFor='groupType'>group type</label>
             <select name='groupType' id='groupType'>
-              <option value='' hidden>
-                Select group type
+              <option value={data?.group?.groupType}>
+                {data?.group?.groupType}
               </option>
-              <option value=''>Peer contribution</option>
-              <option value=''>Association</option>
-              <option value=''>Club</option>
-              <option value=''>Crowd funding</option>
+              {groupType
+                .filter(
+                  (item) =>
+                    item.toLowerCase() !== data?.group?.groupType.toLowerCase()
+                )
+                ?.map((el) => (
+                  <option value={el}>{el}</option>
+                ))}
             </select>
           </div>
           <div className='w-full mb-4 lg:mb-0'>
-            <label htmlFor='groupObjective'>Purpose of Group</label>
-            <select name='groupType' id='groupType'>
-              <option value='' hidden>
-                Select group purpose
+            <label htmlFor='groupPurpose'>Purpose of Group</label>
+            <select name='groupPurpose' id='groupPurpose'>
+              <option value={data?.group?.groupPurpose}>
+                {data?.group?.groupPurpose}
               </option>
-              <option value=''>Personal contribution</option>
-              <option value=''>Group contribution</option>
-              <option value=''>Community portfolio</option>
-              <option value=''>Special project</option>
-              <option value=''>Fund raising</option>
+              {groupPurpose
+                ?.filter(
+                  (el) =>
+                    el.toLowerCase() !== data?.group?.groupPurpose.toLowerCase()
+                )
+                .map((item) => (
+                  <option value={item}>{item}</option>
+                ))}
             </select>
           </div>
           <div className='w-full mb-4 lg:mb-0'>
@@ -53,18 +99,18 @@ const EditAdminGroup = () => {
             <input
               type='file'
               id='group logo'
-              name='group logo'
+              name='photo'
               autoComplete='off'
               className='p-0'
             />
           </div>
         </div>
         <div className='w-full mt-4 lg:mb-0'>
-          <label htmlFor='description'>group description</label>
+          <label htmlFor='groupDescription'>group description</label>
           <textarea
-            name='description'
-            id='description'
-            defaultValue={''}
+            name='groupDescription'
+            id='groupDescription'
+            defaultValue={data?.group?.groupDescription}
             cols={10}
             rows={5}
             className='resize-y'
@@ -79,3 +125,37 @@ const EditAdminGroup = () => {
 };
 
 export default EditAdminGroup;
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchGroup', 'group', params?.id],
+    queryFn: () =>
+      getData({
+        url: `/groups/admin/${params?.id}`,
+      }),
+  });
+
+  const resp = await queryClient.ensureQueryData({
+    queryKey: ['user'],
+    queryFn: () => fetchOnlyData({ url: '/users/me' }),
+  });
+
+  const roles = ['super-admin', 'admin'];
+
+  if (resp?.user && !roles.includes(resp?.user?.role)) {
+    return redirect('/login');
+  }
+
+  return null;
+};
+
+export const action = async ({ request, params }: ActionFunctionArgs) => {
+  const data = await request.formData();
+  return patchData({
+    url: `/groups/admin/${params.id}`,
+    data,
+    invalidate: ['fetchGroupMember', 'fetchGroup'],
+    redirectTo: '/account/admin/group-manager',
+    setToast: true,
+  });
+};

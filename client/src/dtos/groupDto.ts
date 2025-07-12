@@ -11,7 +11,22 @@ export type Group = {
   groupBalance: number;
   approvalAuthorities: string[];
   groupCode?: string;
-  createdAt: Date;
+  createdAt: string;
+};
+
+export type UpdatedGroup = {
+  _id: string;
+  groupRef: string;
+  groupName: string;
+  groupType: string;
+  groupPurpose: string;
+  photo: string;
+  photoPublicId: string;
+  groupDescription: string;
+  owner: string;
+  groupBalance: number;
+  groupCode?: string;
+  createdAt: string;
 };
 
 export type Member = {

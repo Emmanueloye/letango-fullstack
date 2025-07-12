@@ -5,10 +5,12 @@ import GroupTransaction from '../transactions/groupTransactionModel';
 import Member from '../members/memberModel';
 import FundClass from '../groupExpenseHead/FundClassificationModel';
 import statusCodes from '../../errors/statusCodes';
+const { body } = require('express-validator');
 
 // To generate group statement
 export const statement = async (req: Request, res: Response) => {
   const { startDate, endDate } = req.body;
+
   if (startDate > endDate) {
     throw new AppError.BadRequest(
       'End date cannot be earlier than the start date.'
@@ -151,3 +153,8 @@ export const contributionReport = async (req: Request, res: Response) => {
     .status(statusCodes.OK)
     .json({ status: 'success', noHits: result.length, contributions: result });
 };
+
+export const validateDate = utils.checkForErrors([
+  body('startDate').notEmpty().withMessage('Start date is required'),
+  body('endDate').notEmpty().withMessage('End date is required'),
+]);

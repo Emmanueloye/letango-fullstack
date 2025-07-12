@@ -51,12 +51,16 @@ export type Withdrawal = {
   };
   from: string;
   to: string;
-  fromGroup: string;
+  fromGroup: {
+    _id: string;
+    groupName?: string;
+  };
   contribution: number;
   bank: string;
   description: string;
   accountNumber: number;
   head: string;
+  headType: string;
   approvalStatus: string;
   approvedBySys: boolean;
   approvedBy: {

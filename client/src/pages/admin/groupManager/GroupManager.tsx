@@ -1,71 +1,109 @@
-import Table from '../../../components/UI/Table';
-import TableAction from '../../../components/UI/TableAction';
-import TableCard from '../../../components/UI/TableCard';
+/* eslint-disable react-refresh/only-export-components */
+import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
 import Title from '../../../components/UI/Title';
+import {
+  extractParams,
+  getData,
+  queryClient,
+} from '../../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
+import { UpdatedGroup } from '../../../dtos/groupDto';
+import DataTableUI, { Row } from '../../../components/UI/DataTable';
+import TableAction from '../../../components/UI/TableAction';
+import Empty from '../../../components/UI/Empty';
+import Pagination from '../../../components/UI/Pagination';
 
 const GroupManager = () => {
-  const headers = ['group name', 'group type', 'created date', 'action'];
-  const columns = '1fr 1fr 1fr 1.2fr';
+  const params = useLoaderData();
+
+  const { data } = useQuery({
+    queryKey: [
+      'fetchAllGroup',
+      'allGroups',
+      params?.page ?? 1,
+      params?.sort ?? '-createdAt',
+    ],
+    queryFn: () =>
+      getData({
+        url: `/groups?page=${params?.page || 1}&limit=3&sort=${
+          params?.sort || '-createdAt'
+        }`,
+      }),
+  });
+
+  const { groups }: { groups: UpdatedGroup[] } = data || [];
+
+  const { totalPages, currentPage, nextPage, previousPage } = data?.page || {};
+
+  const columns = [
+    {
+      name: 'GROUP REF',
+      selector: (row: Row) => row.groupRef,
+      sortable: true,
+    },
+    {
+      name: 'GROUP NAME',
+      cell: (row: Row) => (
+        <div style={{ textTransform: 'capitalize' }}>{row.groupName}</div>
+      ),
+      sortable: true,
+    },
+    {
+      name: 'GROUP TYPE',
+      selector: (row: Row) => row.groupType,
+      sortable: true,
+    },
+
+    {
+      name: 'ACTION',
+      cell: (row: Row) => {
+        return (
+          <TableAction
+            editUrl={`/account/admin/group-manager/edit/${row?.groupRef}`}
+            viewUrl={`/account/admin/group-manager/view/${row?.groupRef}`}
+            id={row?._id as string}
+          />
+        );
+      },
+    },
+  ];
+
   return (
     <section>
       <Title title='manage groups' />
-      {/* Large screen table view */}
-      <div className='w-full overflow-x-auto hidden lg:block'>
-        <Table headers={headers} columns={columns}>
-          <>
-            <p className='border border-[#d1d5dc]'>Alapomeji Association</p>
-            <p className='border border-[#d1d5dc]'>Peer contribution</p>
-            <p className='border  border-[#d1d5dc]'>April 4, 2025</p>
-            <TableAction
-              editUrl='/account/admin/group-manager/edit/1'
-              viewUrl='/account/admin/group-manager/view/1'
-              showUserAction
-            />
-          </>
-          <>
-            <p className='border border-[#d1d5dc]'>Majue Contribution</p>
-            <p className='border border-[#d1d5dc]'>community portfolio</p>
-            <p className='border  border-[#d1d5dc]'>April 4, 2025</p>
-            <TableAction
-              editUrl='/account/admin/group-manager/edit/1'
-              viewUrl='/account/admin/group-manager/view/1'
-              showUserAction
-            />
-          </>
-        </Table>
-      </div>
 
-      {/*================= Small screen table view =============== */}
-      <div className='block lg:hidden'>
-        {/* Table card header */}
-        <TableCard className='font-600 uppercase'>
-          <p>username</p>
-          <p className='break-all'>email</p>
-          <p>reg date</p>
-        </TableCard>
-        {/* Table card row */}
-        <TableCard
-          editUrl='/account/admin/group-manager/edit/1'
-          viewUrl='/account/admin/group-manager/view/1'
-          showAction
-        >
-          <p>Osunkoya Mayowa</p>
-          <p className='break-all'>Osunkoya@gmail.com</p>
-          <p>April 4, 2025</p>
-        </TableCard>
-        <TableCard
-          editUrl='/account/admin/group-manager/edit/1'
-          viewUrl='/account/admin/group-manager/view/1'
-          showAction
-        >
-          <p>Osunkoya Mayowa</p>
-          <p className='break-all'>Osunkoya@gmail.com</p>
-          <p>April 4, 2025</p>
-        </TableCard>
-      </div>
-      {/*End Small screen table view */}
+      {groups?.length > 0 ? (
+        <div className='block'>
+          {/* Table */}
+          <DataTableUI columns={columns} data={groups} pagination={false} />
+
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            previousPage={previousPage}
+            nextPage={nextPage}
+            baseLink='/account/admin/group-manager'
+          />
+        </div>
+      ) : (
+        <Empty message='No group data available.' />
+      )}
     </section>
   );
 };
 
 export default GroupManager;
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const params = extractParams(request);
+  const { page, sort } = params;
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchAllGroup', 'allGroups', page ?? 1, sort ?? '-createdAt'],
+    queryFn: () =>
+      getData({
+        url: `/groups?page=${page || 1}&limit=3&sort=${sort || '-createdAt'}`,
+      }),
+  });
+
+  return params;
+};

@@ -19,7 +19,9 @@ const ManageGroup = () => {
   const { data } = useQuery({
     queryKey: ['fetchGroupMember', 'groupMember', page ?? 1],
     queryFn: () =>
-      getData({ url: `/members?page=${page || 1}&limit=12&sort=-joinedAt` }),
+      getData({
+        url: `/members?page=${page || 1}&limit=12&sort=-joinedAt&status=true`,
+      }),
   });
 
   const { totalPages, currentPage, nextPage, previousPage } = data?.page || {};
@@ -74,6 +76,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return queryClient.ensureQueryData({
     queryKey: ['fetchGroupMember', 'groupMember', page ?? 1],
     queryFn: () =>
-      getData({ url: `/members?page=${page || 1}&limit=12&sort=-joinedAt` }),
+      getData({
+        url: `/members?page=${page || 1}&limit=12&sort=-joinedAt&status=true`,
+      }),
   });
 };

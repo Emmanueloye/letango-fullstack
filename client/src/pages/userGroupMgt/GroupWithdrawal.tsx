@@ -20,6 +20,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   return postData({
     url: `/withdrawals`,
     data,
+    invalidate: ['fetchWithdrawal'],
     redirectTo: `/account/manage-group/view/${params.groupId}/withdraw`,
     setToast: true,
   });

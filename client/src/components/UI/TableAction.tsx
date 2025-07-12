@@ -31,9 +31,7 @@ const TableAction = ({
     }
   };
   return (
-    <div
-      className={`flex items-center gap-2 border border-[#d1d5dc] ${className}`}
-    >
+    <div className={`flex items-center gap-2 ${className}`}>
       <Link
         to={editUrl}
         className='bg-amber-600 p-2 rounded-full text-slate-50'

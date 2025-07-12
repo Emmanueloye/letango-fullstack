@@ -11,6 +11,7 @@ router
   .get(
     authMiddleware.protect,
     switchDate,
+    groupReportController.validateDate,
     checkMembership,
     groupReportController.statement
   );
@@ -20,6 +21,7 @@ router
   .get(
     authMiddleware.protect,
     switchDate,
+    groupReportController.validateDate,
     checkMembership,
     groupReportController.incomeAndExpense
   );
@@ -29,6 +31,7 @@ router
   .get(
     authMiddleware.protect,
     switchDate,
+    groupReportController.validateDate,
     checkMembership,
     groupReportController.contributionReport
   );
