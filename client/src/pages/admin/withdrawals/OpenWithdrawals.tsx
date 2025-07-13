@@ -13,6 +13,7 @@ import { formatNumber } from '../../../helperFunc.ts/utilsFunc';
 import { ActionFunctionArgs, Link, useSubmit } from 'react-router-dom';
 import { FaEye } from 'react-icons/fa';
 import { useState } from 'react';
+import DownloadWithdrawalExcel from '../../../components/Downloads/Excel/DownloadWithdrawalExcel';
 
 const OpenWithdrawals = () => {
   const submit = useSubmit();
@@ -47,7 +48,7 @@ const OpenWithdrawals = () => {
       sortable: true,
     },
     {
-      name: 'BANK',
+      name: 'ACCOUNT NO.',
       selector: (row: Row) => row.accountNumber,
       sortable: true,
     },
@@ -131,6 +132,9 @@ const OpenWithdrawals = () => {
             onChange={handleSearchChange}
           />
         </div>
+        <div className='mb-4'>
+          <DownloadWithdrawalExcel withdrawal={data?.withdrawals} />
+        </div>
         <DataTableUI columns={columns} data={withdrawals} pagination={true} />
       </>
     </section>
@@ -153,7 +157,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return patchData({
     url: `/withdrawals/admin/${id}`,
     data,
-    invalidate: ['fetchWithdrawal'],
+    invalidate: ['fetchWithdrawal', 'withdrawals'],
     setToast: true,
+    redirectTo: '/account/admin/withdrawals/open',
   });
 };
