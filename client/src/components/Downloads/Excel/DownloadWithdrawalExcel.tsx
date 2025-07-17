@@ -53,8 +53,6 @@ const DownloadWithdrawalExcel = ({
       { wch: 20 }, // Width for the 8th column
     ];
 
-    // const fileName = '';
-
     XLSX.utils.book_append_sheet(wb, ws, `withdrawal`);
 
     XLSX.writeFile(wb, `withdrawal.xlsx`);

@@ -1,10 +1,11 @@
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+/* eslint-disable react-refresh/only-export-components */
+// import DateRangeSelector from '../../components/UI/DateRangeSelector';
+import { useState } from 'react';
 import DateRangeSelector from '../../components/UI/DateRangeSelector';
-import LinkBtn from '../../components/UI/LinkBtn';
-import TransactionBox from '../../components/UI/TransactionBox';
-import { fetchOnlyData } from '../../helperFunc.ts/apiRequest';
 import Empty from '../../components/UI/Empty';
-import { PersonalStatment } from '../../dtos/statementDto';
+import LinkBtn from '../../components/UI/LinkBtn';
+import ReportPagination from '../../components/UI/ReportPagination';
+import TransactionBox from '../../components/UI/TransactionBox';
 import {
   formatDate,
   formatDateWD,
@@ -12,23 +13,35 @@ import {
   formatTime,
   paginate,
 } from '../../helperFunc.ts/utilsFunc';
+import { PersonalStatment } from '../../dtos/statementDto';
+import { useSearchParams } from 'react-router-dom';
+import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
+import { useQuery } from '@tanstack/react-query';
 import { User } from '../../dtos/UserDto';
-import ReportPagination from '../../components/UI/ReportPagination';
-import { useState } from 'react';
 import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
 import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
 
-const WalletTransaction = () => {
+const StatementsPersonal = () => {
   const [report, setReport] = useState<PersonalStatment>();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User>();
 
-  const user = useOutletContext() as User;
+  const { data } = useQuery({
+    queryKey: ['fetchUser', 'users'],
+    queryFn: () =>
+      fetchOnlyData({
+        url: '/users',
+      }),
+  });
+
+  // console.log(data);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const params = Object.fromEntries(formData);
+    const newParams = { ...params };
 
     setIsLoading(true);
 
@@ -36,6 +49,13 @@ const WalletTransaction = () => {
       url: `/personal/statement`,
       params,
     });
+
+    const user = data?.users?.find(
+      (item: { userRef: FormDataEntryValue }) =>
+        item?.userRef === newParams.userRef
+    );
+
+    setUser(user);
 
     if (result.status === 'success') {
       setReport(result);
@@ -65,6 +85,8 @@ const WalletTransaction = () => {
         handleSubmit={handleSubmit}
         error={error}
         isLoading={isLoading}
+        showCustomer
+        users={data?.users}
       />
       {/* table */}
 
@@ -75,14 +97,14 @@ const WalletTransaction = () => {
             <div className='flex gap-2 flex-wrap'>
               <DownloadStatment
                 openingBal={report?.openingBal}
-                closingBal={user?.personalWallet}
+                closingBal={user?.personalWallet as number}
                 customerDetails={user}
                 dateRange={report?.date}
                 statementContent={report?.statement}
               />
               <DownloadStatementPDF
                 openingBal={report?.openingBal}
-                closingBal={user?.personalWallet}
+                closingBal={user?.personalWallet as number}
                 customerDetails={user}
                 dateRange={report?.date}
                 statementContent={report?.statement}
@@ -93,6 +115,9 @@ const WalletTransaction = () => {
             </h4>
             {/* Report date range */}
             <div className='mb-2 text-[13px] border-2 border-green-500 p-2 rounded-md'>
+              <p className='font-poppins uppercase mb-2'>
+                {user?.surname} {user?.otherNames} statement
+              </p>
               <p className='font-poppins capitalize mb-2'>
                 start Date: {formatDate(new Date(report?.date?.startDate))}
               </p>
@@ -140,9 +165,14 @@ const WalletTransaction = () => {
   );
 };
 
-export default WalletTransaction;
+export default StatementsPersonal;
 
-// export const action = async ({ request }: ActionFunctionArgs) => {
-//   const data = await extractFormData(request);
-//   return postData({ url: `/personal/statement`, data });
-// };
+export const loader = () => {
+  return queryClient.ensureQueryData({
+    queryKey: ['fetchUser', 'users'],
+    queryFn: () =>
+      fetchOnlyData({
+        url: '/users',
+      }),
+  });
+};

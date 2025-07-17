@@ -235,7 +235,7 @@ export const customerStatement = async (req: Request, res: Response) => {
 
   // Transactions from beginning till start date to calculate opening balance
   const priorDateData = await PersonalTransaction.find({
-    userRef: req.user.userRef,
+    userRef: req.query.userRef ? req.query.userRef : req.user.userRef,
     createdAt: { $gte: new Date('2025-01-01'), $lte: startDate },
   });
 
@@ -246,7 +246,7 @@ export const customerStatement = async (req: Request, res: Response) => {
 
   // Get transactions within the start and end date
   const statement = await PersonalTransaction.find({
-    userRef: req.user.userRef,
+    userRef: req.query.userRef ? req.query.userRef : req.user.userRef,
     createdAt: { $gte: new Date(startDate), $lte: lastDate },
   });
 

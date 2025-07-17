@@ -52,6 +52,6 @@ export const loader = async () => {
   const roles = ['super-admin', 'admin'];
 
   if (resp?.user && !roles.includes(resp?.user?.role)) {
-    return redirect('/login');
+    return redirect('/');
   }
 };

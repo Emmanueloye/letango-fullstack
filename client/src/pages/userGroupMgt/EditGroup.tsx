@@ -34,7 +34,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   return patchData({
     url: `/groups/${params.groupId}`,
     data,
-    invalidate: ['fetchGroupMember', 'fetchGroup'],
+    invalidate: ['fetchGroupMember', 'fetchGroup', 'fetchAllGroup'],
     redirectTo: '/account/manage-group',
     setToast: true,
   });

@@ -184,11 +184,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
   });
 
-  console.log(
-    !['ASSOCIATION', 'CLUB'].includes(resp?.group?.groupType?.toUpperCase())
-  );
-  console.log(resp.group?.groupType.toUpperCase());
-
   if (
     !['ASSOCIATION', 'CLUB'].includes(resp?.group?.groupType?.toUpperCase())
   ) {

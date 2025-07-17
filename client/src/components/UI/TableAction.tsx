@@ -8,6 +8,7 @@ const TableAction = ({
   className,
   userStatus,
   id,
+  userRef,
 }: {
   editUrl: string;
   viewUrl: string;
@@ -15,6 +16,7 @@ const TableAction = ({
   className?: string;
   id?: string;
   userStatus?: string;
+  userRef?: string;
 }) => {
   const status = ['active', 'suspend', 'banned'];
   const submit = useSubmit();
@@ -27,6 +29,7 @@ const TableAction = ({
       const formData = new FormData();
       formData.append('status', e.target.value);
       formData.append('id', id as string);
+      formData.append('userRef', userRef as string);
       submit(formData, { method: 'PATCH' });
     }
   };

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as transactionController from './transactionController';
 import * as authMiddleware from '../../middlewares/authMiddleware';
 import * as validate from './validateTransaction';
+import { validateDate } from '../groupReport/groupReportController';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router
   .get(
     authMiddleware.protect,
     transactionController.switchDate,
+    validateDate,
     transactionController.customerStatement
   );
 

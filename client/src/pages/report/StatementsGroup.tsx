@@ -1,15 +1,12 @@
-import LinkBtn from '../../components/UI/LinkBtn';
-import TransactionBox from '../../components/UI/TransactionBox';
-import DateRangeSelector from '../../components/UI/DateRangeSelector';
-import {
-  LoaderFunctionArgs,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
-import { fetchOnlyData, queryClient } from '../../helperFunc.ts/apiRequest';
+/* eslint-disable react-refresh/only-export-components */
+// import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import { useState } from 'react';
-import { IGroupTransaction } from '../../dtos/paymentDto';
+import DateRangeSelector from '../../components/UI/DateRangeSelector';
 import Empty from '../../components/UI/Empty';
+import LinkBtn from '../../components/UI/LinkBtn';
+import ReportPagination from '../../components/UI/ReportPagination';
+import Title from '../../components/UI/Title';
+import TransactionBox from '../../components/UI/TransactionBox';
 import {
   formatDate,
   formatDateWD,
@@ -17,17 +14,23 @@ import {
   formatTime,
   paginate,
 } from '../../helperFunc.ts/utilsFunc';
-import ReportPagination from '../../components/UI/ReportPagination';
-import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
+import { useSearchParams } from 'react-router-dom';
+import { IGroupTransaction } from '../../dtos/paymentDto';
+import {
+  fetchOnlyData,
+  getData,
+  queryClient,
+} from '../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
+import { Group } from '../../dtos/groupDto';
+import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
 import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
-import Title from '../../components/UI/Title';
 
-const GroupTransactions = () => {
-  const params = useParams();
+const StatementGroup = () => {
   const [report, setReport] = useState<IGroupTransaction>();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [group, setGroup] = useState<Group>();
 
   const [searchParams] = useSearchParams();
 
@@ -36,22 +39,28 @@ const GroupTransactions = () => {
   const statements = report?.statement || [];
   const paginateStatements = statements?.slice(startIndex, endIndex);
 
-  const { data: groupData } = useQuery({
-    queryKey: ['fetchGroup', params.groupId],
-    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+  const { data } = useQuery({
+    queryKey: ['fetchAllGroup', 'allGroups'],
+    queryFn: () => getData({ url: `/groups` }),
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const form = Object.fromEntries(formData);
-    const data = { ...form, groupRef: params.groupId };
+    const newForm = { ...form };
 
     setIsLoading(true);
+    const group = data?.groups?.find(
+      (item: { groupRef: FormDataEntryValue }) =>
+        item?.groupRef === newForm.groupRef
+    );
+
+    setGroup(group);
 
     const result = await fetchOnlyData({
-      url: `/group-reports/statement`,
-      params: data,
+      url: `/group-reports/statement/admin`,
+      params: form,
     });
 
     if (result.status === 'success') {
@@ -73,15 +82,14 @@ const GroupTransactions = () => {
     <section>
       <Title title='Group Statement' />
       <div className='flex justify-end mb-4'>
-        <LinkBtn
-          btnText='back'
-          url={`/account/manage-group/view/${params.groupId}/reports`}
-        />
+        <LinkBtn btnText='back' url='/account/admin/statement' />
       </div>
       <DateRangeSelector
         handleSubmit={handleSubmit}
         error={error}
         isLoading={isLoading}
+        showCustomer
+        customers={data?.groups}
       />
 
       {/* Transaction cards */}
@@ -94,12 +102,12 @@ const GroupTransactions = () => {
                 closingBal={closingBal as number}
                 statementContent={report?.statement}
                 dateRange={report?.date}
-                group={groupData.group}
+                group={group}
               />
               <DownloadStatment
                 openingBal={report?.openingBal}
                 closingBal={closingBal as number}
-                group={groupData?.group}
+                group={group}
                 statementContent={report?.statement}
                 dateRange={report?.date}
               />
@@ -107,6 +115,9 @@ const GroupTransactions = () => {
             <h4 className='text-center mt-8 font-600'>Transaction history</h4>
             {/* Report date range */}
             <div className='mb-2 text-[13px] border-2 border-green-500 p-2 rounded-md'>
+              <p className='font-poppins uppercase mb-2'>
+                {group?.groupName} statement
+              </p>
               <p className='font-poppins capitalize mb-2'>
                 start Date: {formatDate(new Date(report?.date?.startDate))}
               </p>
@@ -171,12 +182,11 @@ const GroupTransactions = () => {
   );
 };
 
-export default GroupTransactions;
+export default StatementGroup;
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async () => {
   await queryClient.ensureQueryData({
-    queryKey: ['fetchGroup', params.groupId],
-    queryFn: () => fetchOnlyData({ url: `/groups/${params.groupId}` }),
+    queryKey: ['fetchAllGroup', 'allGroups'],
+    queryFn: () => getData({ url: `/groups` }),
   });
 };

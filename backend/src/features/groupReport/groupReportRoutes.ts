@@ -17,6 +17,16 @@ router
   );
 
 router
+  .route('/statement/admin')
+  .get(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('super-admin', 'admin'),
+    switchDate,
+    groupReportController.validateDate,
+    groupReportController.statement
+  );
+
+router
   .route('/income-expense')
   .get(
     authMiddleware.protect,

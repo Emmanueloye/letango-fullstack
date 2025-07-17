@@ -33,7 +33,7 @@ const UserManager = () => {
     ],
     queryFn: () =>
       getData({
-        url: `/users?page=${params?.page || 1}&limit=3&sort=${
+        url: `/users?page=${params?.page || 1}&limit=12&sort=${
           params?.sort || '-createdAt'
         }`,
       }),
@@ -80,6 +80,7 @@ const UserManager = () => {
             showUserAction
             userStatus={row?.status as string}
             id={row?._id as string}
+            userRef={row?.userRef as string}
           />
         );
       },
@@ -124,7 +125,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     queryKey: ['fetchUser', 'users', page ?? 1, sort ?? '-createdAt'],
     queryFn: () =>
       getData({
-        url: `/users?page=${page || 1}&limit=3&sort=${sort || '-createdAt'}`,
+        url: `/users?page=${page || 1}&limit=12&sort=${sort || '-createdAt'}`,
       }),
   });
 
@@ -135,8 +136,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const result = await extractFormData(request);
 
   queryClient.invalidateQueries({ queryKey: ['fetchUser'] });
+
   return patchData({
-    url: `/users/${result.id}`,
+    url: `/users/${result.userRef}`,
     data: { status: result.status },
     setToast: true,
     invalidate: ['fetchUser'],

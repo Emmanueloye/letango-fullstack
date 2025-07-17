@@ -19,7 +19,7 @@ const personalTransactionSchema = new Schema({
   },
   toId: {
     type: Types.ObjectId,
-    ref: 'Group',
+    ref: 'User',
     required: true,
   },
   transactionRef: {

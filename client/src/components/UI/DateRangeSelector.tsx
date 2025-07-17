@@ -4,6 +4,8 @@ import Button from './Button';
 import { useState } from 'react';
 // import { FormActionType } from '../../dtos/formAction';
 import FormError from './FormError';
+import { Group } from '../../dtos/groupDto';
+import { User } from '../../dtos/UserDto';
 
 const DateRangeSelector = ({
   showCustomer = false,
@@ -11,12 +13,16 @@ const DateRangeSelector = ({
   handleSubmit,
   error,
   isLoading,
+  customers,
+  users,
 }: {
   showCustomer?: boolean;
   title?: string;
   handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   error?: string;
   isLoading?: boolean;
+  customers?: Group[];
+  users?: User[];
 }) => {
   const [isDateBoxOpen, setIsDateBoxOpen] = useState(false);
   return (
@@ -34,13 +40,37 @@ const DateRangeSelector = ({
         className={isDateBoxOpen ? 'grid gap-1.5' : 'hidden'}
         onSubmit={(e) => handleSubmit?.(e)}
       >
-        {showCustomer && (
-          <select>
+        {showCustomer && customers && (
+          <select name='groupRef' className='capitalize'>
             <option value='' hidden>
               Select customer
             </option>
-            <option value=''>customer A</option>
-            <option value=''>Customer B</option>
+            {customers?.map((item) => (
+              <option
+                value={item?.groupRef}
+                className='capitalize'
+                key={item?._id}
+              >
+                {item?.groupName}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {showCustomer && users && (
+          <select name='userRef' className='capitalize'>
+            <option value='' hidden>
+              Select user
+            </option>
+            {users?.map((item) => (
+              <option
+                value={item?.userRef}
+                className='capitalize'
+                key={item?._id}
+              >
+                {item?.surname} {item.otherNames}
+              </option>
+            ))}
           </select>
         )}
         <input

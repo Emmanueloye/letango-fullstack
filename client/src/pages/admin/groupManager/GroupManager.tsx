@@ -25,7 +25,7 @@ const GroupManager = () => {
     ],
     queryFn: () =>
       getData({
-        url: `/groups?page=${params?.page || 1}&limit=3&sort=${
+        url: `/groups?page=${params?.page || 1}&limit=12&sort=${
           params?.sort || '-createdAt'
         }`,
       }),
@@ -101,7 +101,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     queryKey: ['fetchAllGroup', 'allGroups', page ?? 1, sort ?? '-createdAt'],
     queryFn: () =>
       getData({
-        url: `/groups?page=${page || 1}&limit=3&sort=${sort || '-createdAt'}`,
+        url: `/groups?page=${page || 1}&limit=12&sort=${sort || '-createdAt'}`,
       }),
   });
 

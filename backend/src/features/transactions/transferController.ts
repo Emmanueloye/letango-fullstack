@@ -30,6 +30,8 @@ export const personalTransfer = async (req: Request, res: Response) => {
 
   // Get the user receiving the transfer
   const newTo = await User.findOne({ userRef: to });
+  console.log(newTo);
+  console.log(newTo?._id);
 
   if (!from) {
     throw new AppError.BadRequest('User not found');
@@ -67,7 +69,7 @@ export const personalTransfer = async (req: Request, res: Response) => {
             from: req.user.userRef,
             to: newTo.userRef,
             fromId: req.user.id,
-            toId: newTo.id,
+            toId: newTo?._id,
             transactionRef: reference,
             contribution: amount * -1, // multiply by minus one to show withdrawal.
             description,
@@ -85,7 +87,7 @@ export const personalTransfer = async (req: Request, res: Response) => {
             from: req.user.userRef,
             to: newTo.userRef,
             fromId: req.user.id,
-            toId: newTo.id,
+            toId: newTo?._id,
             transactionRef: reference,
             contribution: amount, // multiply by minus one to show withdrawal.
             description,

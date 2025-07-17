@@ -64,7 +64,6 @@ import OpenWithdrawals, {
   action as openWithdrawalsAction,
 } from './pages/admin/withdrawals/OpenWithdrawals';
 import ClosedWithdrawals from './pages/admin/withdrawals/ClosedWithdrawals';
-import Statements from './pages/report/Statements';
 import EditUser, {
   loader as adminEditUserLoader,
   action as adminEditUserAction,
@@ -157,6 +156,15 @@ import GroupContributionReport, {
 import ViewWithdrawals, {
   loader as viewWithdrawalLoader,
 } from './pages/admin/withdrawals/ViewWithdrawals';
+import GroupStatementLanding, {
+  loader as groupStatementLandingLoader,
+} from './pages/report/GroupStatementLanding';
+import StatementsPersonal, {
+  loader as statementPersonalLoader,
+} from './pages/report/StatementsPersonal';
+import StatementGroup, {
+  loader as statementGroupLoader,
+} from './pages/report/StatementsGroup';
 
 const router = createBrowserRouter([
   {
@@ -490,7 +498,26 @@ const router = createBrowserRouter([
           },
 
           { path: 'kyc-review', element: <KYCReview /> },
-          { path: 'statement', element: <Statements /> },
+          {
+            path: 'statement',
+            children: [
+              {
+                index: true,
+                element: <GroupStatementLanding />,
+                loader: groupStatementLandingLoader,
+              },
+              {
+                path: 'personal',
+                element: <StatementsPersonal />,
+                loader: statementPersonalLoader,
+              },
+              {
+                path: 'group',
+                element: <StatementGroup />,
+                loader: statementGroupLoader,
+              },
+            ],
+          },
         ],
       },
     ],
