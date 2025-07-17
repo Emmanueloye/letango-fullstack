@@ -49,7 +49,7 @@ const EditAdminGroup = () => {
       </div>
       <Title title='update group' />
 
-      <Form id='updateGroupForm' method='patch'>
+      <Form id='updateGroupForm' method='patch' encType='multipart/form-data'>
         <div className='lg:grid lg:grid-cols-2 gap-4'>
           <div className='w-full mb-4 lg:mb-0'>
             <label htmlFor='groupName'>group name</label>
