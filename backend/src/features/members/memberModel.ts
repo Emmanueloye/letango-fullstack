@@ -26,6 +26,20 @@ const memberSchema = new Schema({
       values: ['member', 'admin', 'owner'],
     },
   },
+  admittedBy: {
+    type: Types.ObjectId,
+    ref: 'User',
+  },
+  admittedDate: {
+    type: Date,
+  },
+  unadmitBy: {
+    type: Types.ObjectId,
+    ref: 'User',
+  },
+  unadmitDate: {
+    type: Date,
+  },
   status: {
     type: Boolean,
     default: false,
@@ -39,10 +53,13 @@ const memberSchema = new Schema({
 type IMember = InferSchemaType<typeof memberSchema>;
 
 memberSchema.pre(/^find/, function (this: Query<{}, IMember>) {
-  this.populate({ path: 'groupId' }).populate({
-    path: 'memberId',
-    select: 'surname otherNames',
-  });
+  this.populate({ path: 'groupId' })
+    .populate({
+      path: 'memberId',
+      select: 'surname otherNames',
+    })
+    .populate({ path: 'admittedBy', select: 'surname otherNames' })
+    .populate({ path: 'unadmitBy', select: 'surname otherNames' });
 });
 
 export default model('Member', memberSchema);

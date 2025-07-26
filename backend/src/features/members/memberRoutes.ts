@@ -21,6 +21,11 @@ router
     authMiddleware.protect,
     memberController.checkAdmin,
     memberController.updateMember
+  )
+  .delete(
+    authMiddleware.protect,
+    memberController.checkAdmin,
+    memberController.deleteMember
   );
 
 export default router;

@@ -11,6 +11,7 @@ import { checkForErrors, generateUniqueId } from '../../utils';
 import GetRequestAPI, { paginateDetails } from '../../utils/getRequestAPI';
 import * as utils from '../../utils';
 import * as factory from '../../utils/handlerFactory';
+import axios from 'axios';
 const { body } = require('express-validator');
 
 // Validate withdrawal creation inputs.
@@ -18,7 +19,7 @@ export const validateWithdrawal = checkForErrors([
   body('amount').notEmpty().withMessage('Amount field is required.'),
   body('to').notEmpty().withMessage('Receiver name field is required.'),
   body('bank').notEmpty().withMessage('Receiver bank field is required.'),
-  body('head').notEmpty().withMessage('Expense head field is required.'),
+  // body('head').notEmpty().withMessage('Expense head field is required.'),
   body('accountNumber')
     .notEmpty()
     .withMessage('Receiver account field is required.'),
@@ -125,6 +126,24 @@ export const createWithdrawal = async (req: Request, res: Response) => {
 
   // Run these codes if there is no approval authorities. i.e it enters automatic approval.
   if (group && group?.approvalAuthorities?.length === 0) {
+    // const url = `${process.env.PAYSTACK_BASE_URL}/transferrecipient`;
+
+    // const data = {
+    //   type: 'nuban',
+    //   name: to,
+    //   account_number: accountNumber,
+    //   bank_code: '058', // make this dynamic later
+    //   currency: 'NGN',
+    // };
+    // const result = await axios.post(url, data, {
+    //   headers: {
+    //     Authorization: `Bearer ${process.env.PAYSTACK_API_SECRET}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    // });
+
+    // console.log(result);
+
     // Initiate session
     await session.withTransaction(async () => {
       // Create withdrawal
@@ -351,6 +370,22 @@ export const approveWithdrawal = async (req: Request, res: Response) => {
         withdrawal.approvedBy![currentIndex!].comment = comment;
         withdrawal.approvalStatus = 'approve';
         await withdrawal.save({ session });
+
+        // const url = `${process.env.PAYSTACK_BASE_URL}/transferrecipient`;
+
+        // const data = {
+        //   type: 'nuban',
+        //   name: withdrawal.to,
+        //   account_number: withdrawal.accountNumber,
+        //   bank_code: '058', // make this dynamic later
+        //   currency: 'NGN',
+        // };
+        // const result = await axios.post(url, data, {
+        //   headers: {
+        //     Authorization: `Bearer ${process.env.PAYSTACK_API_SECRET}`,
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
 
         // Drop the withdrawal in the group transaction
         await GroupTransaction.create(

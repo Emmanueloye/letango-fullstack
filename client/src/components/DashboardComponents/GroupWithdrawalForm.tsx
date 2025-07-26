@@ -86,24 +86,26 @@ const GroupWithdrawalForm = () => {
             className='capitalize'
           />
         </div>
-        <div className='mb-2'>
-          <label
-            htmlFor='bank'
-            className={`after:text-red-500 after:content-['*'] after:font-700 text-sm`}
-          >
-            expense head
-          </label>
-          <select className='capitalize' name='head'>
-            <option value='' hidden>
-              Select expense
-            </option>
-            {data?.fundClasses?.map((item: IFundHead) => (
-              <option value={item?._id} key={item?._id}>
-                {item?.head}
+        {data?.fundClasses.length > 0 && (
+          <div className='mb-2'>
+            <label
+              htmlFor='bank'
+              className={`after:text-red-500 after:content-['*'] after:font-700 text-sm`}
+            >
+              expense head
+            </label>
+            <select className='capitalize' name='head'>
+              <option value='' hidden>
+                Select expense
               </option>
-            ))}
-          </select>
-        </div>
+              {data?.fundClasses?.map((item: IFundHead) => (
+                <option value={item?._id} key={item?._id}>
+                  {item?.head}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className='mb-2'>
           <label
             htmlFor='amount'

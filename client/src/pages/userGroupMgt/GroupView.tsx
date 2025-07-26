@@ -60,6 +60,14 @@ const GroupView = () => {
     queryFn: () => fetchOnlyData({ url: `/members/${PageParams.groupId}` }),
   });
 
+  const { data: admission } = useQuery({
+    queryKey: ['fetchMemberList'],
+    queryFn: () =>
+      fetchOnlyData({
+        url: `/members/group-members?groupRef=${PageParams.groupId}&status=false`,
+      }),
+  });
+
   const withdrawalsPending = pendingWithdrawals?.withdrawals?.reduce(
     (acc: number, curr: { contribution: number }) => acc + curr.contribution,
     0
@@ -119,6 +127,7 @@ const GroupView = () => {
           group={group}
           showLink={showLink}
           setShowLink={setShowLink}
+          newMemberCount={admission?.noHits}
         />
       </>
       {/* Main body */}
@@ -204,6 +213,14 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     queryFn: () =>
       getData({
         url: `/group-transacts?groupRef=${params.groupId}&sort=-createdAt&limit=10`,
+      }),
+  });
+
+  await queryClient.ensureQueryData({
+    queryKey: ['fetchMemberList'],
+    queryFn: () =>
+      fetchOnlyData({
+        url: `/members/group-members?groupRef=${params.groupId}&status=false`,
       }),
   });
 

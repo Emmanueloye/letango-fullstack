@@ -12,7 +12,7 @@ const TransactionBox = ({
   time,
   amount,
   approvals,
-  from,
+  // from,
   id,
   show = false,
 }: {
@@ -49,9 +49,9 @@ const TransactionBox = ({
           <h4 className='font-600 capitalize text-sm mb-2 font-ral'>
             {description}
           </h4>
-          <p className='capitalize text-xs mb-1'>
+          {/* <p className='capitalize text-xs mb-1'>
             {amount > 0 ? 'payment from' : 'transfer to'}: {from}
-          </p>
+          </p> */}
 
           <p className='text-xs  text-gray-500 dark:text-gray-400 mb-1'>
             {date}

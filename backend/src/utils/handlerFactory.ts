@@ -153,6 +153,8 @@ export const updateOne = ({
       excludedFields,
     });
 
+    console.log(filteredObj);
+
     let doc;
 
     if (queryKey) {
@@ -179,13 +181,6 @@ export const updateOne = ({
       const fields = Object.keys(filteredObj).filter(
         (key) => filteredObj[key] != null
       );
-      await auditLog({
-        requester: req.user.id,
-        action: 'update',
-        change: `${req.user.surname} ${req.user.otherNames} updates ${[
-          ...fields,
-        ]}`,
-      });
     }
     res.status(statusCodes.OK).json({
       status: 'success',

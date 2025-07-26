@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import {
   LoaderFunctionArgs,
+  redirect,
   useLoaderData,
   useOutletContext,
   useParams,
@@ -8,6 +9,7 @@ import {
 import LinkBtn from '../../components/UI/LinkBtn';
 import Title from '../../components/UI/Title';
 import {
+  deleteData,
   extractParams,
   fetchOnlyData,
   getData,
@@ -23,8 +25,9 @@ import Empty from '../../components/UI/Empty';
 import { toast } from 'react-toastify';
 import { User } from '../../dtos/UserDto';
 
-const MembersList = () => {
+const MemberAdmission = () => {
   const user = useOutletContext() as User;
+
   // Getting the page from loader
   const { groupId, page } = useLoaderData();
   //   Getting group id from the url
@@ -34,21 +37,19 @@ const MembersList = () => {
   //   loading state
   const [isSearching, setIsSearching] = useState(false);
 
-  const role = ['member', 'owner', 'admin'];
-
   //   Data fetching for members list
   const { data } = useQuery({
-    queryKey: ['fetchMemberList', groupId, page ?? 1],
+    queryKey: ['fetchMemberList', 'pending', groupId, page ?? 1],
     queryFn: () =>
       getData({
         url: `/members/group-members?groupRef=${groupId}&page=${
           page || 1
-        }&limit=12&status=true`,
+        }&limit=12&status=false`,
       }),
   });
 
   const { data: myMembership } = useQuery({
-    queryKey: ['fetchMember', groupId],
+    queryKey: ['fetchMember', 'pending', groupId],
     queryFn: () => getData({ url: `/members/${groupId}` }),
   });
 
@@ -64,10 +65,10 @@ const MembersList = () => {
     // The setTimeout is to wait one sec for the after the user finish typing before making the request
     setTimeout(async () => {
       const result = await queryClient.fetchQuery({
-        queryKey: ['fetchMeberList', searchVal],
+        queryKey: ['fetchMeberList', 'pending', searchVal],
         queryFn: () =>
           fetchOnlyData({
-            url: `/members/group-members?groupRef=${groupId}&status=true&search=memberName&value=${searchVal}`,
+            url: `/members/group-members?groupRef=${groupId}&status=false&search=memberName&value=${searchVal}`,
           }),
       });
 
@@ -82,75 +83,69 @@ const MembersList = () => {
     }, 1000);
   };
 
-  const handleRoleChange = async (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    id: string
-  ) => {
-    // Get the target member from list of members
-    const targetMember = members.find((item) => item._id === id);
-    // get out the user full name
-    const name = `${targetMember?.memberId?.surname} ${
-      targetMember?.memberId?.otherNames.split(' ')[0]
-    }`;
-    //   Confirm that user wants to do the update.
-    const proceed = window.confirm(
-      `Are you sure you want to update ${capitalized(name) || 'user'}'s role?`
-    );
-
-    // update the member once confirmed.
-    if (proceed) {
-      const resp = await patchData({
-        url: `/members/${id}?groupRef=${groupId}`,
-        data: { role: encodeURIComponent(e.target.value) },
-      });
-      if (resp.status === 'success') {
-        queryClient.invalidateQueries({ queryKey: ['fetchMember'] });
-        queryClient.invalidateQueries({ queryKey: ['fetchMemberList'] });
-        toast.success(resp.message);
-      }
-    }
-  };
-
   const handleMemberStatus = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     id: string
   ) => {
     let data;
-    if (e.currentTarget.id === 'deactivate') {
-      data = {
-        status: false,
-        unadmitBy: user?._id,
-        unadmitDate: new Date(Date.now()),
-      };
-    }
-    // if (e.currentTarget.id === 'activate') data = { status: true };
 
     // Get the target member from list of members
     const targetMember = members.find((item) => item._id === id);
-    // get out the user full name
-    const name = `${targetMember?.memberId?.surname} ${
-      targetMember?.memberId?.otherNames.split(' ')[0]
-    }`;
 
-    //   Confirm that user wants to do the update.
-    const proceed = window.confirm(
-      `Are you sure you want to unadmit ${capitalized(name) || 'user'}?`
-    );
+    if (e.currentTarget.id === 'activate') {
+      data = {
+        status: true,
+        admittedBy: user?._id,
+        admittedDate: new Date(Date.now()),
+      };
 
-    // update the member once confirmed.
-    if (proceed) {
-      const resp = await patchData({
-        url: `/members/${id}?groupRef=${groupId}`,
-        data,
-      });
-      if (resp.status === 'success') {
-        queryClient.invalidateQueries({ queryKey: ['fetchMember'] });
-        queryClient.invalidateQueries({ queryKey: ['fetchMemberList'] });
-        toast.success(
-          `${capitalized(targetMember?.memberId?.surname || '')} ${capitalized(
-            targetMember?.memberId?.otherNames?.split(' ')[0] || ''
-          )} has been unadmitted.`
-        );
+      // get out the user full name
+      const name = `${targetMember?.memberId?.surname} ${
+        targetMember?.memberId?.otherNames.split(' ')[0]
+      }`;
+
+      //   Confirm that user wants to do the update.
+      const proceed = window.confirm(
+        `Are you sure you want to admit ${capitalized(name) || 'user'}?`
+      );
+
+      // update the member once confirmed.
+      if (proceed) {
+        const resp = await patchData({
+          url: `/members/${id}?groupRef=${groupId}`,
+          data,
+        });
+        if (resp.status === 'success') {
+          queryClient.invalidateQueries({ queryKey: ['fetchMember'] });
+          queryClient.invalidateQueries({ queryKey: ['fetchMemberList'] });
+          toast.success(
+            `${capitalized(
+              targetMember?.memberId?.surname || ''
+            )} ${capitalized(
+              targetMember?.memberId?.otherNames?.split(' ')[0] || ''
+            )} has been admitted.`
+          );
+        }
+      }
+    }
+
+    if (e.currentTarget.id === 'reject') {
+      // get out the user full name
+      const name = `${targetMember?.memberId?.surname} ${
+        targetMember?.memberId?.otherNames.split(' ')[0]
+      }`;
+
+      //   Confirm that user wants to do the update.
+      const proceed = window.confirm(
+        `Are you sure you want to reject ${
+          capitalized(name) || 'user'
+        }? Rejection would delete this member permanently.`
+      );
+      if (proceed) {
+        await deleteData({
+          url: `/members/${id}?groupRef=${groupId}`,
+          invalidate: ['fetchMemberList'],
+        });
       }
     }
   };
@@ -170,7 +165,7 @@ const MembersList = () => {
         />
       </div>
       {/* page title */}
-      <Title title='Members List' />
+      <Title title='Members awaiting admission' />
       {/* The members grid */}
       {/* search */}
       <div className='w-full md:w-3/6 md:mx-auto mb-6 relative'>
@@ -204,43 +199,40 @@ const MembersList = () => {
                 <p className='capitalize text-[12px]'>
                   joined: {formatDateWD(new Date(member?.joinedAt))}
                 </p>
-                <p className='capitalize text-[12px]'>role: {member?.role}</p>
                 <p className='capitalize text-[12px]'>
-                  admitted by: &nbsp;
-                  <span className='capitalize'>
-                    {member?.admittedBy
-                      ? `${member?.admittedBy?.surname} ${
-                          member?.admittedBy?.otherNames.split(' ')[0]
-                        }`
-                      : 'N/A'}
-                  </span>
+                  Status: {member?.status ? 'admitted' : 'awaiting admission'}
                 </p>
+                <p className='capitalize text-[12px]'>role: {member?.role}</p>
+                {member?.unadmitBy && (
+                  <p className='capitalize text-[12px]'>
+                    unadmitted by: &nbsp;
+                    <span className='capitalize'>
+                      {capitalized(member?.unadmitBy?.surname)} {''}
+                      {capitalized(member?.unadmitBy?.otherNames.split(' ')[0])}
+                    </span>
+                  </p>
+                )}
               </div>
               {['admin', 'owner'].includes(myMembership?.member?.role) && (
                 <div>
-                  <select
-                    name='role'
-                    id={member?._id}
-                    className='capitalize w-30 py-1 text-sm'
-                    onChange={(e) => handleRoleChange(e, member?._id)}
-                  >
-                    <option value={member?.role}>{member?.role}</option>
-                    {role
-                      .filter((item) => item !== member?.role)
-                      .map((el) => (
-                        <option value={el} key={el}>
-                          {el}
-                        </option>
-                      ))}
-                  </select>
+                  <div className='flex justify-center'>
+                    <button
+                      onClick={(e) => handleMemberStatus(e, member?._id)}
+                      className='bg-green-600 px-3 py-1 rounded-2xl mt-2 capitalize text-sm cursor-pointer text-slate-50'
+                      title='Admit Member'
+                      id='activate'
+                    >
+                      Admit
+                    </button>
+                  </div>
                   <div className='flex justify-center mt-4'>
                     <button
                       onClick={(e) => handleMemberStatus(e, member?._id)}
-                      id='deactivate'
-                      className='bg-amber-600 px-3 py-1 rounded-2xl mt-2 capitalize text-sm'
-                      title='Unadmit Member'
+                      className='bg-amber-600 px-3 py-1 rounded-2xl mt-2 capitalize text-sm cursor-pointer text-slate-50'
+                      title='Reject Member'
+                      id='reject'
                     >
-                      unadmit
+                      reject
                     </button>
                   </div>
                 </div>
@@ -262,24 +254,29 @@ const MembersList = () => {
   );
 };
 
-export default MembersList;
+export default MemberAdmission;
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const { page } = extractParams(request);
   await queryClient.ensureQueryData({
-    queryKey: ['fetchMemberList', params.groupId, page ?? 1],
+    queryKey: ['fetchMemberList', 'pending', params.groupId, page ?? 1],
     queryFn: () =>
       getData({
         url: `/members/group-members?groupRef=${params.groupId}&page=${
           page || 1
-        }&limit=12&status=true`,
+        }&limit=12&status=false`,
       }),
   });
 
-  await queryClient.ensureQueryData({
-    queryKey: ['fetchMember', params.groupId],
+  const member = await queryClient.ensureQueryData({
+    queryKey: ['fetchMember', 'pending', params.groupId],
     queryFn: () => fetchOnlyData({ url: `/members/${params.groupId}` }),
   });
+
+  const roles = ['owner', 'admin'];
+  if (!roles.includes(member?.member.role)) {
+    return redirect(`/account/manage-group/view/${params.groupId}`);
+  }
 
   return { groupId: params.groupId, page };
 };

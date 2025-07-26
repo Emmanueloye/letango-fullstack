@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query';
 import { User } from '../../dtos/UserDto';
 import DownloadStatment from '../../components/Downloads/Excel/DownloadStatment';
 import DownloadStatementPDF from '../../components/Downloads/PDF/DownloadStatementPDF';
+import Title from '../../components/UI/Title';
 
 const StatementsPersonal = () => {
   const [report, setReport] = useState<PersonalStatment>();
@@ -77,8 +78,9 @@ const StatementsPersonal = () => {
 
   return (
     <section>
+      <Title title='Personal Statement' />
       <div className='flex justify-end mb-4'>
-        <LinkBtn btnText='back' url='/account/personal-wallet' />
+        <LinkBtn btnText='back' url='/account/admin/statement' />
       </div>
       {/* Date selector */}
       <DateRangeSelector

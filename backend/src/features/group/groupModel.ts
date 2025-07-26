@@ -46,6 +46,14 @@ const groupSchema = new Schema({
     type: Number,
     default: 3,
   },
+  memberLimit: {
+    type: Number,
+    default: 20,
+  },
+  subscription: {
+    type: String,
+    enum: ['basic', 'premium'],
+  },
   groupCode: {
     type: String,
     unique: true,

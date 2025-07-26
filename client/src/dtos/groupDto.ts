@@ -58,6 +58,18 @@ export type IMember = {
   role: 'member' | 'admin';
   status: boolean;
   joinedAt: Date;
+  admittedBy: {
+    _id: string;
+    surname: string;
+    otherNames: string;
+  };
+  unadmitBy: {
+    _id: string;
+    surname: string;
+    otherNames: string;
+  };
+  admittedDate: Date;
+  unadmitDate: Date;
 };
 
 export type IFundHead = {

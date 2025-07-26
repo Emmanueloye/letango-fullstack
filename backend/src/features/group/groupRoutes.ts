@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as groupController from './groupController';
 import { processImage } from '../users/userController';
 import * as authMiddleware from '../../middlewares/authMiddleware';
+import { checkAdmin } from '../members/memberController';
 
 const router = Router();
 
@@ -43,6 +44,7 @@ router
   .route('/:id')
   .patch(
     authMiddleware.protect,
+    // checkAdmin,
     authMiddleware.checkGroupResource,
     groupController.uploadImage,
     groupController.processImage,

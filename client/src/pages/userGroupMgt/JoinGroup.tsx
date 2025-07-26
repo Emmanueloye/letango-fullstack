@@ -14,6 +14,7 @@ import {
   postData,
   queryClient,
 } from '../../helperFunc.ts/apiRequest';
+import { toast } from 'react-toastify';
 
 const JoinGroup = () => {
   const data = useActionData();
@@ -26,7 +27,7 @@ const JoinGroup = () => {
   const handleJoin = () => {
     const formData = new FormData();
     formData.append('group', params.group);
-    formData.append('join', params.join);
+    formData.append('joinCode', params.join);
     submit(formData, { method: 'POST' });
   };
 
@@ -82,6 +83,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (resp.status === 'success') {
     queryClient.invalidateQueries({ queryKey: ['fetchMemberList'] });
+    toast.success(
+      'The group will reflect on your page once approved by the group admin.'
+    );
     return redirect('/account/manage-group');
   }
 

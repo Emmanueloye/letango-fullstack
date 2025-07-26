@@ -8,12 +8,14 @@ const GroupActionsLinks = ({
   group,
   showLink,
   setShowLink,
+  newMemberCount,
 }: {
   roles: string[];
   member: Member;
   group: Group;
   showLink: boolean;
   setShowLink: (data: boolean) => void;
+  newMemberCount: number;
 }) => {
   return (
     <div className='flex flex-wrap gap-3 mt-4 text-sm'>
@@ -25,6 +27,12 @@ const GroupActionsLinks = ({
         <LinkBtn
           btnText='withdrawal'
           url={`/account/manage-group/view/${group?.groupRef}/withdraw`}
+        />
+      )}
+      {roles.includes(member?.role) && (
+        <LinkBtn
+          btnText={`Admission (${newMemberCount})`}
+          url={`/account/manage-group/view/${group?.groupRef}/admission`}
         />
       )}
       <LinkBtn

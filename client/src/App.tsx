@@ -165,6 +165,9 @@ import StatementsPersonal, {
 import StatementGroup, {
   loader as statementGroupLoader,
 } from './pages/report/StatementsGroup';
+import MemberAdmission, {
+  loader as memberAdmissionLoader,
+} from './pages/userGroupMgt/MembersAdmission';
 
 const router = createBrowserRouter([
   {
@@ -340,6 +343,11 @@ const router = createBrowserRouter([
                 path: 'members',
                 element: <MembersList />,
                 loader: memberListLoader,
+              },
+              {
+                path: 'admission',
+                element: <MemberAdmission />,
+                loader: memberAdmissionLoader,
               },
               {
                 path: 'fund-heads',

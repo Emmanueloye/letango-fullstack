@@ -168,9 +168,12 @@ export const getGroup = async (req: Request, res: Response) => {
 
 export const joinGroup = async (req: Request, res: Response) => {
   // Get group and join code from the incoming query parameter
-  const { group, join } = req.body;
-  // Get the group requested to join
-  const reqGroup = await Group.findOne({ groupRef: group, groupCode: join });
+  const { group, joinCode } = req.body;
+  // Get the group requested to joinCode
+  const reqGroup = await Group.findOne({
+    groupRef: group,
+    groupCode: joinCode,
+  });
 
   // Check if the group exist
   if (!reqGroup) {
@@ -184,10 +187,18 @@ export const joinGroup = async (req: Request, res: Response) => {
     groupRef: reqGroup.groupRef,
   });
 
+  const members = await Member.find({ groupRef: reqGroup.groupRef });
+
   //Check if the user is already a member the group
   if (existingMember) {
     throw new AppError.BadRequest(
       `You are already a member of ${reqGroup.groupName}`
+    );
+  }
+
+  if (members.length >= reqGroup.memberLimit) {
+    throw new AppError.TooManyRequests(
+      'The group has reached it membership limit. Please contact the group admin to upgrade to accomodate more members.'
     );
   }
 

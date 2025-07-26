@@ -57,10 +57,22 @@ export const getGroupMembers = factory.getAll({
   values: ['groupRef'],
 });
 
+export const deleteMember = factory.deleteOne({
+  Model: Member,
+  label: 'member',
+});
+
 export const updateMember = factory.updateOne({
   Model: Member,
   label: 'member',
-  includedFields: ['status', 'role'],
+  includedFields: [
+    'status',
+    'role',
+    'admittedBy',
+    'admittedDate',
+    'unadmitBy',
+    'unadmitDate',
+  ],
   // queryKey: 'memberId',
   log: true,
 });
