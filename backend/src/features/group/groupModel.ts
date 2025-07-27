@@ -52,8 +52,10 @@ const groupSchema = new Schema({
   },
   subscription: {
     type: String,
-    enum: ['basic', 'premium'],
+    enum: ['basic', 'bronze', 'gold'],
   },
+  startDate: Date,
+  endDate: Date,
   groupCode: {
     type: String,
     unique: true,

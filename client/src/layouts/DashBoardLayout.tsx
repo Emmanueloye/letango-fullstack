@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { authActions } from '../Actions/authAction';
 import { toast } from 'react-toastify';
 import Loader from '../components/UI/Loader';
+import useAutoLogout from './userAutoLogout';
 
 const DashBoardLayout = () => {
   const { isSidebarOpen } = useAppSelector((state) => state.ui);
@@ -48,6 +49,7 @@ const DashBoardLayout = () => {
     }
   };
 
+  useAutoLogout({ onLogout: logout });
   const adjustMain = isSidebarOpen
     ? 'lg:w-full lg:ml-0'
     : 'lg:w-[calc(100% - 252px)] lg:ml-63';

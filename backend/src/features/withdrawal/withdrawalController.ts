@@ -19,7 +19,10 @@ export const validateWithdrawal = checkForErrors([
   body('amount').notEmpty().withMessage('Amount field is required.'),
   body('to').notEmpty().withMessage('Receiver name field is required.'),
   body('bank').notEmpty().withMessage('Receiver bank field is required.'),
-  // body('head').notEmpty().withMessage('Expense head field is required.'),
+  body('head')
+    .optional()
+    .notEmpty()
+    .withMessage('Expense head field is required.'),
   body('accountNumber')
     .notEmpty()
     .withMessage('Receiver account field is required.'),
