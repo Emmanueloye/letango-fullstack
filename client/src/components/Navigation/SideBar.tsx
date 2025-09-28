@@ -191,11 +191,24 @@ const SideBar = ({ user }: { user: User }) => {
                 statement
               </NavLink>
             </li>
+            <li className='mb-2 p-1'>
+              <NavLink
+                to='/account/admin/group-settings'
+                className={({ isActive }) =>
+                  isActive ? 'block font-700 capitalize' : 'block capitalize'
+                }
+                onClick={() => dispatch(dashboardActions.closeSidebar())}
+              >
+                Group Settings
+              </NavLink>
+            </li>
           </>
         )}
       </ul>
-      <div className='text-[10px] text-slate-300 absolute bottom-0 left-0 mt-10 mx-4'>
-        <small>Developed by Oyediran Emmanuel</small>
+      <div className='text-[10px] text-slate-300 relative'>
+        <small className='absolute bottom-0 left-0 mt-10 mb-2 mx-4'>
+          Developed by Oyediran Emmanuel
+        </small>
       </div>
     </aside>
   );

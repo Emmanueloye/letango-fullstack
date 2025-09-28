@@ -186,10 +186,16 @@ const GroupView = () => {
 export default GroupView;
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  await queryClient.ensureQueryData({
+  const groupData = await queryClient.ensureQueryData({
     queryKey: ['fetchGroup', params.groupId],
     queryFn: () => getData({ url: `/groups/${params.groupId}` }),
   });
+
+  if (!groupData.group.isActive) {
+    queryClient.invalidateQueries({ queryKey: ['fetchGroup'] });
+
+    return redirect(`/account/manage-group/view/${params.groupId}/inactive`);
+  }
 
   await queryClient.ensureQueryData({
     queryKey: ['fetchChat', params.groupId],

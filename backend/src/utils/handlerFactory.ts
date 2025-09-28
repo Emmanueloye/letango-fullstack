@@ -153,8 +153,6 @@ export const updateOne = ({
       excludedFields,
     });
 
-    console.log(filteredObj);
-
     let doc;
 
     if (queryKey) {

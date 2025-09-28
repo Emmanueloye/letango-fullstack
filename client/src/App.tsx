@@ -168,6 +168,13 @@ import StatementGroup, {
 import MemberAdmission, {
   loader as memberAdmissionLoader,
 } from './pages/userGroupMgt/MembersAdmission';
+import GroupSettings, {
+  loader as groupSettingsLoader,
+  action as groupSettingsAction,
+} from './pages/admin/groupManager/GroupSettings';
+import InactiveGroup, {
+  loader as inactiveGroupLoader,
+} from './pages/userGroupMgt/InactiveGroup';
 
 const router = createBrowserRouter([
   {
@@ -296,6 +303,11 @@ const router = createBrowserRouter([
 
             children: [
               { index: true, element: <GroupView />, loader: groupViewLoader },
+              {
+                path: 'inactive',
+                element: <InactiveGroup />,
+                loader: inactiveGroupLoader,
+              },
               {
                 path: 'contribute',
                 element: <GroupContribute />,
@@ -525,6 +537,12 @@ const router = createBrowserRouter([
                 loader: statementGroupLoader,
               },
             ],
+          },
+          {
+            path: 'group-settings',
+            element: <GroupSettings />,
+            loader: groupSettingsLoader,
+            action: groupSettingsAction,
           },
         ],
       },

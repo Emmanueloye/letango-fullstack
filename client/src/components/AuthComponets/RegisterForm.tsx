@@ -98,7 +98,7 @@ const RegisterForm = ({ error }: { error?: string }) => {
             </div>
             {/* Submit buttton */}
             <Button
-              btnText={state === 'submitting' ? 'Logging in' : 'Login'}
+              btnText={state === 'submitting' ? 'Registering...' : 'Register'}
               btnType='submit'
               disabled={state === 'submitting'}
             />

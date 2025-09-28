@@ -12,6 +12,7 @@ import DataTableUI, { Row } from '../../../components/UI/DataTable';
 import TableAction from '../../../components/UI/TableAction';
 import Empty from '../../../components/UI/Empty';
 import Pagination from '../../../components/UI/Pagination';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 
 const GroupManager = () => {
   const params = useLoaderData();
@@ -58,11 +59,20 @@ const GroupManager = () => {
       name: 'ACTION',
       cell: (row: Row) => {
         return (
-          <TableAction
-            editUrl={`/account/admin/group-manager/edit/${row?.groupRef}`}
-            viewUrl={`/account/admin/group-manager/view/${row?.groupRef}`}
-            id={row?._id as string}
-          />
+          <>
+            <TableAction
+              editUrl={`/account/admin/group-manager/edit/${row?.groupRef}`}
+              viewUrl={`/account/admin/group-manager/view/${row?.groupRef}`}
+              id={row?._id as string}
+            />
+            <div>
+              {row?.isActive ? (
+                <FaCheck className='text-green-600 ml-4' />
+              ) : (
+                <FaTimes className='text-rose-500 ml-4' />
+              )}
+            </div>
+          </>
         );
       },
     },

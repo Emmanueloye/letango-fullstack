@@ -16,6 +16,7 @@ import {
   queryClient,
 } from '../../../helperFunc.ts/apiRequest';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 const EditAdminGroup = () => {
   const params = useParams();
@@ -27,6 +28,12 @@ const EditAdminGroup = () => {
         url: `/groups/admin/${params?.id}`,
       }),
   });
+
+  const [groupStatus, setGroupStatus] = useState(
+    data?.group?.isActive ? 'true' : 'false'
+  );
+
+  console.log(groupStatus);
 
   const groupType = [
     'Peer Contribution',
@@ -73,8 +80,10 @@ const EditAdminGroup = () => {
                   (item) =>
                     item.toLowerCase() !== data?.group?.groupType.toLowerCase()
                 )
-                ?.map((el) => (
-                  <option value={el}>{el}</option>
+                ?.map((el, i) => (
+                  <option value={el} key={i}>
+                    {el}
+                  </option>
                 ))}
             </select>
           </div>
@@ -89,8 +98,10 @@ const EditAdminGroup = () => {
                   (el) =>
                     el.toLowerCase() !== data?.group?.groupPurpose.toLowerCase()
                 )
-                .map((item) => (
-                  <option value={item}>{item}</option>
+                .map((item, i) => (
+                  <option value={item} key={i}>
+                    {item}
+                  </option>
                 ))}
             </select>
           </div>
@@ -116,6 +127,38 @@ const EditAdminGroup = () => {
             className='resize-y'
           ></textarea>
         </div>
+        {/* Group status settings */}
+        <Title title='group status' />
+        <div className='lg:grid lg:grid-cols-2 gap-4'>
+          <div className='w-full mb-4 lg:mb-0'>
+            <label htmlFor='isActive'>group name</label>
+            <select
+              name='isActive'
+              id='isActive'
+              onChange={(e) => setGroupStatus(e.target.value)}
+            >
+              <option value={data?.group?.isActive ? 'true' : 'false'}>
+                {data?.group?.isActive ? 'Active' : 'Inactive'}
+              </option>
+              <option value={!data?.group?.isActive ? 'true' : 'false'}>
+                {!data?.group?.isActive ? 'Active' : 'Inactive'}
+              </option>
+            </select>
+          </div>
+          {groupStatus === 'false' && (
+            <div className='w-full mb-4 lg:mb-0'>
+              <label htmlFor='reason'>Reason for Deactivation</label>
+              <textarea
+                name='reason'
+                id='reason'
+                rows={3}
+                cols={3}
+                defaultValue={data?.group?.reason}
+              ></textarea>
+            </div>
+          )}
+        </div>
+
         <div className='mt-3'>
           <Button btnText='save' btnType='submit' />
         </div>

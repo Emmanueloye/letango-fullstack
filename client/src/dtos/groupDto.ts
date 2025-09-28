@@ -9,6 +9,7 @@ export type Group = {
   groupDescription: string;
   owner: string;
   groupBalance: number;
+  isActive: boolean;
   approvalAuthorities: string[];
   groupCode?: string;
   createdAt: string;

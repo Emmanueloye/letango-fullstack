@@ -31,6 +31,7 @@ import approvalRouter from './features/approval/approvalRoutes';
 import withdrawalRouter from './features/withdrawal/withdrawalRoutes';
 import chatRouter from './features/chat/chatRoutes';
 import groupReportRouter from './features/groupReport/groupReportRoutes';
+import groupSettingRouter from './features/settings/groupSettingRoutes';
 
 // setup the application
 /**
@@ -104,6 +105,7 @@ app.use('/api/v1/approvals', approvalRouter);
 app.use('/api/v1/withdrawals', withdrawalRouter);
 app.use('/api/v1/chats', chatRouter);
 app.use('/api/v1/group-reports', groupReportRouter);
+app.use('/api/v1/group-settings', groupSettingRouter);
 
 //==================== send the html file for all routes =================//
 app.get(/^\/(?!api).*/, (req: Request, res: Response) => {

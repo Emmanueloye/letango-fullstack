@@ -60,6 +60,8 @@ const groupSchema = new Schema({
     type: String,
     unique: true,
   },
+  isActive: { type: Boolean, default: true },
+  reason: String,
   createdAt: {
     type: Date,
     default: Date.now(),

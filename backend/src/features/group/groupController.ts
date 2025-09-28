@@ -1,107 +1,125 @@
 import Group from './groupModel';
 import FundClass from '../groupExpenseHead/FundClassificationModel';
 import Member from '../members/memberModel';
+import GroupSetting from '../settings/groupSettingModel';
 import AppError from '../../errors';
 import * as factory from '../../utils/handlerFactory';
 import * as utils from '../../utils';
 import { NextFunction, Request, Response } from 'express';
-import { startSession } from 'mongoose';
-import { auditLog } from '../log/logController';
+import { ClientSession, startSession } from 'mongoose';
+// import { auditLog } from '../log/logController';
 import statusCodes from '../../errors/statusCodes';
 import sharp from 'sharp';
 import { v2 as cloudinary } from 'cloudinary';
 
 export const uploadImage = utils.upload.single('photo');
 
+// Function that creates a new group.
+const createNewGroup = async (req: Request, session: ClientSession) => {
+  const group = await Group.create(
+    [
+      {
+        groupRef: `GP-${utils.generateUniqueId(8)}`.toUpperCase(),
+        groupName: req.body.groupName,
+        groupType: req.body.groupType,
+        groupPurpose: req.body.groupPurpose,
+        photo: req.body.photo,
+        photoPublicId: req.body.photoPublicId,
+        groupDescription: req.body.groupDescription,
+        owner: req.user.id,
+        groupCode: utils.generateUniqueId(10),
+      },
+    ],
+    { session }
+  );
+
+  // create member
+  await Member.create(
+    [
+      {
+        memberId: req.user.id,
+        groupId: group[0]._id,
+        groupRef: group[0].groupRef,
+        memberName: `${req.user.surname} ${req.user.otherNames}`,
+        role: 'owner',
+        status: true,
+      },
+    ],
+    { session }
+  );
+};
+
 export const createGroup = async (req: Request, res: Response) => {
   // Initiate the session
   const session = await startSession();
-  let changeMade = 'create group and creator added as member.';
+
+  // Get the group settings
+  const settings = await GroupSetting.find();
+  // Get the number of groups created
+  const userCreatedGroups = await Group.find({
+    groupType: 'Peer contribution',
+    owner: req.user.id,
+  });
 
   await session.withTransaction(async () => {
     // create new group
-    const group = await Group.create(
-      [
-        {
-          groupRef: `GP-${utils.generateUniqueId(8)}`.toUpperCase(),
-          groupName: req.body.groupName,
-          groupType: req.body.groupType,
-          groupPurpose: req.body.groupPurpose,
-          photo: req.body.photo,
-          photoPublicId: req.body.photoPublicId,
-          groupDescription: req.body.groupDescription,
-          owner: req.user.id,
-          groupCode: utils.generateUniqueId(10),
-        },
-      ],
-      { session }
-    );
 
-    // Only create default expense and income head when it is not peer contribution.
-    if (['association', 'club'].includes(req.body.groupType.toLowerCase())) {
-      // create default income and expense head
-      const defaultIncomeHeads = [
-        'annual subscription',
-        'weekly dues',
-        'monthly levy',
-      ];
-
-      const defaultExpenseHeads = ['events', 'salaries & wages', 'others'];
-
-      // Save default income head
-      for (const incomeHead of defaultIncomeHeads) {
-        await FundClass.create(
-          [
-            {
-              groupRef: group[0].groupRef,
-              groupId: group[0]._id,
-              head: incomeHead,
-              headType: 'income',
-            },
-          ],
-          { session }
-        );
-      }
-      // Save default expense head
-      for (const expenseHead of defaultExpenseHeads) {
-        await FundClass.create(
-          [
-            {
-              groupRef: group[0].groupRef,
-              groupId: group[0]._id,
-              head: expenseHead,
-              headType: 'expense',
-            },
-          ],
-          { session }
+    if (['peer contribution'].includes(req.body.groupType.toLowerCase())) {
+      //
+      if (userCreatedGroups.length >= settings[0].cGroupLimit) {
+        throw new AppError.BadRequest(
+          'You have reach the maximum limit of group you can create. Please upgrade.'
         );
       }
 
-      changeMade =
-        'create group, default group income and expense head and creator added as member.';
+      // Create the group
+      await createNewGroup(req, session);
     }
 
-    // create member
-    await Member.create(
-      [
-        {
-          memberId: req.user.id,
-          groupId: group[0]._id,
-          groupRef: group[0].groupRef,
-          memberName: `${req.user.surname} ${req.user.otherNames}`,
-          role: 'owner',
-        },
-      ],
-      { session }
-    );
+    // Only create default expense and income head when it is not peer contribution.
+    // if (['association', 'club'].includes(req.body.groupType.toLowerCase())) {
+    //   // create default income and expense head
+    //   const defaultIncomeHeads = [
+    //     'annual subscription',
+    //     'weekly dues',
+    //     'monthly levy',
+    //   ];
 
-    // Create audit log
-    auditLog({
-      requester: req.user.id,
-      action: 'create',
-      change: changeMade,
-      targetGroup: group[0]._id,
-    });
+    //   const defaultExpenseHeads = ['events', 'salaries & wages', 'others'];
+
+    //   // Save default income head
+    //   for (const incomeHead of defaultIncomeHeads) {
+    //     await FundClass.create(
+    //       [
+    //         {
+    //           groupRef: group[0].groupRef,
+    //           groupId: group[0]._id,
+    //           head: incomeHead,
+    //           headType: 'income',
+    //         },
+    //       ],
+    //       { session }
+    //     );
+    //   }
+    //   // Save default expense head
+    //   for (const expenseHead of defaultExpenseHeads) {
+    //     await FundClass.create(
+    //       [
+    //         {
+    //           groupRef: group[0].groupRef,
+    //           groupId: group[0]._id,
+    //           head: expenseHead,
+    //           headType: 'expense',
+    //         },
+    //       ],
+    //       { session }
+    //     );
+    //   }
+
+    //   // changeMade =
+    //   //   'create group, default group income and expense head and creator added as member.';
+    // }
+
     res
       .status(statusCodes.CREATED)
       .json({ status: 'success', message: 'Group created successfully.' });
@@ -123,7 +141,7 @@ export const adminUpdateGroup = factory.updateOne({
   label: 'group',
   queryKey: 'groupRef',
   excludedFields: ['groupBalance', 'approvalAuthorities', 'groupCode', 'owner'],
-  log: true,
+  // log: true,
 });
 
 export const getGroups = factory.getAll({ Model: Group, label: 'groups' });

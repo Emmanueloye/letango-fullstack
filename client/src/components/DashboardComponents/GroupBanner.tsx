@@ -47,6 +47,12 @@ const GroupBanner = ({ group }: { group: Group }) => {
           <span className='font-600 capitalize'>group description: </span>
           <span className='text-justify'>{group?.groupDescription}</span>
         </div>
+        <div className='mb-2'>
+          <span className='font-600 capitalize'>group status: </span>
+          <span className='text-justify'>
+            {group?.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
         <div className='flex flex-wrap gap-2'>
           <LinkBtn
             btnText='manage rules'

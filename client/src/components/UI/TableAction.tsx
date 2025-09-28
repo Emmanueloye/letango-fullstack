@@ -47,6 +47,7 @@ const TableAction = ({
       >
         <FaEye />
       </Link>
+
       {showUserAction && (
         <select className='p-1 w-25 capitalize' onChange={handleOnChange}>
           <option value={userStatus}>{userStatus}</option>
