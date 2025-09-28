@@ -8,7 +8,7 @@ const CreateGroupForm = () => {
   return (
     <div className='w-full lg:w-4/5 lg:mx-auto bg-gray-100 dark:bg-slate-800 p-2.5 lg:p-4 rounded-lg'>
       {/* Form title */}
-      <Title title='create new group' />
+      <Title title='new contribution' />
       <Form id='createGroup' method='post' encType='multipart/form-data'>
         {error?.status === 'fail' && <FormError error={error.message} />}
         {/* Group name input */}
@@ -35,13 +35,7 @@ const CreateGroupForm = () => {
             group type
           </label>
           <select name='groupType' id='groupType'>
-            <option value='' hidden>
-              Select group type
-            </option>
             <option value='Peer contribution'>Peer contribution</option>
-            <option value='Association'>Association</option>
-            <option value='Club'>Club</option>
-            <option value='Crowd funding'>Crowd funding</option>
           </select>
         </div>
         {/* Group purpose input */}
@@ -54,13 +48,7 @@ const CreateGroupForm = () => {
           </label>
 
           <select name='groupPurpose' id='groupPurpose'>
-            <option value='' hidden>
-              Select group purpose
-            </option>
             <option value='Group contribution'>Group contribution</option>
-            <option value='Community portfolio'>Community portfolio</option>
-            <option value='Special project'>Special project</option>
-            <option value='Fund raising'>Fund raising</option>
           </select>
         </div>
         {/* Group logo */}
@@ -80,7 +68,7 @@ const CreateGroupForm = () => {
 
           <textarea name='groupDescription' id='description'></textarea>
         </div>
-        <Button btnText='create group' btnType='submit' />
+        <Button btnText='create Contribution' btnType='submit' />
       </Form>
     </div>
   );

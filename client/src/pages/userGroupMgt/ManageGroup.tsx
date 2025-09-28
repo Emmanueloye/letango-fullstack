@@ -28,12 +28,20 @@ const ManageGroup = () => {
 
   return (
     <section>
-      <Link
-        to='/account/manage-group/create-group'
-        className='bg-primary-500 text-slate-50 px-3 py-2 rounded-md capitalize font-600 mt-1 mb-4'
-      >
-        create group
-      </Link>
+      <div className='flex gap-2 flex-wrap'>
+        <Link
+          to='/account/manage-group/create-group'
+          className='bg-primary-500 text-slate-50 px-3 py-2 rounded-md capitalize font-600 mt-1 mb-4'
+        >
+          New Contribution
+        </Link>
+        <Link
+          to='/account/manage-group/create-group' // to be updated
+          className='bg-primary-500 text-slate-50 px-3 py-2 rounded-md capitalize font-600 mt-1 mb-4'
+        >
+          New Club & Association
+        </Link>
+      </div>
 
       {data?.userGroups?.length > 0 ? (
         <>
